@@ -104,7 +104,37 @@ testmapdata = Map2 (
          "#   #",
          "#  T#",
          "#####"])
-
+         
+testmapdataR = " Map2 (     \
+\    ElemDescription [       \
+\        ElemProp (          \
+\            ElemChar '#',   \
+\            ElemColor 1,    \
+\            ElemName \"Wall\",\
+\            ElemPropertys [Ppassable False])\
+\        ,\
+\        ElemProp (ElemChar 'T', \
+\            ElemColor 2,        \
+\            ElemName \"Tree\",    \
+\            ElemPropertys [Ppassable False])\
+\        ,\
+\        ElemProp (ElemChar ' ', \
+\            ElemColor 0,        \
+\            ElemName \"Stone floor\",\
+\            ElemPropertys [Ppassable True])\
+\    ],\
+\    --CharLocalmap \
+\    inputMapFromStrings\
+\        [\"#####\",   \
+\         \"#   #\",   \
+\         \"#   #\",   \
+\         \"#  T#\",   \
+\         \"#####\"])"
+-- такое мы должны получить. как сохранить и прочитать в текст?
+-- то есть должны быть функции
+--readMap2 :: String -> Map2
+--writeMap2 :: Map2 -> String
+-- надо просто методы showForSave
 
 main = do 
 {-	print "#####"
@@ -114,7 +144,7 @@ main = do
 	print "#####"  -}
 	--print (CharLocalmap $ Lmap [stringTolistMapChar "###!!.###"])
 	--print (inputMapFromStrings ["!@#","abc"])
-    --print testmapdata
+    print testmapdataR
 
     
     
