@@ -152,6 +152,23 @@ testmapdataR1 = read testmapdataR
 -- собственно.. это и получились сами read & show
 -- чтож, теперь надо эти данные задействовать.
 -- сначала добавим игрока(на карту и ссылочную точку для доступа)
+data Player = Player Point  deriving (Show, Read)
+data Point = Point{px::Int, py::Int}  deriving (Show, Read)
+testplayer = Player Point{px=1, py=1}
+-- далее функции перемещения игрока, с "изменением" структур его и карты
+-- двиг игрок :: мир (карта игрок) куда -> новый мир
+-- добавим мир
+data World = World (Map2, Player) deriving (Show, Read) -- так что можно сохр и загр весь мир, как и передавать по сети
+data Direction = North | South | East | West
+movePlayer :: World->Direction->World
+movePlayer w@(World (m, (Player p))) d = case d of 
+    North -> World (m , Player p{px=px p - 1})
+    South -> World (m , Player p{px=px p + 1})
+    East -> World (m , Player p{py=py p + 1})
+    West -> World (m , Player p{py=py p - 1})
+
+testworld = World (testmapdata, testplayer)
+-- сделать showmap для мира
 
 
 main = do 
@@ -164,6 +181,8 @@ main = do
 	--print (inputMapFromStrings ["!@#","abc"])
     print testmapdataR
     print testmapdataR1
+    print testworld
+    print $ movePlayer testworld South
 
     
     
