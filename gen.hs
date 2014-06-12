@@ -1,6 +1,6 @@
 import System.IO
 -- #!/usr/bin/env runhaskell
-
+-- import Text.JSON
 -- одна сущность - один тип
 -- карты могут быть разные (карта местности, объектов) различающиеся поведением но имеющие общее.
 -- значит будут наследоваться от общей
@@ -37,9 +37,49 @@ inputMapFromStrings [[]] = CharLocalmap $ Lmap [[]]
 inputMapFromStrings x = CharLocalmap $ Lmap $ map stringTolistMapChar x
 
 -- теперь сделаю более сложные типы объектов
-
 -- а также их преобразование из специально построенных строк описывающих карту
--- допустим так: "{item: '$';  map = ["   $  "," $$   "] "
+-- допустим так: "{"item": '$';  map = ["   $  "," $$   "] "
+-- use Json or parsec?
+-- так как же будет...
+{- пусть так описывается
+
+Map2 (
+ElemDescription [
+ElemProp (ElemChar '#'
+ElemColor 1
+ElemName "Wall"
+ElemPropertys [Ppassable False])
+,
+ElemProp (ElemChar 'T'
+ElemColor 2
+ElemName "Tree"
+ElemPropertys [Ppassable False])
+,
+ElemProp (ElemChar ' '
+ElemColor 0
+ElemName "Stone floor"
+ElemPropertys [Ppassable True])
+],
+CharLocalmap 
+["#####",
+ "#   #", 
+ "#   #",
+ "#  T#",
+ "#####"])
+
+итак имеем следующую структуру
+-}
+data Map2 = Map2 (ElemDescription, CharLocalmap)
+data ElemDescription = ElemDescription [ElemProp]
+data ElemProp = ElemProp (ElemChar, ElemColor, ElemName, ElemPropertys)
+data ElemChar = ElemChar Char
+data ElemColor = ElemColor Int
+data ElemName = ElemName String
+data ElemPropertys = ElemPropertys [ElemOthProp]
+data ElemOthProp = Ppassable Bool | Other
+-- уф, как то великовато. ну чтож...
+
+
 
 main = do 
 {-	print "#####"
