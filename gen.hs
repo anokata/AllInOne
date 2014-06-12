@@ -77,11 +77,23 @@ data ElemChar = ElemChar Char deriving (Read, Show)
 data ElemColor = ElemColor Int deriving (Read, Show)
 data ElemName = ElemName String deriving (Read, Show)
 data ElemPropertys = ElemPropertys [ElemOthProp] deriving (Read, Show)
-data ElemOthProp = Ppassable Bool | Other deriving (Read, Show)
+data ElemOthProp = Ppassable Bool | Other | IsPlayer | Item deriving (Read, Show)
 -- уф, как то великовато. ну чтож...
 -- теперь надо это как то считывать. пусть будет для примера теста
 testmapdata = Map2 (
     ElemDescription [
+        ElemProp (
+            ElemChar '@',
+            ElemColor 1,
+            ElemName "Player",
+            ElemPropertys [Other, IsPlayer])
+        ,
+        ElemProp (
+            ElemChar '$',
+            ElemColor 1,
+            ElemName "Item1",
+            ElemPropertys [Item])
+        ,
         ElemProp (
             ElemChar '#',
             ElemColor 1,
@@ -101,9 +113,9 @@ testmapdata = Map2 (
     --CharLocalmap 
     inputMapFromStrings
         ["#####",
-         "#   #", 
+         "#@  #", 
          "#   #",
-         "#  T#",
+         "#$ T#",
          "#####"])
          
 testmapdataR = " Map2 (     \
@@ -137,6 +149,10 @@ testmapdataR = " Map2 (     \
 -- надо просто методы showForSave
 testmapdataR1 :: Map2
 testmapdataR1 = read testmapdataR
+-- собственно.. это и получились сами read & show
+-- чтож, теперь надо эти данные задействовать.
+-- сначала добавим игрока(на карту и ссылочную точку для доступа)
+
 
 main = do 
 {-	print "#####"
