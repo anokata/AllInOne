@@ -5,29 +5,29 @@ import System.IO
 -- карты могут быть разные (карта местности, объектов) различающиеся поведением но имеющие общее.
 -- значит будут наследоваться от общей
 -- локальная карта(чего угодно). фиксированного размера? 
-data MapElem = MapChar Char | MapNone
-data Localmap a = Lmap [[a]]
+data MapElem = MapChar Char | MapNone deriving (Read, Show)
+data Localmap a = Lmap [[a]]  deriving (Read, Show)
 
-instance Show a => Show (Localmap a) where
-	show (Lmap x) = concatMap (concatMap show) x
+--instance Show a => Show (Localmap a) where
+showLmap (Lmap x) = concatMap (concatMap showMapElem) x
 {-
 data MapChar = MapChar Char
 instance Show MapChar where
 	show (MapChar x) = [x]
 -}
-instance Show MapElem where
-	show (MapChar x) = [x]
-	show MapNone = [' ']
+--instance Show MapElem where
+showMapElem (MapChar x) = [x]
+showMapElem MapNone = [' ']
 
 stringTolistMapChar :: String -> [MapElem]
 stringTolistMapChar [] = []
 stringTolistMapChar (x:y) = MapChar x : stringTolistMapChar y
 
 -- простейшая карта с объектами символами
-data CharLocalmap = CharLocalmap (Localmap MapElem) 
+data CharLocalmap = CharLocalmap (Localmap MapElem)  deriving (Read, Show)
 -- даже почти не надо доопределять show?
-instance Show CharLocalmap where
-	show (CharLocalmap x) = show x
+--instance Show CharLocalmap where
+showCharLocalmap (CharLocalmap x) = showLmap x
 
 -- теперь хочу: пусть будет список строк - простая карта, будет фун для преобразования 
 -- этого в карту
@@ -69,14 +69,15 @@ CharLocalmap
 
 итак имеем следующую структуру
 -}
-data Map2 = Map2 (ElemDescription, CharLocalmap)
-data ElemDescription = ElemDescription [ElemProp]
-data ElemProp = ElemProp (ElemChar, ElemColor, ElemName, ElemPropertys)
-data ElemChar = ElemChar Char
-data ElemColor = ElemColor Int
-data ElemName = ElemName String
-data ElemPropertys = ElemPropertys [ElemOthProp]
-data ElemOthProp = Ppassable Bool | Other
+data Map2 = Map2 (ElemDescription, CharLocalmap) deriving (Read, Show)
+data ElemDescription = ElemDescription [ElemProp] deriving (Read, Show)
+data ElemProp = ElemProp (ElemChar, ElemColor, ElemName, ElemPropertys) 
+    deriving (Read, Show)
+data ElemChar = ElemChar Char deriving (Read, Show)
+data ElemColor = ElemColor Int deriving (Read, Show)
+data ElemName = ElemName String deriving (Read, Show)
+data ElemPropertys = ElemPropertys [ElemOthProp] deriving (Read, Show)
+data ElemOthProp = Ppassable Bool | Other deriving (Read, Show)
 -- уф, как то великовато. ну чтож...
 -- теперь надо это как то считывать. пусть будет для примера теста
 testmapdata = Map2 (
@@ -122,19 +123,20 @@ testmapdataR = " Map2 (     \
 \            ElemColor 0,        \
 \            ElemName \"Stone floor\",\
 \            ElemPropertys [Ppassable True])\
-\    ],\
-\    --CharLocalmap \
-\    inputMapFromStrings\
-\        [\"#####\",   \
-\         \"#   #\",   \
-\         \"#   #\",   \
-\         \"#  T#\",   \
-\         \"#####\"])"
+\    ],"++ show
+        (inputMapFromStrings
+        ["#####",   
+         "#   #",   
+         "#   #",   
+         "#  T#",   
+         "#####"]) ++ ")"
 -- такое мы должны получить. как сохранить и прочитать в текст?
 -- то есть должны быть функции
 --readMap2 :: String -> Map2
 --writeMap2 :: Map2 -> String
 -- надо просто методы showForSave
+testmapdataR1 :: Map2
+testmapdataR1 = read testmapdataR
 
 main = do 
 {-	print "#####"
@@ -145,6 +147,7 @@ main = do
 	--print (CharLocalmap $ Lmap [stringTolistMapChar "###!!.###"])
 	--print (inputMapFromStrings ["!@#","abc"])
     print testmapdataR
+    print testmapdataR1
 
     
     
