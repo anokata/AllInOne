@@ -78,7 +78,32 @@ data ElemName = ElemName String
 data ElemPropertys = ElemPropertys [ElemOthProp]
 data ElemOthProp = Ppassable Bool | Other
 -- уф, как то великовато. ну чтож...
-
+-- теперь надо это как то считывать. пусть будет для примера теста
+testmapdata = Map2 (
+    ElemDescription [
+        ElemProp (
+            ElemChar '#',
+            ElemColor 1,
+            ElemName "Wall",
+            ElemPropertys [Ppassable False])
+        ,
+        ElemProp (ElemChar 'T',
+            ElemColor 2,
+            ElemName "Tree",
+            ElemPropertys [Ppassable False])
+        ,
+        ElemProp (ElemChar ' ',
+            ElemColor 0,
+            ElemName "Stone floor",
+            ElemPropertys [Ppassable True])
+    ],
+    --CharLocalmap 
+    inputMapFromStrings
+        ["#####",
+         "#   #", 
+         "#   #",
+         "#  T#",
+         "#####"])
 
 
 main = do 
@@ -87,6 +112,10 @@ main = do
 	print "#   #"
 	print "# $ #"
 	print "#####"  -}
-	print (CharLocalmap $ Lmap [stringTolistMapChar "###!!.###"])
-	print (inputMapFromStrings ["!@#","abc"])
+	--print (CharLocalmap $ Lmap [stringTolistMapChar "###!!.###"])
+	--print (inputMapFromStrings ["!@#","abc"])
+    --print testmapdata
+
+    
+    
 	
