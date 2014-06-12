@@ -161,7 +161,10 @@ testplayer = Player Point{px=1, py=1}
 data World = World (Map2, Player) deriving (Show, Read) -- так что можно сохр и загр весь мир, как и передавать по сети
 data Direction = North | South | East | West
 movePlayer :: World->Direction->World
-movePlayer w@(World (m, (Player p))) d = case d of 
+movePlayer w@(World (m, (Player p))) d = 
+-- проверки на возможность двиг
+-- if canMove World Dir Who(point - откуда)
+case d of 
     North -> World (m , Player p{px=px p - 1})
     South -> World (m , Player p{px=px p + 1})
     East -> World (m , Player p{py=py p + 1})
@@ -169,6 +172,18 @@ movePlayer w@(World (m, (Player p))) d = case d of
 
 testworld = World (testmapdata, testplayer)
 -- сделать showmap для мира
+
+-- переделать. всё статичное останется в массиве. а вот всё динамичнее удобнее просто списком. а искать по карте можно и сгенереной
+-- тогда мир выглядит так.. (статик-карта, список-динамик-объектов-типа1, игрок, предметы)
+data World2 = World2 (StaticMap, Player, Items) deriving (Show, Read)
+-- StaticMap состоит из статик элементов
+-- Player, Items имеют такое общее, они динамик-элементы
+-- общее всех элементов! - имя для показа при будущем экплоринге да и просто для понимания
+--      - символ id?... - свойства\(тип это уже расширенные наследованные элементы)
+-- как учесть что часть свойств элементов будет общая для всего типа и неизменная, а часть индивидуальная?. надо ли
+data Element = Element {ename::String, echar::Char} deriving (Show, Read)
+--data PlayerElement = Player {playerPlace::Point, } --ха так не понаследуешь
+class -- надо дальше учить язык особо монады и функторы
 
 
 main = do 
