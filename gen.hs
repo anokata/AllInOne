@@ -240,6 +240,13 @@ instance Functor MyMatrix where
 fromLists :: [[a]] -> MyMatrix a
 fromLists = MyMatrix
 
+myMatrixfoldl :: (a -> b -> a) -> a -> MyMatrix b -> a
+--myMatrixfoldlSC :: (String -> Char -> String) -> String -> MyMatrix Char -> String
+--myMatrixfoldlSC (\s x->s++[x]) "" matr  --> "asdf"
+myMatrixfoldl f init (MyMatrix m) = foldl (\s x-> foldl f s x) init m -- удивительно. написал интуитивно и оно таки работает сразу о_О
+
+
+
 -- фун замены карты динамик объектов из символьного представления, основываясь на описании для символов, матрицей с этими объектами
 -- описание есть DynamicElem
 fromCharMatrixToElemMatrix :: MyMatrix Char -> DynamicElem -> MyMatrix DynamicElem
@@ -255,11 +262,12 @@ elems :: DynamicElem
 elems = Elems [DynElem '$' True True, DynElem '.' True False, DynElem 'T' False False]
 dynamicObjMap2 = fromCharMatrixToElemMatrix dynamicObjMap elems
 
---showStaticMap :: MyMatrix Char -> String
---showStaticMap m = fmap (\x->)
+showStaticMap :: MyMatrix Char -> String
+showStaticMap m = myMatrixfoldl (\s x->s++[x]) "" m
 
 --showallMap :: MyMatrix Char -> MyMatrix DynamicElem -> Player -> String
 --showallMap staticMap dynamicMap player = (showPlayer player) `showOver` (showStaticMap staticMap)  `showOver` (showDynMap dynamicMap)
+--foldl1 :: (a -> a -> a) -> [a] -> a
 
 
 
@@ -276,7 +284,7 @@ main = do
     --print testworld
     --print $ movePlayer testworld South
     print dynamicObjMap2
-
+    print $ showStaticMap staticObjMap
     
     
 	
