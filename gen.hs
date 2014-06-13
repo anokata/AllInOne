@@ -1,4 +1,8 @@
 import System.IO
+import Data.Matrix
+import Data.Maybe
+import Data.List
+
 -- #!/usr/bin/env runhaskell
 -- import Text.JSON
 -- одна сущность - один тип
@@ -164,7 +168,7 @@ movePlayer :: World->Direction->World
 movePlayer w@(World (m, (Player p))) d = 
 -- проверки на возможность двиг
 -- if canMove World Dir Who(point - откуда)
-case d of 
+    case d of 
     North -> World (m , Player p{px=px p - 1})
     South -> World (m , Player p{px=px p + 1})
     East -> World (m , Player p{py=py p + 1})
@@ -175,15 +179,69 @@ testworld = World (testmapdata, testplayer)
 
 -- переделать. всё статичное останется в массиве. а вот всё динамичнее удобнее просто списком. а искать по карте можно и сгенереной
 -- тогда мир выглядит так.. (статик-карта, список-динамик-объектов-типа1, игрок, предметы)
-data World2 = World2 (StaticMap, Player, Items) deriving (Show, Read)
+--data World2 = World2 (StaticMap, Player, Items) deriving (Show, Read)
 -- StaticMap состоит из статик элементов
 -- Player, Items имеют такое общее, они динамик-элементы
 -- общее всех элементов! - имя для показа при будущем экплоринге да и просто для понимания
 --      - символ id?... - свойства\(тип это уже расширенные наследованные элементы)
 -- как учесть что часть свойств элементов будет общая для всего типа и неизменная, а часть индивидуальная?. надо ли
-data Element = Element {ename::String, echar::Char} deriving (Show, Read)
+--data Element = Element {ename::String, echar::Char} deriving (Show, Read)
 --data PlayerElement = Player {playerPlace::Point, } --ха так не понаследуешь
-class -- надо дальше учить язык особо монады и функторы
+-- любой элемент где то находится и как то печатается
+{- class MapElement a where
+    ecoord :: a -> Point
+    echar :: a -> Char
+    --имя
+-- более конкретные элементы. статичный может быть непроходим
+class (MapElement a) => MapStaticElement a where
+    passable :: a -> Bool
+    
+class (MapElement a) => MapDynamicElement a --where
+class (MapDynamicElement a) => MapPlayerElement a --where
+class (MapDynamicElement a) => MapItemElement a --where
+-}
+--instance MapPlayerElement Player where
+  --  ecoord = 
+--logic
+--data Imp a = Imp a a
+--data Ax1 a = Ax1 (Imp (Imp a a) a)
+--data A = A
+--imp :: A -> A
+--modusPonens :: 
+-- переделать. ElemDescription не обязан же быть списком or
+ -- надо дальше учить язык особо монады и функторы
+map1 =  ["#####",
+         "#$  #", 
+         "#   #",
+         "#$ T#",
+         "#####"]
+map2 =  ["     ",
+         " $  .", 
+         "     ",
+         " $ T ",
+         "     "]
+-- еденичный элемент
+data DynElem = DynElem {echar::Char, epassable::Bool} deriving (Show, Read)
+-- элемент в ячейке, нет или множество
+data DynamicElem = Nothing | Elems [DynElem] deriving (Show, Read)
+fromDynamicElem :: DynamicElem -> [DynElem]
+fromDynamicElem (Elems d) = d
+fromDynamicElem _ = error ""
+-- фун замены карты динамик объектов из символьного представления, основываясь на описании для символов, матрицей с этими объектами
+-- описание есть DynamicElem
+fromCharMatrixToElemMatrix :: Matrix Char -> DynamicElem -> Matrix DynamicElem
+fromCharMatrixToElemMatrix m d = fmap elemForChar m where
+    -- доп фун. для выбора элемента по символу из описания
+    elemForChar :: Char -> DynamicElem
+    elemForChar c = Elems [(fromMaybe (DynElem ' ' True) (find (\x->echar x == c) (fromDynamicElem d)))]
+
+staticObjMap = fromLists map1
+dynamicObjMap = fromLists map2
+--showallMap :: Matrix -> 
+--showallMap staticMap dynamicMap player =
+elems :: DynamicElem
+elems = Elems [DynElem '$' True, DynElem '.' True, DynElem 'T' False]
+dynamicObjMap2 = fromCharMatrixToElemMatrix dynamicObjMap elems
 
 
 main = do 
