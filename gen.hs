@@ -221,26 +221,27 @@ map2 =  ["     ",
          " $ T ",
          "     "]
 -- еденичный элемент
-data DynElem = DynElem {echar::Char, epassable::Bool} deriving (Show, Read)
+data DynElem = DynElem {echar::Char, epassable::Bool, eitemable::Bool} deriving (Show, Read)
 -- элемент в ячейке, нет или множество
 data DynamicElem = Nothing | Elems [DynElem] deriving (Show, Read)
 fromDynamicElem :: DynamicElem -> [DynElem]
 fromDynamicElem (Elems d) = d
 fromDynamicElem _ = error ""
+defaultDynElem = (DynElem ' ' True False)
 -- фун замены карты динамик объектов из символьного представления, основываясь на описании для символов, матрицей с этими объектами
 -- описание есть DynamicElem
 fromCharMatrixToElemMatrix :: Matrix Char -> DynamicElem -> Matrix DynamicElem
 fromCharMatrixToElemMatrix m d = fmap elemForChar m where
     -- доп фун. для выбора элемента по символу из описания
     elemForChar :: Char -> DynamicElem
-    elemForChar c = Elems [(fromMaybe (DynElem ' ' True) (find (\x->echar x == c) (fromDynamicElem d)))]
+    elemForChar c = Elems [(fromMaybe defaultDynElem (find (\x->echar x == c) (fromDynamicElem d)))]
 
 staticObjMap = fromLists map1
 dynamicObjMap = fromLists map2
 --showallMap :: Matrix -> 
 --showallMap staticMap dynamicMap player =
 elems :: DynamicElem
-elems = Elems [DynElem '$' True, DynElem '.' True, DynElem 'T' False]
+elems = Elems [DynElem '$' True True, DynElem '.' True False, DynElem 'T' False False]
 dynamicObjMap2 = fromCharMatrixToElemMatrix dynamicObjMap elems
 
 
@@ -252,10 +253,11 @@ main = do
 	print "#####"  -}
 	--print (CharLocalmap $ Lmap [stringTolistMapChar "###!!.###"])
 	--print (inputMapFromStrings ["!@#","abc"])
-    print testmapdataR
-    print testmapdataR1
-    print testworld
-    print $ movePlayer testworld South
+    --print testmapdataR
+    --print testmapdataR1
+    --print testworld
+    --print $ movePlayer testworld South
+    print dynamicObjMap2
 
     
     
