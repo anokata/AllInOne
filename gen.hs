@@ -156,23 +156,22 @@ testmapdataR1 = read testmapdataR
 -- собственно.. это и получились сами read & show
 -- чтож, теперь надо эти данные задействовать.
 -- сначала добавим игрока(на карту и ссылочную точку для доступа)
-data Player = Player Point  deriving (Show, Read)
+data Player = Player {pcoord::Point, pchar::Char} deriving (Show, Read)
 data Point = Point{px::Int, py::Int}  deriving (Show, Read)
-testplayer = Player Point{px=1, py=1}
 -- далее функции перемещения игрока, с "изменением" структур его и карты
 -- двиг игрок :: мир (карта игрок) куда -> новый мир
 -- добавим мир
 data World = World (Map2, Player) deriving (Show, Read) -- так что можно сохр и загр весь мир, как и передавать по сети
 data Direction = North | South | East | West
 movePlayer :: World->Direction->World
-movePlayer w@(World (m, (Player p))) d = 
+movePlayer w@(World (m, (Player p c))) d = 
 -- проверки на возможность двиг
 -- if canMove World Dir Who(point - откуда)
     case d of 
-    North -> World (m , Player p{px=px p - 1})
-    South -> World (m , Player p{px=px p + 1})
-    East -> World (m , Player p{py=py p + 1})
-    West -> World (m , Player p{py=py p - 1})
+    North -> World (m , Player p{px=px p - 1} c)
+    South -> World (m , Player p{px=px p + 1} c)
+    East -> World (m , Player p{py=py p + 1} c)
+    West -> World (m , Player p{py=py p - 1} c)
 
 testworld = World (testmapdata, testplayer)
 -- сделать showmap для мира
@@ -211,12 +210,12 @@ class (MapDynamicElement a) => MapItemElement a --where
 -- переделать. ElemDescription не обязан же быть списком or
  -- надо дальше учить язык особо монады и функторы
 map1 =  ["#####",
-         "#$  #", 
+         "#   #", 
          "#   #",
-         "#$ T#",
+         "#   #",
          "#####"]
 map2 =  ["     ",
-         " $  .", 
+         " $ . ", 
          "     ",
          " $ T ",
          "     "]
@@ -240,6 +239,12 @@ instance Functor MyMatrix where
 fromLists :: [[a]] -> MyMatrix a
 fromLists = MyMatrix
 
+mcols :: MyMatrix a -> Int
+mcols (MyMatrix m) = length (m!!0)
+
+mrows :: MyMatrix a -> Int
+mrows (MyMatrix m) = length m
+
 myMatrixfoldl :: (a -> b -> a) -> a -> MyMatrix b -> a
 --myMatrixfoldlSC :: (String -> Char -> String) -> String -> MyMatrix Char -> String
 --myMatrixfoldlSC (\s x->s++[x]) "" matr  --> "asdf"
@@ -256,8 +261,13 @@ fromCharMatrixToElemMatrix m d = fmap elemForChar m where
     elemForChar :: Char -> DynamicElem
     elemForChar c = Elems [(fromMaybe defaultDynElem (find (\x->echar x == c) (fromDynamicElem d)))]
 
+--обратное преобразование
+fromElemMatrixToCharMatrix :: MyMatrix DynamicElem -> MyMatrix Char
+fromElemMatrixToCharMatrix m = fmap (\(Elems x)-> echar (head x)) m 
+
 staticObjMap = fromLists map1
 dynamicObjMap = fromLists map2
+testplayer = Player Point{px=2, py=2} '@'
 
 elems :: DynamicElem
 elems = Elems [DynElem '$' True True, DynElem '.' True False, DynElem 'T' False False]
@@ -267,27 +277,37 @@ showStaticMap :: MyMatrix Char -> String
 showStaticMap m = myMatrixfoldl (\s x->s++[x]) "" m
 showStaticMap2 m = myMatrixfoldl2 (\s x->s++[x]) (\x->x++"\n") "" m
 
---showallMap :: MyMatrix Char -> MyMatrix DynamicElem -> Player -> String
---showallMap staticMap dynamicMap player = (showPlayer player) `showOver` (showStaticMap staticMap)  `showOver` (showDynMap dynamicMap)
---foldl1 :: (a -> a -> a) -> [a] -> a
+showDynMap m = showStaticMap2 (fromElemMatrixToCharMatrix m)
+
+showOver :: String -> String -> String
+showOver a b = zipWith overMap a b where
+    overMap x y | (x==y) = y
+                | (y==' ') = x
+                | otherwise = y
+
+showallMap :: MyMatrix Char -> MyMatrix DynamicElem -> Player -> String
+showallMap staticMap dynamicMap player = insertPlayer ( (showStaticMap2 staticMap)  `showOver` (showDynMap dynamicMap) ) (mcols staticMap) player
+
+insertPlayer :: String -> Int -> Player -> String
+insertPlayer s k pl@(Player xy c) = let addr = ((k+1)*(py xy)+(px xy)) in --каждая строка на 1 символ \n больше
+    (take addr s) ++ [c] ++ (drop (addr+1) s)
+
 
 
 
 main = do 
-{-	print "#####"
-	print "# @ #"
-	print "#   #"
-	print "# $ #"
-	print "#####"  -}
 	--print (CharLocalmap $ Lmap [stringTolistMapChar "###!!.###"])
 	--print (inputMapFromStrings ["!@#","abc"])
     --print testmapdataR
     --print testmapdataR1
     --print testworld
     --print $ movePlayer testworld South
-    print dynamicObjMap2
-    print $ showStaticMap staticObjMap
-    putStr $ showStaticMap2 staticObjMap
-    
+    --print dynamicObjMap2
+    --print $ showStaticMap staticObjMap
+    --putStr $ showStaticMap2 staticObjMap
+    --print $ showDynMap dynamicObjMap2
+    --putStr $ showDynMap dynamicObjMap2
+    --putStr $ (showStaticMap2 staticObjMap) `showOver` (showDynMap dynamicObjMap2)
+    putStr $ showallMap staticObjMap dynamicObjMap2 testplayer
     
 	
