@@ -244,8 +244,9 @@ myMatrixfoldl :: (a -> b -> a) -> a -> MyMatrix b -> a
 --myMatrixfoldlSC :: (String -> Char -> String) -> String -> MyMatrix Char -> String
 --myMatrixfoldlSC (\s x->s++[x]) "" matr  --> "asdf"
 myMatrixfoldl f init (MyMatrix m) = foldl (\s x-> foldl f s x) init m -- удивительно. написал интуитивно и оно таки работает сразу о_О
-
-
+--как бы так изменить чтобы оно каждое новое начало сврётки внутренней выполняло ещё фун над элементом
+--чтобы передать ей (\x->x++"\n")
+myMatrixfoldl2 f finner init (MyMatrix m) = foldl (\s x-> finner (foldl f s x)) init m
 
 -- фун замены карты динамик объектов из символьного представления, основываясь на описании для символов, матрицей с этими объектами
 -- описание есть DynamicElem
@@ -264,6 +265,7 @@ dynamicObjMap2 = fromCharMatrixToElemMatrix dynamicObjMap elems
 
 showStaticMap :: MyMatrix Char -> String
 showStaticMap m = myMatrixfoldl (\s x->s++[x]) "" m
+showStaticMap2 m = myMatrixfoldl2 (\s x->s++[x]) (\x->x++"\n") "" m
 
 --showallMap :: MyMatrix Char -> MyMatrix DynamicElem -> Player -> String
 --showallMap staticMap dynamicMap player = (showPlayer player) `showOver` (showStaticMap staticMap)  `showOver` (showDynMap dynamicMap)
@@ -285,6 +287,7 @@ main = do
     --print $ movePlayer testworld South
     print dynamicObjMap2
     print $ showStaticMap staticObjMap
+    putStr $ showStaticMap2 staticObjMap
     
     
 	
