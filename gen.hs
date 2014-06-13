@@ -1,5 +1,5 @@
 import System.IO
-import Data.Matrix
+--import Data.Matrix
 import Data.Maybe
 import Data.List
 
@@ -228,9 +228,21 @@ fromDynamicElem :: DynamicElem -> [DynElem]
 fromDynamicElem (Elems d) = d
 fromDynamicElem _ = error ""
 defaultDynElem = (DynElem ' ' True False)
+
+data MyMatrix a = MyMatrix [[a]] deriving (Show, Read)
+
+myMatrixfmap :: (a -> b) -> MyMatrix a -> MyMatrix b
+myMatrixfmap f (MyMatrix m) = MyMatrix $ fmap (fmap f) m
+
+instance Functor MyMatrix where
+    fmap = myMatrixfmap
+
+fromLists :: [[a]] -> MyMatrix a
+fromLists = MyMatrix
+
 -- фун замены карты динамик объектов из символьного представления, основываясь на описании для символов, матрицей с этими объектами
 -- описание есть DynamicElem
-fromCharMatrixToElemMatrix :: Matrix Char -> DynamicElem -> Matrix DynamicElem
+fromCharMatrixToElemMatrix :: MyMatrix Char -> DynamicElem -> MyMatrix DynamicElem
 fromCharMatrixToElemMatrix m d = fmap elemForChar m where
     -- доп фун. для выбора элемента по символу из описания
     elemForChar :: Char -> DynamicElem
@@ -238,11 +250,17 @@ fromCharMatrixToElemMatrix m d = fmap elemForChar m where
 
 staticObjMap = fromLists map1
 dynamicObjMap = fromLists map2
---showallMap :: Matrix -> 
---showallMap staticMap dynamicMap player =
+
 elems :: DynamicElem
 elems = Elems [DynElem '$' True True, DynElem '.' True False, DynElem 'T' False False]
 dynamicObjMap2 = fromCharMatrixToElemMatrix dynamicObjMap elems
+
+--showStaticMap :: MyMatrix Char -> String
+--showStaticMap m = fmap (\x->)
+
+--showallMap :: MyMatrix Char -> MyMatrix DynamicElem -> Player -> String
+--showallMap staticMap dynamicMap player = (showPlayer player) `showOver` (showStaticMap staticMap)  `showOver` (showDynMap dynamicMap)
+
 
 
 main = do 
