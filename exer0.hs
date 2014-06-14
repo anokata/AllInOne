@@ -1,5 +1,5 @@
 module Void where
-import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($))
+import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($),Bool(..),otherwise)
 
 class Group a where
     e :: a
@@ -25,7 +25,12 @@ data Nat = Zero | Succ Nat deriving (Show, Eq)
 
 instance Num Nat where
     a + Zero = a
+    -- for fastest ?
+    Zero + a = a
+    (+) (Succ a) (Succ b) = Succ (Succ (a + b))
     (+) a (Succ b) = Succ (a + b)
+
+    
     negate _ = error "Not def for Nat"
     a * Zero = Zero
     a * (Succ b) = a + (a * b)
@@ -39,10 +44,27 @@ natToInteger :: Nat -> Int
 natToInteger Zero = 0
 natToInteger (Succ n) = 1+(natToInteger n)
 
+beside :: Nat -> Nat -> Bool
+beside x y | (x == (Succ y)) = True
+           | (y == (Succ x)) = True
+           | otherwise = False
 
+beside2 :: Nat -> Nat -> Bool
+beside2 x y | (x == Succ(Succ y)) = True
+           | (y == Succ(Succ x)) = True
+           | otherwise = False
+
+pow :: Nat -> Nat -> Nat
+pow a Zero = Succ Zero
+pow a (Succ Zero) = a
+pow a (Succ b) = a * pow a b
 
 main = do
     print (8::Nat)
     print (2*3 :: Nat)
     print $ natToInteger ((Succ (Succ Zero)) * (Succ (Succ (Succ Zero))))
+    --print $ natToInteger ((80::Nat)*(120::Nat))
+    print $ beside2 5 7
+    print $ natToInteger (pow 4 4)
+    
     
