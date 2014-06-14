@@ -1,5 +1,5 @@
 module Void where
-import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($),Bool(..),otherwise)
+import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($),Bool(..),otherwise,(++))
 
 class Group a where
     e :: a
@@ -59,12 +59,36 @@ pow a Zero = Succ Zero
 pow a (Succ Zero) = a
 pow a (Succ b) = a * pow a b
 
+max :: Nat -> Nat -> Nat
+max x Zero = x
+max Zero x = x
+max (Succ x) (Succ y) = Succ (max x y)
+
+data BinTree a = Leaf a | Branch (BinTree a) (BinTree a) deriving (Show, Eq)
+reverse :: BinTree a -> BinTree a
+reverse (Leaf x) = (Leaf x)
+reverse (Branch x y) = Branch (reverse y) (reverse x)
+
+depth :: BinTree a -> Nat
+depth (Leaf x) = Zero
+depth (Branch x y) = max (Succ (depth x)) (Succ (depth y))
+
+leaves :: BinTree a -> [a]
+leaves (Leaf x) = [x]
+leaves (Branch x y) = (leaves x) ++ (leaves y)
+
 main = do
     print (8::Nat)
-    print (2*3 :: Nat)
-    print $ natToInteger ((Succ (Succ Zero)) * (Succ (Succ (Succ Zero))))
+    --print (2*3 :: Nat)
+    --print $ natToInteger ((Succ (Succ Zero)) * (Succ (Succ (Succ Zero))))
     --print $ natToInteger ((80::Nat)*(120::Nat))
-    print $ beside2 5 7
-    print $ natToInteger (pow 4 4)
+    --print $ beside2 5 7
+    --print $ natToInteger (pow 4 4)
+    let a = Branch (Branch (Leaf 1) (Leaf 2)) (Branch (Leaf 3) (Branch (Leaf 3) (Leaf 4))) in
+        do print a
+           print $ reverse a
+           print $ depth a
+           print $ leaves a
+           print $ leaves (reverse a)
     
     
