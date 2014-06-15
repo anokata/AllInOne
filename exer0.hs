@@ -76,6 +76,17 @@ depth (Branch x y) = max (Succ (depth x)) (Succ (depth y))
 leaves :: BinTree a -> [a]
 leaves (Leaf x) = [x]
 leaves (Branch x y) = (leaves x) ++ (leaves y)
+{-
+data Impl a b = Impl a b -- a->b
+-- MP: A->B, A | B
+-- expr.1 impl expr.2, expr.2
+-- modusponens :: (Impl a b) -> a -> b
+-- modusponens :: IsTheorem (Impl a b) -> IsTheorem a -> IsTheorem b
+data IsTheorem = IsTheorem LogicExpr
+data LogicExpr = LogicExpr1 | LogicExpr2
+data LogicExpr1 = 
+-}
+
 
 main = do
     print (8::Nat)

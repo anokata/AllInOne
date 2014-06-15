@@ -2,7 +2,7 @@ import System.IO
 --import Data.Matrix
 import Data.Maybe
 import Data.List
-
+import System.Random
 -- #!/usr/bin/env runhaskell
 -- import Text.JSON
 -- одна сущность - один тип
@@ -64,6 +64,7 @@ stringTolistMapChar (x:y) = MapChar x : stringTolistMapChar y
 
 -- простейшая карта с объектами символами
 data CharLocalmap = CharLocalmap (Localmap MapElem)  deriving (Read, Show)
+--или лучше type CharLocalmap = Localmap MapElem --!!
 
 showCharLocalmap (CharLocalmap x) = showLmap x
 
@@ -75,6 +76,7 @@ inputMapFromStrings [[]] = CharLocalmap $ Lmap [[]]
 inputMapFromStrings x = CharLocalmap $ Lmap $ map stringTolistMapChar x
 
 {- итак имеем следующую структуру -}
+-- ТОЖЕ чаще исп синонимы
 data Map2 = Map2 (ElemDescription, CharLocalmap) deriving (Read, Show)
 data ElemDescription = ElemDescription [ElemProp] deriving (Read, Show)
 data ElemProp = ElemProp (ElemChar, ElemColor, ElemName, ElemPropertys) 
@@ -195,6 +197,39 @@ fromDynamicElem (Elems d) = d
 fromDynamicElem _ = error ""
 defaultDynElem = (DynElem ' ' True False)
 
+stdElemWall = DynElem '#' False False
+--genLabirynt sizex sizey seed
+-- fromLists replicate sizey [replicate sizex defaultDynElem]
+-- choose rand point. choose rand: 
+--  choose rand direction, choose rand nums of tunel(rand len), room(rand size)
+-- let x = mkStdGen seed
+--    fst x is random num -- take `mod` n
+--    snd x is next generator.. and take there recursive genLab
+{-
+genLabirynt :: Int -> Int -> Int -> Int -> DynamicMap -- StaticMap
+genLabirynt sizex sizey seed deep = 
+    let randGenX = (mkStdGen seed)
+        randGenY = (mkStdGen seed*2)
+        initLab = fromLists replicate sizey [replicate sizex defaultDynElem]
+        in genLabiryntRecurs initLab randGenX randGenY deep
+        where 
+            genLabiryntRecurs lab genX genY deep curX curY = 
+                -- выберем точку
+                rx = (fst genX) `mod` sizex
+                ry = (fst genY) `mod` sizey
+                -- выберем количество направлений
+                dirs = (fst genX) `mod` 4
+                -- основная генерация
+                
+                -- следующие генераторы
+                if (deep > 0) then
+                genLabiryntRecurs lab (snd genX) (snd genY) (deep-1)
+                else lab
+
+-}
+
+type StaticMap = MyMatrix Char
+type DynamicMap = MyMatrix DynamicElem
 
 staticObjMap = fromLists map1
 dynamicObjMap = fromLists map2
