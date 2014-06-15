@@ -220,7 +220,8 @@ genLabirynt sizex sizey seed deep =
                 -- выберем количество направлений
                 dirs = (fst genX) `mod` 4
                 -- основная генерация
-                
+                genTunel :: DynamicMap ->  -> DynamicMap
+                genTunel lab x y len wid
                 -- следующие генераторы
                 if (deep > 0) then
                 genLabiryntRecurs lab (snd genX) (snd genY) (deep-1)
@@ -260,8 +261,8 @@ insertPlayer s k pl@(Player xy c) = let addr = ((k+1)*(py xy)+(px xy)) in --ка
 
 
 
-
+main :: IO ()
 main = do 
     putStr $ showallMap staticObjMap dynamicObjMap2 testplayer
-    
+    print "End."
 	

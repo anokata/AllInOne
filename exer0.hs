@@ -1,5 +1,6 @@
 module Void where
-import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($),Bool(..),otherwise,(++))
+import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($),Bool(..),otherwise,(++),
+    putStrLn,getLine)
 
 class Group a where
     e :: a
@@ -102,4 +103,9 @@ main = do
            print $ leaves a
            print $ leaves (reverse a)
     
+    putStrLn "Enter string:"
+    s <- getLine
+    --putStrLn $ toUpper s
+    
+    print "End."
     
