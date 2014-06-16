@@ -8,6 +8,7 @@ import Control.Exception
 showcmd = ["show","s","view","v"]
 delcmd  = ["del","d","delete","remove","r"]
 addcmd  = ["add","a","+"]
+bumpcmd  = ["bump","b","top"]
 -- cmd arg format: menu cmd file [arg]
 help = "use menu CMD FILE [ARG]\n where\n CMD=show or del or add"
 err_more = "need more arguments: "++help
@@ -17,6 +18,7 @@ dispatch [] = (\x-> putStrLn err_more)
 dispatch x | x `elem` showcmd = showcmdF
 dispatch x | x `elem` addcmd = addcmdF
 dispatch x | x `elem` delcmd = delcmdF
+dispatch x | x `elem` bumpcmd = bumpcmdF
 
 showcmdF :: [String] -> IO ()
 showcmdF []  = putStrLn err_more
@@ -49,7 +51,23 @@ delcmdF (file:sn:_) = do
             removeFile file
             renameFile tempName file)
     --writeFile file (unlines $ delete (elements !! n) elements)
-    
+
+
+bumpcmdF :: [String] -> IO ()
+bumpcmdF (file:sn:_) = do
+    let n = read sn
+    strings <- readFile file
+    let elements = lines strings 
+        newElements = unlines $ (elements !! n) : (delete (elements !! n) elements)
+    bracketOnError (openTempFile "." "temp") 
+        (\(tempName, tempHandle)-> do -- в случае ошибки освобождаем
+            hClose tempHandle
+            removeFile tempName)
+        (\(tempName, tempHandle)-> do -- пытаемся делать?
+            hPutStr tempHandle newElements
+            hClose tempHandle
+            removeFile file
+            renameFile tempName file)
 
 main = do
     (cmd:args) <- getArgs
