@@ -1,4 +1,5 @@
 import System.IO
+import Data.Time
 
 main = do 
     handle <- openFile "test.txt" ReadMode
@@ -13,4 +14,10 @@ main = do
     
     c <- readFile "test.txt" 
     print c
+    
+    time <- getCurrentTime
+    zone <- getCurrentTimeZone
+    print $ utcToLocalTime utc time
+    print $ utcToLocalTime zone time
+    
     
