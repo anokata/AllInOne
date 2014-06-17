@@ -224,7 +224,7 @@ genLabirynt sizex sizey seed deep =
                 ry = rynm `mod` sizey
                 -- выберем количество направлений
                 dirs = dirnm `mod` 4 -}
-                (rx, genX2) = (randomR (0, sizeX) genX)
+                (rx, genX2) = (randomR (0, sizeX) genX) :: (Int, StdGen)
                 (rx, genY2) = (randomR (0, sizeY) genY)
                 (dir, genX3) = (randomR (1,4) genX2)
                 (_, genY3) = (randomR (1,2) genY2)
@@ -237,6 +237,11 @@ genLabirynt sizex sizey seed deep =
                 genLabiryntRecurs lab genX3 genY3 (deep-1)
                 else lab
 
+--in where main:
+genLabirynt :: IO ()...
+ do gen <- getStdGen
+    let (seed, _) = random gen
+    genLabirynt ...seed
 -}
 
 type StaticMap = MyMatrix Char
