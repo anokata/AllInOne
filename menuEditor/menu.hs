@@ -5,6 +5,8 @@ import Data.List
 import System.Directory
 import Control.Exception
 
+-- TODO: submenu
+
 showcmd = ["show","s","view","v"]
 delcmd  = ["del","d","delete","remove","r"]
 addcmd  = ["add","a","+"]

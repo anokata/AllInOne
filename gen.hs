@@ -215,16 +215,26 @@ genLabirynt sizex sizey seed deep =
         where 
             genLabiryntRecurs lab genX genY deep curX curY = 
                 -- выберем точку
-                rx = (fst genX) `mod` sizex
-                ry = (fst genY) `mod` sizey
+                let
+                {-(rxnm, genX2) = (random genX)
+                (rynm, genY2) = (random genY)
+                (dirnm, genX3) = (random genX2)
+                (_, genY3) = (random genY2)
+                rx = rxnm `mod` sizex 
+                ry = rynm `mod` sizey
                 -- выберем количество направлений
-                dirs = (fst genX) `mod` 4
+                dirs = dirnm `mod` 4 -}
+                (rx, genX2) = (randomR (0, sizeX) genX)
+                (rx, genY2) = (randomR (0, sizeY) genY)
+                (dir, genX3) = (randomR (1,4) genX2)
+                (_, genY3) = (randomR (1,2) genY2)
+                
                 -- основная генерация
                 genTunel :: DynamicMap ->  -> DynamicMap
                 genTunel lab x y len wid
                 -- следующие генераторы
                 if (deep > 0) then
-                genLabiryntRecurs lab (snd genX) (snd genY) (deep-1)
+                genLabiryntRecurs lab genX3 genY3 (deep-1)
                 else lab
 
 -}
