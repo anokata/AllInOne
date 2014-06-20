@@ -1,7 +1,7 @@
 module RPlayer(Player(..)) where
 
 import Data.List
-import RMap
+import Point
 
 type Stat = Int
 
@@ -21,7 +21,7 @@ data Player = Player {getPlayerCoord :: Point,
 --tests
 testplayer = Player $ Point 0 0
 --test main
--- {-
+ {-
 main = do
-    print testplayer
--- -}
+    --print testplayer
+ -}
