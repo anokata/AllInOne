@@ -238,10 +238,13 @@ genLabirynt sizex sizey seed deep =
                 else lab
 
 --in where main:
-genLabirynt :: IO ()...
+genLabirynt :: IO DynamicMap
  do gen <- getStdGen
     let (seed, _) = random gen
-    genLabirynt ...seed
+    genLabirynt 20 20 10 seed
+-}
+{-
+
 -}
 
 type StaticMap = MyMatrix Char

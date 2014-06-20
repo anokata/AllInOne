@@ -3,12 +3,17 @@ import Prelude (Show(..), Eq(..), Num(..),error,print,Int,($),Bool(..),otherwise
     putStrLn,getLine)
 
 class Group a where
-    e :: a
+    groupE :: a
     groupPlus :: a -> a -> a
-    inv :: a -> a
+    groupInv :: a -> a
    -- e + a == a
    -- (inv a) + a == e
+
 {-
+class + instance - это структура математическая
+data -  это объекты
+функции это ... функции, отображения
+
 data SystemConfig = SystemConfig [Config] -- конфиг системы это множество конкретных конфигов
 data Config = Config [Setting] -- конфиг это множество правильных установок
 data Setting = Setting Name Separator Expression -- установка это две имя разделитель выражение
