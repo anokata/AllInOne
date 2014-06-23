@@ -19,11 +19,13 @@ data Cell =  Cell {cellItems::Items, cellBuildings::Buildings, cellPlayer::Maybe
 
 data ItItem = ItItem {itemName::String, itemChar::Char} deriving (Show)
 data Item = Item {itemID::ItItem, itemCount::Int} deriving (Show)
-data BuildingID = BuildingID {buildingDescription::String, buildingChar::Char} deriving (Show)
+data BuildingID = BuildingID {buildingDescription::String, buildingChar::Char, 
+    buildingPassable::Bool} deriving (Show)
 data Building = Building {buildingID::BuildingID} deriving (Show)
 type MiniMap = [Cell]
 data WorldMap = WorldMap {minimaps::[MiniMap], minimapWidth::Int, minimapHeight::Int, wmapWidth::Int
     --current minimap
+    currentMM::Point
     } deriving (Show)
 
 addrForPoint :: Point -> Int -> Int
@@ -53,10 +55,22 @@ getCellChar c =
 insertEveryN :: [a] -> [a] -> Int -> [a]
 insertEveryN [] _ _ = []
 insertEveryN _ _ 0 = []
---insertEveryN 
 insertEveryN x i n = (take n x) ++ i ++ (insertEveryN (drop n x) i n)
 
---TODO: фун для адресации ячеек. фун отображения лок карты. поиск? игрока. 
+type CellAddr = Int
+
+getCurrentMinimap :: WorldMap -> MiniMap
+getCurrentMinimap w = (minimaps w) !! (addrForPoint (currentMM w))
+
+movePlayer :: WorldMap -> Point -> Point -> WorldMap
+movePlayer w s d  = 
+    let m = getCurrentMinimap w
+        sourceAddr = addrForPoint s
+        destAddr   = addrForPoint d
+    in
+        w{minimaps=}
+
+--TODO: поиск? игрока. двигать игрока. смена ячейки (адр яч). двиг игрока(яч из, яч куд)
 --test
 i1 = ItItem "potion" '!'
 i2 = ItItem "something" '$'
@@ -64,8 +78,8 @@ i11 = Item i1 1
 i22 = Item i2 1
 is1 = [i11]
 is2 = [i22]
-b1 = BuildingID "" '#'
-b11 = Building b1
+b1 = BuildingID "" '#' False
+b11 = Building b1 
 bs = [b11]
 --c = Cell is bs p
 p = Player (Point 0 1) "z" 1 1 1 1 '@'

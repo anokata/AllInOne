@@ -4,7 +4,12 @@
 import qualified Graphics.Vty as VT
 import Graphics.Vty.Picture
 import Graphics.Vty.Attributes
-import Control.Concurrent(threadDelay)
+import Control.Concurrent --(threadDelay, forkIO)
+import Control.Monad(forever)
+import System.Exit
+
+discard :: Functor f => f a -> f ()
+discard = fmap (const ())
 
 blockFull = '\x2588'
 horBlock = replicate 20 blockFull
@@ -37,17 +42,42 @@ framedList l w attr =
         lWalla = lWall attr
         drawList = foldl (\acc x->acc <-> lWalla <|> (string attr x) <|> (translate (w - length x, 0) lWalla)) empty_image l
 
+repaintOnEvent :: (VT.Event, VT.Vty) -> IO ()
+repaintOnEvent (e, v) = let 
+        img = framedList ["(1.)","(2.) - ","(1) list node.","abraCaDabra","------",show e] 15 defAttr
+        pic = Picture (Cursor 0 0) img (Background ' ' defAttr)
+    in
+        VT.update v pic
+
 main = do 
     v <- VT.mkVty
     
     let 
         img4 = framedList ["(1.)","(2.) - ","(1) list node.","abraCaDabra","------"] 15 defAttr
-
         pic = Picture (Cursor 0 0) img4 (Background ' ' defAttr)
-        mainloop = inputloop...
-    
+
     VT.update v pic
-    event <- VT.next_event v
-    print event
-    --threadDelay 100000
---TODO: event loop while not 'Q' & update view
+    
+    endI <- newEmptyMVar
+    
+    let inputloop = do
+            event <- VT.next_event v
+            case event of
+                (VT.EvKey k []) -> if (k == (VT.KASCII 'q')) 
+                    then do 
+                        putMVar endI ()
+                        exitSuccess 
+                        else
+                    --print event
+                    repaintOnEvent (event, v)
+                    --refresh
+                otherwise -> repaintOnEvent (event, v)
+            inputloop
+    
+    tid <- forkIO inputloop
+    
+    --wait until input write in endI
+    takeMVar endI
+    VT.shutdown v
+    
+--TODO: 
