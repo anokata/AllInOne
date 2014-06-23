@@ -1,1 +1,1 @@
-[Bookmark ("filesystem root","file://","dillo"),Bookmark ("home","file:///home/ksi","pcmanfm"),Folder "web urls" [Bookmark ("google","google.com","dillo"),Bookmark ("elementy.ru","elementy.ru","dillo")] True,Bookmark ("term","","xterm")]
+[Bookmark ("filesystem root","file://","dillo"),Bookmark ("home","file:///home/ksi","pcmanfm"),Folder ("web urls",[Bookmark ("google","google.com","dillo"),Bookmark ("elementy.ru","elementy.ru","dillo")],True),Bookmark ("term","","xterm")]
