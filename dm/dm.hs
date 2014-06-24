@@ -94,6 +94,7 @@ changeBookmarkElement (a@(Bookmark _):bs) c n e = a : (changeBookmarkElement bs 
 changeBookmarkElement (a@(Folder (_, f, _)):bs) c n e = a : (changeBookmarkElement f bs (n-1) e)
 changeBookmarkElement [] f n e = changeBookmarkElement f f n e
 
+-- да, проще избавиться от этой вложенности. и будет просто список элементов. потом возможно и список каталогов и всё. отдельно.
 
 
 handleInput :: VT.Event -> MenuState -> MenuState
@@ -180,6 +181,7 @@ emptyMenuState = (1, 1)
 --file format: bookTitle URL. Haskell data! show read.
 -- HOW? folder unexpand!?
 -- scroll
+-- переделывать структуру что ли? дерево или как? или может по другому, отдельно выбор каталога.. но каталоги тож могут быть вложенными?
 type BookmarksFile = [BookmarksFileElement] 
 data BookmarksFileElement = Bookmark BookmarkE | Folder FolderE deriving (Show, Read)
 type ExecCmd = String
