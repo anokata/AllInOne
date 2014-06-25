@@ -21,14 +21,14 @@ btreefmap f (Node x) = Node (f x)
 btreefmap f (B x l r) = B (f x) (btreefmap f l) (btreefmap f r)
 
 -- проще и правильнее наверно будет с id/key значением дополнительным
-changeAt :: Btree a -> Btree a -> ? -> Btree a
+--changeAt :: Btree a -> Btree a -> ? -> Btree a
 
 {-instance Monoid Btree where
     mempty = -}
 
 --и надо всё же решить всяки упражнений. найди и выпиши все. распредели по порядку сложности. (книги,лек,(realworld) + та статья + моё)
 --TODO: +fmap fold changeAt +prettyPrint \ Same for infinity tree \ maybe monad\app instance?
-main = putStr (prettyPrintTree t) >> putStr (prettyPrintTree (fmap (\x-> log (fromIntegral x)) t))
+main = putStr (prettyPrintTree t) >> putStrLn "" >> putStr (prettyPrintTree (fmap (\x-> log (fromIntegral x)) t))
 {-
 >18
  |-77

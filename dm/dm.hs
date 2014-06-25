@@ -44,11 +44,11 @@ framedList l w attr =
         drawList = foldl 
           (\acc x->acc <-> lWalla <|> (string attr x) <|> (translate (w - length x, 0) lWalla)) empty_image l
 
-mkMenuWithSelected :: BookmarksFile -> MenuState -> [(String, Attr)]
+mkMenuWithSelected :: Bookmarks -> MenuState -> [(String, Attr)]
 mkMenuWithSelected b (i, _,_) = zipWith (\s n-> if (n==i) then (s, defSelAttr) else (s, defAttr)) (lines $ showbookmarksMenu b) [1..]
 
 
-menuToImage :: BookmarksFile -> MenuState -> Int -> Image
+menuToImage :: Bookmarks -> MenuState -> Int -> Image
 --menuToImage b s@(i,_) w = 
  {- let menu = (mkMenuWithSelected b s)
       (text,_) = menu !! (i-1)
@@ -81,14 +81,14 @@ repaintOnEvent (e, v) m =
         return newmenustate
 
 
-toggleFolder :: BookmarksFile -> Int -> BookmarksFile
+toggleFolder :: Bookmarks -> Int -> Bookmarks
 toggleFolder b n = 
     case (bookmarkAt b n) of
         (Folder (x, y, f)) -> changeBookmarkElement b b n $ Folder (x, y, (not f)) 
         otherwise -> b
         
 
-changeBookmarkElement :: BookmarksFile -> BookmarksFile -> Int -> BookmarksFileElement -> BookmarksFile
+changeBookmarkElement :: Bookmarks -> Bookmarks -> Int -> BookmarksE -> Bookmarks
 changeBookmarkElement (b:bs) c 0 e = e : bs
 changeBookmarkElement (a@(Bookmark _):bs) c n e = a : (changeBookmarkElement bs c (n-1) e)
 changeBookmarkElement (a@(Folder (_, f, _)):bs) c n e = a : (changeBookmarkElement f bs (n-1) e)
@@ -114,14 +114,14 @@ handleInput e m@(i,l,b) =
                 otherwise -> m
         otherwise -> m
 
-getSelectedUrl :: BookmarksFile -> MenuState -> String
+getSelectedUrl :: Bookmarks -> MenuState -> String
 getSelectedUrl b (i,_,_) = 
     case (bookmarkAt b i) of 
         (Folder (t, _, _)) -> t
         (Bookmark (_,u,e)) -> e++":"++u
         --otherwise -> ""
 
-bookmarkAt :: BookmarksFile -> Int -> BookmarksFileElement
+bookmarkAt :: Bookmarks -> Int -> BookmarksE
 bookmarkAt b n = (lienizebookmarks b) !! (n-1)
 
 repaint :: (VT.Event, VT.Vty) -> MenuState -> IO ()
@@ -175,64 +175,65 @@ main = do
     takeMVar endI
     VT.shutdown v
     
-type MenuState = (Int, Int, BookmarksFile) --(current, length, bookmarks) 
+type MenuState = (Int, Int, Bookmarks) --(current, length, bookmarks) 
 emptyMenuState = (1, 1)
 --TODO: bind keys, menu selected up down, show url,help, del, add,Edit, open with. Folders of bm, open close(expand). gzip it save. open unzip in ram.
 --file format: bookTitle URL. Haskell data! show read.
 -- HOW? folder unexpand!?
 -- scroll
 -- переделывать структуру что ли? дерево или как? или может по другому, отдельно выбор каталога.. но каталоги тож могут быть вложенными?
-type BookmarksFile = [BookmarksFileElement] 
-data BookmarksFileElement = Bookmark BookmarkE | Folder FolderE deriving (Show, Read)
+-- проще сначала обычный список но уж хорошо и скрольно
+--type Bookma = [BookmarksE] 
+--data BookmarksElem = Bookmark BookmarkE | Folder FolderE deriving (Show, Read)
 type ExecCmd = String
 type Opened = Bool
 type BTitle = String
 type URL = String
 type BookmarkE = (BTitle, URL, ExecCmd)
-type FolderE = (BTitle, BookmarksFile, Opened)
+type FolderE = (BTitle, Bookmarks, Opened)
 
-testbookmarks :: BookmarksFile
+type Bookmarks = [BookmarkE]
+
+testbookmarks :: Bookmarks
 testbookmarks = [
-     Bookmark ("filesystem root", "file://", "dillo")
-    ,Bookmark ("home", "file:///home/ksi", "pcmanfm")
-    ,Folder ("web urls", [
-             Bookmark ("google", "google.com", "dillo")
-             ,Bookmark ("elementy.ru", "elementy.ru", "dillo")
-            ], True)
-    ,Bookmark ("term", "", "xterm")
-        ]
+("filesystem root", "file://", "dillo")
+,("home", "file:///home/ksi", "pcmanfm")
+,("google", "google.com", "dillo")
+,("elementy.ru", "elementy.ru", "dillo")
+,("term", "", "xterm")
+]
 
-savebookmarks :: String -> BookmarksFile -> IO ()
+savebookmarks :: String -> Bookmarks -> IO ()
 savebookmarks file b = writeFile file (show b)
 
-loadbookmarks :: String -> IO BookmarksFile
+loadbookmarks :: String -> IO Bookmarks
 loadbookmarks file = (readFile file) >>= return . read
 
-showbookmarks :: BookmarksFile -> String
+showbookmarks :: Bookmarks -> String
 showbookmarks b = showbookmarksS b ""
 
-showbookmarksS :: BookmarksFile -> String -> String--Image
+showbookmarksS :: Bookmarks -> String -> String--Image
 showbookmarksS b prefix = foldl showOneBookmark "" b
     where
-        showOneBookmark :: String -> BookmarksFileElement -> String
+        showOneBookmark :: String -> BookmarksE -> String
         showOneBookmark acc (Bookmark (t,_,_)) = acc ++ prefix ++ t ++ "\n"
         showOneBookmark acc (Folder (t, b, _)) = acc ++ (prefix ++ "["++t++"]"++"\n") ++ (showbookmarksS b (prefix++"*")) 
 
-showbookmarksMenu :: BookmarksFile -> String
+showbookmarksMenu :: Bookmarks -> String
 showbookmarksMenu b = showbookmarksS b ""
 
-showbookmarksSMenu :: BookmarksFile -> String -> String--Image
+showbookmarksSMenu :: Bookmarks -> String -> String--Image
 showbookmarksSMenu b prefix = foldl showOneBookmarkMenu "" b
     where
-        showOneBookmarkMenu :: String -> BookmarksFileElement -> String
+        showOneBookmarkMenu :: String -> BookmarksE -> String
         showOneBookmarkMenu acc (Bookmark (t,_,_)) = acc ++ prefix ++ t ++ "\n"
         showOneBookmarkMenu acc (Folder (t, b, False)) = acc ++ (prefix ++ "["++t++"]"++"\n")
         showOneBookmarkMenu acc (Folder (t, b, True)) = acc ++ (prefix ++ "["++t++"]"++"\n") ++ (showbookmarksS b (prefix++"*")) 
 
-lienizebookmarks :: BookmarksFile -> BookmarksFile
+lienizebookmarks :: Bookmarks -> Bookmarks
 lienizebookmarks b = foldl lienizebookmarks' [] b
     where
-        lienizebookmarks' :: BookmarksFile -> BookmarksFileElement -> BookmarksFile
+        lienizebookmarks' :: Bookmarks -> BookmarksE -> Bookmarks
         lienizebookmarks' acc t@(Bookmark _) = acc ++ [t] 
         lienizebookmarks' acc t@(Folder (_, _, False)) = acc ++ [t]
         lienizebookmarks' acc t@(Folder (_, b, True)) = acc ++ [t] ++ (lienizebookmarks b) 
