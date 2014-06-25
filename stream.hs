@@ -1,5 +1,5 @@
 import qualified Prelude as P
-import Prelude hiding (head,tail,(!!),take,map,filter,zip,zipWith)
+import Prelude hiding (head,tail,(!!),take,map,filter,zip,zipWith,iterate)
 import Data.Char
 
 data Stream a = a :& Stream a
@@ -44,8 +44,17 @@ zip (a :& aa) (b :& bb) = (a, b) :& (zip aa bb)
 
 test3 = zip ints1 test2 -- ха. равномощность чётных и целых, посчитали
 
-zipWith (a->b->c) -> Stream a -> Stream b -> Stream c
-zipWith 
+zipWith :: (a->b->c) -> Stream a -> Stream b -> Stream c
+zipWith f (a :& aa) (b :& bb) = f a b :& zipWith f aa bb
+
+test4 = zipWith (\x y->  (show x)++"%"++[y]) ints1 test1
+-- как из двух фун от одного арг. сделать фун от двух... и третьей связывающей рез? - аппфунктор?
+
+iterate :: (a->a) -> a -> Stream a
+iterate next a = a :& iterate next (next a)
+
+test5 = iterate succ 'a'
+
 
 
 
