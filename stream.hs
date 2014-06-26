@@ -55,6 +55,14 @@ iterate next a = a :& iterate next (next a)
 
 test5 = iterate succ 'a'
 
+--- (.)
+ab :: Int -> Char
+bc :: Char -> Bool
+ab = chr
+bc = (=='a')
+
+abc = (.) bc ab
+ac = bc . ab
 
 
 

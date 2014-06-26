@@ -44,17 +44,12 @@ framedList l w attr =
         drawList = foldl 
           (\acc x->acc <-> lWalla <|> (string attr x) <|> (translate (w - length x, 0) lWalla)) empty_image l
 
-mkMenuWithSelected :: Bookmarks -> MenuState -> [(String, Attr)]
-mkMenuWithSelected b (i, _,_) = zipWith (\s n-> if (n==i) then (s, defSelAttr) else (s, defAttr)) (lines $ showbookmarksMenu b) [1..]
+mkMenuWithSelected :: MenuState -> [(String, Attr)]
+mkMenuWithSelected (i, _,b) = zipWith (\s n-> if (n==i) then (s, defSelAttr) else (s, defAttr)) (lines $ showbookmarksMenu b) [1..]
 
 
-menuToImage :: Bookmarks -> MenuState -> Int -> Image
---menuToImage b s@(i,_) w = 
- {- let menu = (mkMenuWithSelected b s)
-      (text,_) = menu !! (i-1)
-  in 
-    framedMenu menu w defAttr -}
-menuToImage b s w = framedMenu (mkMenuWithSelected b s) w defAttr
+menuToImage :: MenuState -> Int -> Image
+menuToImage s w = framedMenu (mkMenuWithSelected s) w defAttr
 --menuToImage = framedMenu . mkMenuWithSelected
 
 framedMenu :: [(String, Attr)] -> Int -> Attr -> Image
@@ -80,22 +75,7 @@ repaintOnEvent (e, v) m =
         repaint (e, v) newmenustate
         return newmenustate
 
-
-toggleFolder :: Bookmarks -> Int -> Bookmarks
-toggleFolder b n = 
-    case (bookmarkAt b n) of
-        (Folder (x, y, f)) -> changeBookmarkElement b b n $ Folder (x, y, (not f)) 
-        otherwise -> b
-        
-
-changeBookmarkElement :: Bookmarks -> Bookmarks -> Int -> BookmarksE -> Bookmarks
-changeBookmarkElement (b:bs) c 0 e = e : bs
-changeBookmarkElement (a@(Bookmark _):bs) c n e = a : (changeBookmarkElement bs c (n-1) e)
-changeBookmarkElement (a@(Folder (_, f, _)):bs) c n e = a : (changeBookmarkElement f bs (n-1) e)
-changeBookmarkElement [] f n e = changeBookmarkElement f f n e
-
 -- да, проще избавиться от этой вложенности. и будет просто список элементов. потом возможно и список каталогов и всё. отдельно.
-
 
 handleInput :: VT.Event -> MenuState -> MenuState
 handleInput e m@(i,l,b) = 
@@ -106,34 +86,40 @@ handleInput e m@(i,l,b) =
                 'i' -> (l,l,b)
                 'k' | i<l -> (i+1,l,b)
                 'k' -> (1,l,b)
-                'l' ->  -- on selected toggle opened & len change //showbookmarksMenu
-                    let bm = toggleFolder b i
-                        newl = length (lines $ showbookmarksMenu bm)
-                    in
-                        (i,newl,bm)
+                'd' -> deleteCurrent m
+                'a' -> addBookmark m
                 otherwise -> m
         otherwise -> m
 
-getSelectedUrl :: Bookmarks -> MenuState -> String
-getSelectedUrl b (i,_,_) = 
+getSelectedUrl :: MenuState -> String
+getSelectedUrl (i,l,b) = if l > 0 then
     case (bookmarkAt b i) of 
-        (Folder (t, _, _)) -> t
-        (Bookmark (_,u,e)) -> e++":"++u
-        --otherwise -> ""
+         (_,u,e) -> e++":"++u
+    else ""
 
-bookmarkAt :: Bookmarks -> Int -> BookmarksE
-bookmarkAt b n = (lienizebookmarks b) !! (n-1)
+bookmarkAt :: Bookmarks -> Int -> BookmarkE
+bookmarkAt b n = b !! (n-1)
 
 repaint :: (VT.Event, VT.Vty) -> MenuState -> IO ()
-repaint (e, v) m@(_,_,b) = 
+repaint (e, v) m = 
     let 
         --img = framedList ["(1.)","(2.) - ","(1) list node.","abraCaDabra","------",show e] 15 defAttr
         --img = framedList (lines $ showbookmarks testbookmarks) 25 defAttr
-        img = menuToImage b m 25 <-> (string defAttr (show m ++(show e)))  <-> (string defAttr (getSelectedUrl b m))
+        img = menuToImage m 25 <-> (string defAttr (show m ++(show e)))  <-> (string defAttr (getSelectedUrl m))
         pic = Picture (Cursor 0 0) img (Background ' ' defAttr)
     in
         VT.update v pic
 
+deleteCurrent :: MenuState -> MenuState
+deleteCurrent m@(i,l,b) | l>1 = (if i==1 then i else i-1, l-1, deleteAt i b)
+                        | otherwise = m
+
+deleteAt :: Int -> [a] -> [a]
+deleteAt n l = take (n-1) l ++ drop n l
+
+-- тут мы должны спросить строку.. принципиально тут уже нужно вводить новое состояние, в котором и рис и обработка другая.. тогда может либо меню же и будет содержать функцию обработчик либо лишь перечисление из состояний? что лучше...
+-- давай делать что первое приходит в голову
+addBookmark :: 
 
 
 main = do 
@@ -175,8 +161,8 @@ main = do
     takeMVar endI
     VT.shutdown v
     
-type MenuState = (Int, Int, Bookmarks) --(current, length, bookmarks) 
-emptyMenuState = (1, 1)
+type MenuState = (Int, Int, Bookmarks, InputMenuFunc, RepaintMenuFunc) --(current, length, bookmarks) 
+emptyMenuState = (0, 0, []) 
 --TODO: bind keys, menu selected up down, show url,help, del, add,Edit, open with. Folders of bm, open close(expand). gzip it save. open unzip in ram.
 --file format: bookTitle URL. Haskell data! show read.
 -- HOW? folder unexpand!?
@@ -190,52 +176,41 @@ type Opened = Bool
 type BTitle = String
 type URL = String
 type BookmarkE = (BTitle, URL, ExecCmd)
-type FolderE = (BTitle, Bookmarks, Opened)
-
+--type FolderE = (BTitle, Bookmarks, Opened)
 type Bookmarks = [BookmarkE]
+type InputMenuFunc = VT.Event -> MenuState -> MenuState
+type RepaintMenuFunc = MenuState -> Image
+
 
 testbookmarks :: Bookmarks
 testbookmarks = [
-("filesystem root", "file://", "dillo")
-,("home", "file:///home/ksi", "pcmanfm")
-,("google", "google.com", "dillo")
-,("elementy.ru", "elementy.ru", "dillo")
-,("term", "", "xterm")
-]
+    ("filesystem root", "file://", "dillo")
+    ,("home", "file:///home/ksi", "pcmanfm")
+    ,("google", "google.com", "dillo")
+    ,("elementy.ru", "elementy.ru", "dillo")
+    ,("term", "", "xterm")
+    ]
 
 savebookmarks :: String -> Bookmarks -> IO ()
 savebookmarks file b = writeFile file (show b)
 
 loadbookmarks :: String -> IO Bookmarks
 loadbookmarks file = (readFile file) >>= return . read
-
+{-
 showbookmarks :: Bookmarks -> String
-showbookmarks b = showbookmarksS b ""
-
+showbookmarks b = showbookmarksS b "" -}
+{-
 showbookmarksS :: Bookmarks -> String -> String--Image
 showbookmarksS b prefix = foldl showOneBookmark "" b
     where
-        showOneBookmark :: String -> BookmarksE -> String
-        showOneBookmark acc (Bookmark (t,_,_)) = acc ++ prefix ++ t ++ "\n"
-        showOneBookmark acc (Folder (t, b, _)) = acc ++ (prefix ++ "["++t++"]"++"\n") ++ (showbookmarksS b (prefix++"*")) 
-
+        showOneBookmark :: String -> BookmarkE -> String
+        showOneBookmark acc  (t,_,_) = acc ++ prefix ++ t ++ "\n"
+-}
 showbookmarksMenu :: Bookmarks -> String
-showbookmarksMenu b = showbookmarksS b ""
+showbookmarksMenu b = foldl (\acc (t,_,_)-> acc ++ t ++ "\n") "" b
 
 showbookmarksSMenu :: Bookmarks -> String -> String--Image
 showbookmarksSMenu b prefix = foldl showOneBookmarkMenu "" b
     where
-        showOneBookmarkMenu :: String -> BookmarksE -> String
-        showOneBookmarkMenu acc (Bookmark (t,_,_)) = acc ++ prefix ++ t ++ "\n"
-        showOneBookmarkMenu acc (Folder (t, b, False)) = acc ++ (prefix ++ "["++t++"]"++"\n")
-        showOneBookmarkMenu acc (Folder (t, b, True)) = acc ++ (prefix ++ "["++t++"]"++"\n") ++ (showbookmarksS b (prefix++"*")) 
-
-lienizebookmarks :: Bookmarks -> Bookmarks
-lienizebookmarks b = foldl lienizebookmarks' [] b
-    where
-        lienizebookmarks' :: Bookmarks -> BookmarksE -> Bookmarks
-        lienizebookmarks' acc t@(Bookmark _) = acc ++ [t] 
-        lienizebookmarks' acc t@(Folder (_, _, False)) = acc ++ [t]
-        lienizebookmarks' acc t@(Folder (_, b, True)) = acc ++ [t] ++ (lienizebookmarks b) 
-
-
+        showOneBookmarkMenu :: String -> BookmarkE -> String
+        showOneBookmarkMenu acc  (t,_,_) = acc ++ prefix ++ t ++ "\n"
