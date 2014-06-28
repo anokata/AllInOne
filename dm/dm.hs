@@ -7,6 +7,7 @@ import Graphics.Vty.Attributes
 import Control.Concurrent --(threadDelay, forkIO)
 import Control.Monad(forever)
 import System.Exit
+import Data.Char
 
 discard :: Functor f => f a -> f ()
 discard = fmap (const ())
@@ -45,7 +46,7 @@ framedList l w attr =
           (\acc x->acc <-> lWalla <|> (string attr x) <|> (translate (w - length x, 0) lWalla)) empty_image l
 
 mkMenuWithSelected :: MenuState -> [(String, Attr)]
-mkMenuWithSelected (i, _,b) = zipWith (\s n-> if (n==i) then (s, defSelAttr) else (s, defAttr)) (lines $ showbookmarksMenu b) [1..]
+mkMenuWithSelected (MenuState i  _ b _ _ _) = zipWith (\s n-> if (n==i) then (s, defSelAttr) else (s, defAttr)) (lines $ showbookmarksMenu b) [1..]
 
 
 menuToImage :: MenuState -> Int -> Image
@@ -69,8 +70,9 @@ framedMenu l w attr =
 
 repaintOnEvent :: (VT.Event, VT.Vty) -> MenuState -> IO MenuState
 repaintOnEvent (e, v) m = 
-    let  
-    newmenustate = (handleInput e m)
+    let 
+    f = gFinput m 
+    newmenustate = (f e m)
     in do   
         repaint (e, v) newmenustate
         return newmenustate
@@ -78,21 +80,25 @@ repaintOnEvent (e, v) m =
 -- да, проще избавиться от этой вложенности. и будет просто список элементов. потом возможно и список каталогов и всё. отдельно.
 
 handleInput :: VT.Event -> MenuState -> MenuState
-handleInput e m@(i,l,b) = 
+handleInput e m@(MenuState i l b inpf rf _) = 
     case e of 
         (VT.EvKey (VT.KASCII k) []) -> 
             case k of
-                'i' | i>1 -> (i-1,l,b)
-                'i' -> (l,l,b)
-                'k' | i<l -> (i+1,l,b)
-                'k' -> (1,l,b)
+                'i' | i>1 -> m {gCurrentMenuEl=(i-1)}
+                'i' -> m {gCurrentMenuEl=l}
+                'k' | i<l -> m{gCurrentMenuEl=(i+1)}
+                'k' -> m{gCurrentMenuEl=1}
                 'd' -> deleteCurrent m
-                'a' -> addBookmark m
+                'a' -> m {
+                            gBuffer = "e",
+                            gFinput = addInput,
+                            gFpaint = addPaint
+                         }
                 otherwise -> m
         otherwise -> m
 
 getSelectedUrl :: MenuState -> String
-getSelectedUrl (i,l,b) = if l > 0 then
+getSelectedUrl (MenuState i l b _ _ _) = if l > 0 then
     case (bookmarkAt b i) of 
          (_,u,e) -> e++":"++u
     else ""
@@ -101,17 +107,21 @@ bookmarkAt :: Bookmarks -> Int -> BookmarkE
 bookmarkAt b n = b !! (n-1)
 
 repaint :: (VT.Event, VT.Vty) -> MenuState -> IO ()
-repaint (e, v) m = 
+repaint (e, v) m@(MenuState _ _ _ inputF paintF _) = 
     let 
         --img = framedList ["(1.)","(2.) - ","(1) list node.","abraCaDabra","------",show e] 15 defAttr
         --img = framedList (lines $ showbookmarks testbookmarks) 25 defAttr
-        img = menuToImage m 25 <-> (string defAttr (show m ++(show e)))  <-> (string defAttr (getSelectedUrl m))
+        --img = --<-> (string defAttr (show m ++(show e)))
+        img = paintF m
         pic = Picture (Cursor 0 0) img (Background ' ' defAttr)
     in
         VT.update v pic
 
+paintMenu :: RepaintMenuFunc -- MenuState -> Image
+paintMenu m = menuToImage m 25   <-> (string defAttr (getSelectedUrl m))
+
 deleteCurrent :: MenuState -> MenuState
-deleteCurrent m@(i,l,b) | l>1 = (if i==1 then i else i-1, l-1, deleteAt i b)
+deleteCurrent m@(MenuState i l b xf zf bf) | l>1 = MenuState (if i==1 then i else i-1)  (l-1)  (deleteAt i b)  xf zf bf
                         | otherwise = m
 
 deleteAt :: Int -> [a] -> [a]
@@ -119,7 +129,27 @@ deleteAt n l = take (n-1) l ++ drop n l
 
 -- тут мы должны спросить строку.. принципиально тут уже нужно вводить новое состояние, в котором и рис и обработка другая.. тогда может либо меню же и будет содержать функцию обработчик либо лишь перечисление из состояний? что лучше...
 -- давай делать что первое приходит в голову
-addBookmark :: 
+addBookmark :: Bookmarks -> BookmarkE -> Bookmarks
+addBookmark b x = b ++ [x]
+
+-- функции рисования и обработки ввода для добавления записи
+addPaint :: MenuState -> Image
+addInput :: VT.Event -> MenuState -> MenuState
+
+addPaint m = (string defAttr "Enter new:") <-> framedList [gBuffer m] 30 defAttr 
+
+addInput e m = 
+    case e of 
+        (VT.EvKey VT.KEnter []) -> m{
+                           gBook = addBookmark (gBook m) ("added title",gBuffer m ,"cmd"),
+                           gFinput = handleInput,
+                           gFpaint = paintMenu,
+                           gLenMenu = 1+(gLenMenu m)
+                      }
+        (VT.EvKey (VT.KASCII k) []) -> 
+            case k of
+                otherwise -> m{gBuffer= (gBuffer m) ++ [k]}
+        otherwise -> m
 
 
 main = do 
@@ -133,7 +163,8 @@ main = do
     let 
         img4 = framedList ["(1.)","(2.) - ","(1) list node.","abraCaDabra","------"] 15 defAttr
         pic = Picture (Cursor 0 0) img4 (Background ' ' defAttr)
-        m = (1, length (lines $ showbookmarksMenu n), n)
+        --m = MenuState (1, length (lines $ showbookmarksMenu n), n,handleInput,paintMenu)
+        m = MenuState 1 (length (lines $ showbookmarksMenu n)) n addInput addPaint ""
     VT.update v pic
     
     endI <- newEmptyMVar
@@ -161,8 +192,18 @@ main = do
     takeMVar endI
     VT.shutdown v
     
-type MenuState = (Int, Int, Bookmarks, InputMenuFunc, RepaintMenuFunc) --(current, length, bookmarks) 
-emptyMenuState = (0, 0, []) 
+--(current, length, bookmarks) 
+--data MenuState = MenuState (Int, Int, Bookmarks, InputMenuFunc, RepaintMenuFunc) 
+data MenuState = MenuState {
+    gCurrentMenuEl::Int, 
+    gLenMenu::Int, 
+    gBook::Bookmarks, 
+    gFinput::InputMenuFunc, 
+    gFpaint::RepaintMenuFunc
+    , gBuffer::String
+    
+    }
+emptyMenuState = (0, 0, [],handleInput,paintMenu) 
 --TODO: bind keys, menu selected up down, show url,help, del, add,Edit, open with. Folders of bm, open close(expand). gzip it save. open unzip in ram.
 --file format: bookTitle URL. Haskell data! show read.
 -- HOW? folder unexpand!?

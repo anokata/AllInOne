@@ -64,6 +64,28 @@ bc = (=='a')
 abc = (.) bc ab
 ac = bc . ab
 
+infixl 0 :&
+instance Num a => Num (Stream a) where -- + * - negate abs signum fromInteger
+    (+) (s :& ss) (t :& tt) = s P.+ t :& ss+tt
+    (-) (s :& ss) (t :& tt) = s-t :& ss-tt
+    (*) (s :& ss) (t :& tt) = s*t :& ss*tt
+    negate (s :& ss) = negate s :& negate ss
+    abs (s :& ss) = abs s :& abs ss
+    signum (s :& ss) = signum s :& signum ss
+    fromInteger x = constStream (fromInteger x) --iterate id $ fromInteger x
+
+data St a b = St (a -> (b, St a b))
+ap :: St a b -> [a] -> [b]
+ap (St s) a = map s a
+
+
+
+
+
+
+
+
+
 
 
 
