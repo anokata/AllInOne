@@ -3,6 +3,8 @@
 import qualified Graphics.Vty as VT
 import Graphics.Vty.Picture
 import Graphics.Vty.Attributes
+import Graphics.Vty.Terminal
+import Data.Word
 --import Control.Concurrent --(threadDelay, forkIO)
 --import Control.Monad(forever)
 --import System.Exit
@@ -20,8 +22,12 @@ data MenuState = MenuState {
 data StateID = Exit | Proceed deriving (Eq, Show, Read)
 data InternalDataForInfoMenu = IDFIM {
     gState::StateID,
-    gVty::VT.Vty
+    gVty::VT.Vty,
+    ggCursorX::Word,
+    ggCursorY::Word
     }
+gCursorX = ggCursorX . gIDFIM
+gCursorY = ggCursorY . gIDFIM
 -- emptyMenuState = (0, 0, [],handleInput,paintMenu) 
 --TODO: bind keys, menu selected up down, show url,help, del, add,Edit, open with. Folders of bm, open close(expand). gzip it save. open unzip in ram.
 --file format: bookTitle URL. Haskell data! show read.
@@ -137,22 +143,22 @@ handleInput e m@(MenuState i l b inpf rf _ _) =
     case e of 
         (VT.EvKey (VT.KASCII k) []) -> 
             case k of
-                'i' | i>1 -> return m {gCurrentMenuEl=(i-1)}
-                'i' -> return m {gCurrentMenuEl=l}
-                'k' | i<l -> return m{gCurrentMenuEl=(i+1)}
-                'k' -> return m{gCurrentMenuEl=1}
-                'd' -> return $ deleteCurrent m
+                'i' | i>1 -> return $ cursorForMenu $ m {gCurrentMenuEl=(i-1)}
+                'i' -> return $ cursorForMenu m{gCurrentMenuEl=l}
+                'k' | i<l -> return $ cursorForMenu m {gCurrentMenuEl=(i+1)}
+                'k' -> return $ cursorForMenu m{gCurrentMenuEl=1}
+                'd' -> return $ cursorForMenu (deleteCurrent m)
                 'a' -> do
                     let 
                         oldFinput = gFinput m
                         oldFpaint = gFpaint m
                     
-                    newmenu <- runInterfaceAndWaitFor m {
+                    newmenu <- runInterfaceAndWaitFor (cursorForAdd m {
                             gBuffer = "=",
                             gFinput = addInput,
                             gFpaint = addPaint
-                         } (VT.EvKey VT.KEnter [])
-                    return newmenu{gFinput=oldFinput, gFpaint = oldFpaint,
+                         }) (VT.EvKey VT.KEnter [])
+                    return $ cursorForMenu newmenu{gFinput=oldFinput, gFpaint = oldFpaint,
                         gLenMenu = 1+(gLenMenu newmenu),
                         gBook = addBookmark (gBook newmenu) ("added title",gBuffer newmenu ,"cmd")
                         }
@@ -172,7 +178,7 @@ repaint :: (VT.Event, VT.Vty) -> MenuState -> IO ()
 repaint (e, v) m@(MenuState _ _ _ inputF paintF _ _) = 
     let 
         img = paintF m
-        pic = Picture (Cursor 0 0) img (Background ' ' defAttr)
+        pic = Picture (Cursor (gCursorX m) (gCursorY m)) img (Background ' ' defAttr)
     in
         VT.update v pic
 
@@ -185,6 +191,8 @@ deleteCurrent m@(MenuState i l b xf zf bf e) | l>1 = MenuState (if i==1 then i e
 
 deleteAt :: Int -> [a] -> [a]
 deleteAt n l = take (n-1) l ++ drop n l
+insertAt :: Int -> a -> [a] -> [a]
+insertAt n k l = take n l ++ [k] ++ drop n l
 
 addBookmark :: Bookmarks -> BookmarkE -> Bookmarks
 addBookmark b x = b ++ [x]
@@ -193,14 +201,34 @@ addBookmark b x = b ++ [x]
 addPaint :: MenuState -> Image
 addInput :: VT.Event -> MenuState -> IO MenuState
 
-addPaint m = (string defAttr "Enter new:") <-> framedList [gBuffer m] 30 defAttr 
+addPaint m = (string defAttr "Enter new:") <-> framedList [gBuffer m] ((+) 3 $ length $ gBuffer m) defAttr 
+
+editBackspace :: MenuState -> MenuState
+editBackspace m | null (gBuffer m) = m
+                | otherwise = let 
+                    n = dec $ fromIntegral (gCursorX m)
+                    newbuf = deleteAt n (gBuffer m)
+                    newm = m{gBuffer= newbuf}
+                    newm2 = moveCursorEdit newm L
+                    in newm2
+
+editAdd :: MenuState -> Char -> MenuState
+editAdd m k = let 
+                n = dec $ fromIntegral (gCursorX m)
+                newbuf = insertAt n k (gBuffer m)
+                newm = m{gBuffer= newbuf}
+                newm2 = moveCursorEdit newm R
+                in newm2
 
 addInput e m = 
     return $ case e of 
+        (VT.EvKey VT.KBS []) -> editBackspace m
+        (VT.EvKey VT.KLeft []) -> moveCursorEdit m L
+        (VT.EvKey VT.KRight []) -> moveCursorEdit m R
         (VT.EvKey (VT.KASCII k) []) -> 
             case k of
-                '\b' -> m{gBuffer= tail (gBuffer m)}
-                otherwise -> m{gBuffer= (gBuffer m) ++ [k]}
+                
+                otherwise -> editAdd m k
         otherwise -> m
 
 runInterfaceAndWaitFor :: MenuState -> VT.Event -> IO MenuState
@@ -208,11 +236,45 @@ runInterfaceAndWaitFor m exi = do
     let v = gVty $ gIDFIM m
     repaintOnEvent (VT.EvResize 0 0, v) m
     event <- VT.next_event v
+    --print event
     case event of
         k | k==exi -> return m {gIDFIM = (gIDFIM m){ gState = Exit}}
         otherwise -> do
             newmenu <- repaintOnEvent (event, v) m
             runInterfaceAndWaitFor newmenu exi
+
+data Direction = L | R | U | D
+moveCursor :: MenuState -> Direction -> MenuState
+moveCursor m R = m{gIDFIM=(gIDFIM m) {ggCursorX=(gCursorX m)+1}}
+moveCursor m L | (gCursorX m) == 1 = m
+               |otherwise = m{gIDFIM=(gIDFIM m) {ggCursorX=(gCursorX m)-1}}
+moveCursor m D = m{gIDFIM=(gIDFIM m) {ggCursorY=(gCursorY m)+1}}
+moveCursor m U | (gCursorY m) == 1 = m 
+               |otherwise = m{gIDFIM=(gIDFIM m) {ggCursorY=(gCursorY m)-1}}
+
+moveCursorAtX :: MenuState -> Word -> MenuState
+moveCursorAtX m x = m{gIDFIM=(gIDFIM m) {ggCursorX=x}}
+moveCursorAtY :: MenuState -> Word -> MenuState
+moveCursorAtY m y = m{gIDFIM=(gIDFIM m) {ggCursorY=y}}
+
+moveCursorEdit :: MenuState -> Direction -> MenuState
+moveCursorEdit m R | 1 + length (gBuffer m) > fromIntegral (gCursorX m) = moveCursor m R
+                   | otherwise = m
+moveCursorEdit m L = moveCursor m L
+
+
+cursorForMenu :: MenuState -> MenuState
+cursorForMenu m = m{gIDFIM=(gIDFIM m) {ggCursorX=0, ggCursorY= fromIntegral (gCurrentMenuEl m) }}
+
+dec :: Num a => a -> a
+dec x = x - 1
+inc :: Num a => a -> a
+inc x = x + 1
+
+cursorForAdd :: MenuState -> MenuState
+cursorForAdd m = m{gIDFIM=(gIDFIM m) {
+    ggCursorX=fromIntegral (inc $ length $ gBuffer m), 
+    ggCursorY= fromIntegral (2) } }
 
 main = do 
 
@@ -221,7 +283,7 @@ main = do
     --putStrLn (showbookmarks n)
     v <- VT.mkVty
     let 
-        m = MenuState 1 (length (lines $ showbookmarksMenu n)) n handleInput paintMenu "" (IDFIM {gVty = v, gState = Proceed})
+        m = MenuState 1 (length (lines $ showbookmarksMenu n)) n handleInput paintMenu "" (IDFIM {gVty = v, gState = Proceed, ggCursorX=0, ggCursorY=1})
 
     repaintOnEvent ((VT.EvResize 0 0), v) m
     res <- runInterfaceAndWaitFor m (VT.EvKey (VT.KASCII 'q') [])
