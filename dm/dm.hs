@@ -31,6 +31,7 @@ gCursorY = ggCursorY . gIDFIM
 -- emptyMenuState = (0, 0, [],handleInput,paintMenu) 
 --TODO: bind keys, menu selected up down, show url,help, del, add,Edit, open with. Folders of bm, open close(expand). gzip it save. open unzip in ram.
 --file format: bookTitle URL. Haskell data! show read.
+--multi line add
 -- HOW? folder unexpand!?
 -- scroll
 -- переделывать структуру что ли? дерево или как? или может по другому, отдельно выбор каталога.. но каталоги тож могут быть вложенными?
