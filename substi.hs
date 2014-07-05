@@ -23,12 +23,26 @@ xx = x a t
 -- если подставив в Х теорему, это является началом какой то строки "(Х->" то есть то остаток этой строки можно добавить в теоремы
 -- применять его пока не станет не к чему, без изменений
 -- убрать ещё : (:) ++ tail == (,) []
-
+import Data.List (isPrefixOf)
 -- isTheorem :: I->AxiomaticSystem->B
--- getTheoremProof :: I->AxiomaticSystem->S
--- allPossibleWithMP :: S->S
+-- getTheoremProof :: I->AxiomaticSystem->Proof
+--allPossibleWithMP :: Theorems->TermsVar->Theorems
+--allPossibleWithMP a t = findMPTheorems a (generateAllSubst a)  -- "X->"
+generateAllSubst :: Theorems->S -- get all "X->"...
+generateAllSubst a = fmap (\x-> "("++(s x "X" "X->")++")") a
+findMPTheorems :: Theorems->S->Theorems
+findMPTheorems a b = getSecondImplication b $ filter (startWithOneOf b) a
+startWithOneOf :: I->S->B
+startWithOneOf i sts = any id (fmap (isPrefixOf i) sts)
+getSecondImplication :: S->Theorems->Theorems
+getSecondImplication st tr = 
 
 --import Prelude ()
+type Axiom = I
+type Theorem = I
+type Axioms = S
+type Theorems = S
+type TermsVar = S
 type I = String
 type B = Bool
 type S = [I]
