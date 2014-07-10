@@ -76,7 +76,7 @@ int main()
   	textcolor(BRIGHT, RED, BLACK);	
 	printf("In color\n");
 	textcolor(RESET, WHITE, BLACK);
-  
+  int x = 3 | 8;
   return 0;
 }
 
