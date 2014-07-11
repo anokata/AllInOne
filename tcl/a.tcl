@@ -151,3 +151,5 @@ proc textget {k v i} {
     puts =$v;
 }
 
+puts $auto_path
+#package require http
