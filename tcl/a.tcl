@@ -1,3 +1,5 @@
+#package require tcl3d
+package require struct::set
 puts {a}
 set a b
 puts $a
