@@ -89,10 +89,16 @@ last(I,[I | []]). % last(I,[I]).
 last(I,[_|T]) :- last(I,T).  %иначе ищем в хвосте
 lastc(I,L) :- appent(_,[I],L).
 
-
-
-
-
+%del from Source the X to Dest
+del([X|S],X,S). % если этот эл в говове то результат это хвост
+del([S|T],X,[S|T2]) :- del(T,X,T2).
+%de(S,X,D) :- S=[H|T], H=X, D=T.
+%de(S,X,D) :- S=[A|T], del(T,X, D).
+subl([],L).
+subl([S|SS],[S|LL]) :- subl(SS,LL).
+subl(S,[L|LL]) :- subl(S,LL).
+sub(S,L) :- appent(L1,L2,L), appent(S,L3,L2).
+perm(S,D) :- S=[H|T], member(H,D), del(D,H,X) , perm(T,X).
 
 
 
