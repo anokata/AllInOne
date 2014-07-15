@@ -100,5 +100,93 @@ subl(S,[L|LL]) :- subl(S,LL).
 sub(S,L) :- appent(L1,L2,L), appent(S,L3,L2).
 perm(S,D) :- S=[H|T], member(H,D), del(D,H,X) , perm(T,X).
 
+:- op(600, xfx, has).
 
+?- sub([1,3,4],X).
+
+:- op(950, xfx, [==>, abracadabra]).
+:- op(900, fy, ~~).
+%A ==> A.
+
+teor((A ==> (B ==> C)) ==> ((A ==> B) ==> (A ==> C))).
+teor(A ==> (B ==> A)).
+teor((~~ B ==> ~~ A) ==> ((~~ B ==> A) ==> B)).
+teor(B) :- teor((A ==> B)), teor(A).
+%mp! A==>B, A
+
+ 
+display_date :-
+    get_time(Time),
+    format_time(atom(Short), '%Y-%M-%d',      Time),
+    format_time(atom(Long),  '%A, %B %d, %Y', Time),
+    format('~w~n~w~n', [Short, Long]).
+
+:- op(300, xfx, plays).
+:- op(200, xfy, and).
+% jim plays foot and sq. - plays(jim, and(foot, sq))
+% sus plays ten and bas and vol. - plays(sus, and(ten, and(bas,vol))).
+:- op(300, xfx, was).
+:- op(200, xfx, of).
+:- op(100, fy, the).
+diana was the secretary of the department.
+
+t(0+1,1+0).
+t(X+0+1, X+1+0).
+t(X+1+1, Z) :-
+    t(X+1, X1),
+    t(X+1, Z).
+
+% BBk
+% T in U . T e. U.
+% определим множество С(назовём setC) = {a,b,c}
+:- op(300, xfy, in). % x in y in z = (x in y) in z or ..?
+% отношение принадлежность это суть предикат от объекта и множества (оба терма).
+a in setC.
+b in setC.
+c in setC.
+% множество включим в отношение, характеризующее его как множество. (т.е. множество множеств будет).
+isSet(setC).
+% можно узнать все объекты множества : X in setC. или все множества в которых есть данный объект b in X.
+% опр. отношение включения x => y х вложено в у или у включает х. Так: Если произвольный элемент принадлежит одному множеству, то он должен принадлежать и второму. прологовская :- тут и есть импликация (только обратная). и разумеется оба они должны быть множествами.
+:- op(290, xfy, =>).
+%X => Y :- (A in X :- A in Y). %, isSet(X), isSet(Y).
+%X => Y :- not(A in X) ; A in Y. % переведя импликацию в НЕ А или В. ОП не хватает квантора!
+X => Y :- forall(A in X, A in Y). % есть ->
+%X => Y :- forall(A, A in X -> A in Y).
+% сделаем ещё одно множество d = {a,b} 
+b in setD.
+a in setD.
+isSet(setD).
+b in setE.
+a in setE.
+e in setE.
+isSet(setE).
+b in setF.
+a in setF.
+isSet(setF).
+% и спросим вложено ли оно в С: setD => setC. setE => setC.
+:- op(280, xfy, =-=).
+X =-= Y :- X=>Y, Y=>X.
+% coll ? coll(R) :- R(_).
+
+нравится(мэри, пища).
+нравится(мэри, вино).
+нравится(джон, вино).
+нравится(джон, мэри).
+% нравится(мэри, X), нравится(джон, X). trace.
+%gtrace. gdebug.
+нравится(джон, X) :- нравится(X, вино).
+
+sentence --> noun_phrase, verb_phrase. 
+noun_phrase --> det, noun. 
+verb_phrase --> verb, noun_phrase. 
+det --> [the]. 
+det --> [a]. 
+noun --> [cat]. 
+noun --> [bat]. 
+verb --> [eats]. 
+% ?- sentence(X,[]).
+s --> symbols(Sem,a), symbols(Sem,b), symbols(Sem,c). 
+symbols(end,_) --> []. 
+symbols(s(Sem),S) --> [S], symbols(Sem,S). 
 
