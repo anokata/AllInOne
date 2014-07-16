@@ -190,3 +190,22 @@ s --> symbols(Sem,a), symbols(Sem,b), symbols(Sem,c).
 symbols(end,_) --> []. 
 symbols(s(Sem),S) --> [S], symbols(Sem,S). 
 
+tr([],[]).
+tr([H|T],[B|A]) :- za(H,B), tr(T,A).
+za(is,am).
+za(i,you).
+za(X,X).
+
+% tr([am,i,is],X).
+% name(X,Y). name(some,"some").
+sm(X,Y) :- name(X,A), name(Y,B), sm1(A,B).
+sm1([],[_|_]).
+sm1([H|_],[A|_]) :- H<A.
+sm1([H|T],[H|B]) :- sm1(T,B).
+
+sme(X,Y) :- name(X,A), name(Y,B), sme1(A,B).
+sme1([],[_|_]).
+sme1([],[]).
+sme1([H|_],[A|_]) :- H<A.
+sme1([H|T],[H|B]) :- sme1(T,B).
+
