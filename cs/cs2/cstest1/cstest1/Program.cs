@@ -6,13 +6,48 @@ using System.IO;
 namespace cstest1
 {
 	class ConMenu{
-		//ArrayList elements;
+
+		class MenuElement
+		{
+			ArrayList efields;
+			public string show(string separator)
+			{
+				string a = "";
+				foreach (string s in efields)
+					a += separator+s;
+				return a.Substring(separator.Length);
+			}
+			public MenuElement(string a, string separator)
+			{
+				efields = new ArrayList ();
+				foreach (string s in a.Split(separator.ToCharArray()))
+					efields.Add (s);
+			}
+		}
+
+		ArrayList elements;
+		string separator = "|";
+		string separator2 = "||";
+		public ConMenu(){
+			elements = new ArrayList();
+		}
+		public void add(string s)
+		{
+			elements.Add (new MenuElement (s, separator));
+		}
+		public string showall()
+		{
+			string a = "";
+			foreach (MenuElement i in elements)
+				a += i.show(this.separator2) +"\n";
+			return a;
+		}
 	}
 	class MainClass
 	{
 		public static void Main (string[] args)
 		{
-			Console.BackgroundColor = ConsoleColor.DarkCyan;
+			Console.BackgroundColor = ConsoleColor.DarkGray;
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.SetCursorPosition (10, 10);
 			Console.Clear ();
@@ -27,11 +62,15 @@ namespace cstest1
 			}
 			r.Close ();
 			//f.Close ();
-			foreach (string i in cont) 
-				Console.WriteLine(i);
+			//foreach (string i in cont) 
+			//	Console.WriteLine(i);
 
+			ConMenu m = new ConMenu ();
+			foreach (string i in cont)
+				m.add (i);
+			Console.Write (m.showall ());
 
-			Console.WriteLine ("{0} | {0}",(char)9000);
+			/*Console.WriteLine ("{0} | {0}",(char)9000);
 			//sorting bubble!
 			//int x = 0xFFF;
 			//long y = 0xFFF;
@@ -67,10 +106,9 @@ namespace cstest1
 				}}
 			Ln(); showarray(c);
 			// 
-
+		*/
 
 		}
-		int s(int i){return 2+i;}
 		static void showarray(byte[] a){
 			Console.Write ("[");
 			foreach(byte x in a) Console.Write(x+" ");
