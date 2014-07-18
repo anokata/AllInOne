@@ -6,31 +6,19 @@ using System.IO;
 namespace cstest1
 {
 	class ConMenu{
-		//ArrayList elements;
+		ArrayList elements;
 	}
 	class MainClass
 	{
 		public static void Main (string[] args)
 		{
+			FileStream f = new FileStream(".downloads", FileMode.Open);
+			StreamReader r;
+
 			Console.BackgroundColor = ConsoleColor.DarkCyan;
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.SetCursorPosition (10, 10);
 			Console.Clear ();
-
-			ArrayList cont = new ArrayList ();
-			//FileStream f = new FileStream("/home/ksi/dev/cs/.downloads", FileMode.Open);
-			//StreamReader r = new StreamReader(f);
-			StreamReader r = new StreamReader ("/home/ksi/dev/cs/.downloads");
-			while (!r.EndOfStream){
-				cont.Add (r.ReadLine ());
-				//Console.WriteLine (cont [cont.Count - 1]);
-			}
-			r.Close ();
-			//f.Close ();
-			foreach (string i in cont) 
-				Console.WriteLine(i);
-
-
 			Console.WriteLine ("{0} | {0}",(char)9000);
 			//sorting bubble!
 			//int x = 0xFFF;
