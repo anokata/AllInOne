@@ -13,7 +13,7 @@ namespace cstest1
 			public string show(string separator)
 			{
 				string a = "";
-				foreach (string s in efields)
+				foreach (string s in efields) // my: foreach s efields
 					a += separator+s;
 				return a.Substring(separator.Length);
 			}
@@ -27,7 +27,7 @@ namespace cstest1
 
 		ArrayList elements;
 		string separator = "|";
-		string separator2 = "||";
+		public string separator2 = "||";
 		public ConMenu(){
 			elements = new ArrayList();
 		}
@@ -40,6 +40,36 @@ namespace cstest1
 			string a = "";
 			foreach (MenuElement i in elements)
 				a += i.show(this.separator2) +"\n";
+			return a;
+		}
+		//char blockFull = '\x2588';
+		//char blockLWall = '\x2503';
+		char blockRWall = '\x2503';
+		char blockCornerRU = '\x2513';
+		char blockCornerLU = '\x250F';
+		char blockCornerRD = '\x251B';
+		char blockCornerLD = '\x2517';
+		char blockHWall = '\x2501';
+		public string inframe(uint h)
+		{
+			string a = "";
+			// head
+			a+=blockCornerLU;
+			for (int i=0; i<h; i++)
+				a += blockHWall;
+			a+=blockCornerRU+"\n";
+
+			foreach (MenuElement i in elements) {
+				string e = (i.show (this.separator2));
+				string dop = "";
+				for (int j=e.Length; j<h; j++) dop+=' ';
+				a += blockRWall + e + dop + blockRWall + "\n";
+			}
+
+			a+=blockCornerLD;
+			for (int i=0; i<h; i++)
+				a += blockHWall;
+			a+=blockCornerRD;
 			return a;
 		}
 	}
@@ -69,7 +99,9 @@ namespace cstest1
 			foreach (string i in cont)
 				m.add (i);
 			Console.Write (m.showall ());
-
+			m.separator2 = " -\x2588 ";
+			Console.Write (m.showall ());
+			Console.Write (m.inframe(26));
 			/*Console.WriteLine ("{0} | {0}",(char)9000);
 			//sorting bubble!
 			//int x = 0xFFF;
