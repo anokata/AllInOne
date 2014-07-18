@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-// using System.Windows;
 // в чём разница между var и dynamic?
 namespace cstest1
 {
@@ -27,13 +26,31 @@ namespace cstest1
 
 		ArrayList elements;
 		string separator = "|";
-		public string separator2 = "||";
+		string separator2 = "||";
+		uint selected;
+		ConsoleColor bkcolor = ConsoleColor.Black;
+		ConsoleColor fgcolor = ConsoleColor.Blue;
+		int x = 0;
+		int y = 0;
+		int maxwidth = 0;
+
 		public ConMenu(){
 			elements = new ArrayList();
+		}
+		public void changeSeparator(string s)
+		{
+			separator2 = s;
+			updatemaxw ();
+		}
+		void updatemaxw()
+		{
+			if (maxwidth < ((MenuElement)elements [elements.Count - 1]).show (separator2).Length)
+				maxwidth = ((MenuElement)elements [elements.Count - 1]).show (separator2).Length;
 		}
 		public void add(string s)
 		{
 			elements.Add (new MenuElement (s, separator));
+			updatemaxw ();
 		}
 		public string showall()
 		{
@@ -50,14 +67,10 @@ namespace cstest1
 		char blockCornerRD = '\x251B';
 		char blockCornerLD = '\x2517';
 		char blockHWall = '\x2501';
-		public string inframe(uint h)
+		public string inframe(int h)
 		{
 			string a = "";
-			// head
-			a+=blockCornerLU;
-			for (int i=0; i<h; i++)
-				a += blockHWall;
-			a+=blockCornerRU+"\n";
+			a += topframe (h);
 
 			foreach (MenuElement i in elements) {
 				string e = (i.show (this.separator2));
@@ -65,13 +78,47 @@ namespace cstest1
 				for (int j=e.Length; j<h; j++) dop+=' ';
 				a += blockRWall + e + dop + blockRWall + "\n";
 			}
-
+			//bottom
+			a += botframe (h);
+			return a;
+		}
+		string topframe(int w)
+		{
+			string a = "";
+			a+=blockCornerLU;
+			for (int i=0; i<w; i++)
+				a += blockHWall;
+			a+=blockCornerRU+"\n";
+			return a;
+		}
+		string botframe(int w)
+		{
+			string a = "";
 			a+=blockCornerLD;
-			for (int i=0; i<h; i++)
+			for (int i=0; i<w; i++)
 				a += blockHWall;
 			a+=blockCornerRD;
 			return a;
 		}
+		/*int maxW()
+		{
+			int max = 0;
+			foreach (MenuElement e in elements)
+				if ((e.show(this.separator2).Length) > max)
+					max = e.show (this.separator2).Length;
+			return max;
+		}*/
+		//toselected
+		//fromselected
+		public void print()
+		{
+			Console.BackgroundColor = bkcolor;
+			Console.ForegroundColor = fgcolor;
+			Console.SetCursorPosition (x, y);
+			Console.Write (inframe (this.maxwidth));
+		}
+
+
 	}
 	class MainClass
 	{
@@ -88,57 +135,20 @@ namespace cstest1
 			StreamReader r = new StreamReader ("/home/ksi/dev/cs/.downloads");
 			while (!r.EndOfStream){
 				cont.Add (r.ReadLine ());
-				//Console.WriteLine (cont [cont.Count - 1]);
 			}
 			r.Close ();
-			//f.Close ();
-			//foreach (string i in cont) 
-			//	Console.WriteLine(i);
+
 
 			ConMenu m = new ConMenu ();
 			foreach (string i in cont)
 				m.add (i);
 			Console.Write (m.showall ());
-			m.separator2 = " -\x2588 ";
+			m.changeSeparator(" -\x2588 ");
 			Console.Write (m.showall ());
 			Console.Write (m.inframe(26));
-			/*Console.WriteLine ("{0} | {0}",(char)9000);
-			//sorting bubble!
-			//int x = 0xFFF;
-			//long y = 0xFFF;
-			//byte z = 0xFF;
-			//double Z = 0xFFF;
-			//Array a;
-			byte[] b = new byte[5];
-			byte[] c = {32,0,35,87,65,31,42,12,8,87,55,4,90};
-			Console.Write (b);
-			char[] s1 = {'a','b','c','d'};
-			string s2 = new string(s1);
-			Console.Write(s1);
-			Console.Write(s2+':');
-			s1[3]='E';
-			Console.Write(s1);
-			Console.Write(s2+':');
 
-			showarray(c);
-			//bubble
-			bool flag = true;
-			byte buf;
-			while (flag){
-				flag = false;
-				for (int i=0; i<c.Length-1;i++){
-					if (c[i]>c[i+1]) {flag = true; buf = c[i]; c[i]=c[i+1]; c[i+1]=buf;}
-			}}
-			Ln(); showarray(c);
-			// toehr
-			c = new byte[] {32,0,35,1,65,31,42,12,8,87,55,4,90};
-			for (int i=0; i<c.Length-2;i++){
-				for (int j=i+1; j<c.Length-1;j++){
-					if (c[i]>c[j]) {buf = c[i]; c[i]=c[j]; c[j]=buf;}
-				}}
-			Ln(); showarray(c);
-			// 
-		*/
+			m.print ();
+	
 
 		}
 		static void showarray(byte[] a){
