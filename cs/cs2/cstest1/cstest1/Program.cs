@@ -4,7 +4,112 @@ using System.IO;
 // в чём разница между var и dynamic?
 namespace cstest1
 {
-	class ConMenu{
+	class ConFrame
+	{
+		protected ConsoleColor bkcolor = ConsoleColor.Black;
+		protected ConsoleColor fgcolor = ConsoleColor.Blue;
+		//char blockFull = '\x2588';
+		//char blockLWall = '\x2503';
+		protected char blockRWall = '\x2503';
+		protected char blockCornerRU = '\x2513';
+		protected char blockCornerLU = '\x250F';
+		protected char blockCornerRD = '\x251B';
+		protected char blockCornerLD = '\x2517';
+		protected char blockHWall = '\x2501';
+		protected int x = 0;
+		protected int y = 0;
+
+		protected string topframe(int w)
+		{
+			string a = "";
+			a+=blockCornerLU;
+			for (int i=0; i<w; i++)
+				a += blockHWall;
+			a+=blockCornerRU+"\n";
+			return a;
+		}
+		protected string botframe(int w)
+		{
+			string a = "";
+			a+=blockCornerLD;
+			for (int i=0; i<w; i++)
+				a += blockHWall;
+			a+=blockCornerRD;
+			return a;
+		}
+		protected string textframe(string s)
+		{
+			return  blockRWall + s + blockRWall + "\n";
+		}
+		protected void print()
+		{
+			Console.Clear ();
+			Console.BackgroundColor = bkcolor;
+			Console.ForegroundColor = fgcolor;
+			Console.SetCursorPosition (x, y);
+		}
+		protected string dopspace(int len)
+		{
+			string dop = "";
+			for (int j=0; j<len; j++) dop+=' ';
+			return dop;
+		}
+	}
+
+	//=====add dialog
+	class AddDia : ConFrame
+	{
+		string text;
+		string title;
+		string buf = "";
+		public AddDia(string title)
+		{
+			text = "";
+			this.title = title;
+		}
+		public string process()
+		{
+			bool exit = false;
+			print ();
+			while (!exit) {
+				ConsoleKeyInfo keyi = Console.ReadKey (true);
+				char key = keyi.KeyChar;
+				ConsoleKey ckey = keyi.Key;
+				switch (ckey)
+				{
+				case ConsoleKey.Enter:
+					exit = true;
+					break;
+				case ConsoleKey.Backspace:
+					if (text.Length>0)
+					text = text.Substring (0, text.Length - 1);
+					break;
+				default: 
+					text += key;
+
+					break;
+				}
+				print ();
+			}
+			return text;
+		}
+		new public void print()
+		{
+			base.print ();
+			int w = Math.Max (title.Length, text.Length+4);
+			buf = topframe(w) + textframe(title + dopspace(w-title.Length)) ;
+			buf += textframe ("> " + text + dopspace(w-text.Length-2));
+			buf += botframe (w);
+			Console.Write (buf);
+			Console.SetCursorPosition (x + 3 + text.Length, y+2); // +frame + ">" , +frame+title
+
+		}
+	}
+	//=====
+
+	class ConMenu : ConFrame {
+
+		//public static string operator ++(ConMenu a){}
 
 		class MenuElement
 		{
@@ -28,16 +133,14 @@ namespace cstest1
 		string separator = "|";
 		string separator2 = "||";
 		int selected;
-		ConsoleColor bkcolor = ConsoleColor.Black;
-		ConsoleColor fgcolor = ConsoleColor.Blue;
 		ConsoleColor sbkcolor = ConsoleColor.DarkGray;
 		ConsoleColor sfgcolor = ConsoleColor.Cyan;
-		int x = 0;
-		int y = 0;
+
 		int maxwidth = 0;
 
+
 		delegate bool ConKeyEventC (char k);
-		event ConKeyEventC keyEvent;
+		//event ConKeyEventC keyEvent;
 		//onkey
 		//processKeys : console.readkey...
 		public void processKeys()
@@ -63,6 +166,20 @@ namespace cstest1
 						else
 							selected = elements.Count - 1;
 					break;
+					case 'd':
+					if (elements.Count>0)
+					{
+						elements.RemoveAt (selected);
+						if (selected == elements.Count && elements.Count!=0)
+							selected--;
+					}
+						break;
+				case 'a':
+					//AddDia adddialog = new AddDia ("Enter new url");
+					add (new AddDia ("Enter new url").process () + separator +
+						new AddDia ("Enter new name").process () + separator +
+						new AddDia ("Enter new count").process ());
+					break;
 				default:
 						Console.Write (key);
 					break;
@@ -77,6 +194,11 @@ namespace cstest1
 		public ConMenu(){
 			elements = new ArrayList();
 			selected = 0;
+		}
+		public ConMenu(string file){
+			elements = new ArrayList();
+			selected = 0;
+			loadFromFile (file);
 		}
 		public void changeSeparator(string s)
 		{
@@ -101,14 +223,7 @@ namespace cstest1
 				a += i.show(this.separator2) +"\n";
 			return a;
 		}
-		//char blockFull = '\x2588';
-		//char blockLWall = '\x2503';
-		char blockRWall = '\x2503';
-		char blockCornerRU = '\x2513';
-		char blockCornerLU = '\x250F';
-		char blockCornerRD = '\x251B';
-		char blockCornerLD = '\x2517';
-		char blockHWall = '\x2501';
+
 		public string inframe(int h)
 		{
 			string a = "";
@@ -121,24 +236,7 @@ namespace cstest1
 			a += botframe (h);
 			return a;
 		}
-		string topframe(int w)
-		{
-			string a = "";
-			a+=blockCornerLU;
-			for (int i=0; i<w; i++)
-				a += blockHWall;
-			a+=blockCornerRU+"\n";
-			return a;
-		}
-		string botframe(int w)
-		{
-			string a = "";
-			a+=blockCornerLD;
-			for (int i=0; i<w; i++)
-				a += blockHWall;
-			a+=blockCornerRD;
-			return a;
-		}
+
 		int updateMaxFull()
 		{
 			int max = 0;
@@ -163,11 +261,14 @@ namespace cstest1
 		{
 			string a = "";
 			string s = e.show (separator2);
-			string dop = "";
-			for (int j=s.Length; j<h; j++) dop+=' ';
-			a += blockRWall + s + dop + blockRWall + "\n";
+			string dop = dopspace (h - s.Length);
+			//for (int j=s.Length; j<h; j++) dop+=' ';
+
+			//a += blockRWall + s + dop + blockRWall + "\n";
+			a += textframe (s + dop);
 			return a;
 		}
+
 		//fromselected
 		public string inframeFromSel(int h)
 		{
@@ -179,19 +280,29 @@ namespace cstest1
 			a += botframe (h);
 			return a;
 		}
-		public void print()
+		new public void print()
 		{
-			Console.BackgroundColor = bkcolor;
-			Console.ForegroundColor = fgcolor;
-			Console.SetCursorPosition (x, y);
+			base.print ();
 			Console.Write (inframeToSel (maxwidth));
 			//Console.Write (inframe (this.maxwidth));
 			Console.BackgroundColor = sbkcolor;
 			Console.ForegroundColor = sfgcolor;
+			if (elements.Count>0)
 			Console.Write (showElem (maxwidth, (MenuElement)elements [selected]));
 			Console.BackgroundColor = bkcolor;
 			Console.ForegroundColor = fgcolor;
 			Console.Write (inframeFromSel (maxwidth));
+		}
+		public void loadFromFile(string file)
+		{
+			ArrayList cont = new ArrayList ();
+			StreamReader r = new StreamReader (file);
+			while (!r.EndOfStream){
+				cont.Add (r.ReadLine ());
+			}
+			r.Close ();
+			foreach (string i in cont)
+				add (i);
 		}
 
 
@@ -200,40 +311,27 @@ namespace cstest1
 	{
 		public static void Main (string[] args)
 		{
-
-			Console.BackgroundColor = ConsoleColor.DarkGray;
-			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.SetCursorPosition (10, 10);
 			Console.Clear ();
 
-			ArrayList cont = new ArrayList ();
-			//FileStream f = new FileStream("/home/ksi/dev/cs/.downloads", FileMode.Open);
-			//StreamReader r = new StreamReader(f);
-			StreamReader r = new StreamReader ("/home/ksi/dev/cs/.downloads");
-			while (!r.EndOfStream){
-				cont.Add (r.ReadLine ());
-			}
-			r.Close ();
+			ConMenu m = new ConMenu ("/home/ksi/dev/cs/.downloads");
+			//m.loadFromFile ("/home/ksi/dev/cs/.downloads");
+			AddDia d = new AddDia ("testdialog");
+			//d.print ();
+			d.process ();
 
 
-			ConMenu m = new ConMenu ();
-			foreach (string i in cont)
-				m.add (i);
-			Console.Write (m.showall ());
-			m.changeSeparator(" -\x2588 ");
-			Console.Write (m.showall ());
-			Console.Write (m.inframe(26));
-
-			m.print ();
-			//(Console.ReadKey ().KeyChar)=='i' ;
+			m.changeSeparator("  ");
 			m.processKeys ();
 
 		}
-		static void showarray(byte[] a){
+		static void showarray<Type>(Type [] a){
 			Console.Write ("[");
-			foreach(byte x in a) Console.Write(x+" ");
+			foreach(Type x in a) Console.Write(x+" ");
 			Console.Write("]");
 		}
 		static void Ln() {Console.WriteLine ();}
+		delegate void Dln ();
+		//Dln Lnd = Ln;
 	}
 }
