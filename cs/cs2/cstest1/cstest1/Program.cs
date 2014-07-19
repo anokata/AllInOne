@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
 using System.IO;
-// в чём разница между var и dynamic?
+// dynamic?
+// TODO: edit(url,.. choise class) save load Folders
 namespace cstest1
 {
 	class ConFrame
@@ -121,6 +122,13 @@ namespace cstest1
 					a += separator+s;
 				return a.Substring(separator.Length);
 			}
+			public string showAScmd()
+			{
+				string a = "";
+				if (efields.Count > 2)
+					a = efields [2] + "@" + efields [1];
+				return a;
+			}
 			public MenuElement(string a, string separator)
 			{
 				efields = new ArrayList ();
@@ -135,6 +143,7 @@ namespace cstest1
 		int selected;
 		ConsoleColor sbkcolor = ConsoleColor.DarkGray;
 		ConsoleColor sfgcolor = ConsoleColor.Cyan;
+		string filename;
 
 		int maxwidth = 0;
 
@@ -176,9 +185,9 @@ namespace cstest1
 						break;
 				case 'a':
 					//AddDia adddialog = new AddDia ("Enter new url");
-					add (new AddDia ("Enter new url").process () + separator +
-						new AddDia ("Enter new name").process () + separator +
-						new AddDia ("Enter new count").process ());
+					add (new AddDia ("Enter new name").process () + separator +
+						new AddDia ("Enter new url").process () + separator +
+						new AddDia ("Enter new cmd").process ());
 					break;
 				default:
 						Console.Write (key);
@@ -292,9 +301,14 @@ namespace cstest1
 			Console.BackgroundColor = bkcolor;
 			Console.ForegroundColor = fgcolor;
 			Console.Write (inframeFromSel (maxwidth));
+			Console.WriteLine ();
+			if (elements.Count>0)
+			Console.WriteLine (((MenuElement)elements [selected]).showAScmd ());
+			Console.Write (filename);
 		}
 		public void loadFromFile(string file)
 		{
+			filename = file;
 			ArrayList cont = new ArrayList ();
 			StreamReader r = new StreamReader (file);
 			while (!r.EndOfStream){
@@ -316,9 +330,9 @@ namespace cstest1
 
 			ConMenu m = new ConMenu ("/home/ksi/dev/cs/.downloads");
 			//m.loadFromFile ("/home/ksi/dev/cs/.downloads");
-			AddDia d = new AddDia ("testdialog");
+			//AddDia d = new AddDia ("testdialog");
 			//d.print ();
-			d.process ();
+			//d.process ();
 
 
 			m.changeSeparator("  ");
