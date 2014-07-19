@@ -27,15 +27,56 @@ namespace cstest1
 		ArrayList elements;
 		string separator = "|";
 		string separator2 = "||";
-		uint selected;
+		int selected;
 		ConsoleColor bkcolor = ConsoleColor.Black;
 		ConsoleColor fgcolor = ConsoleColor.Blue;
+		ConsoleColor sbkcolor = ConsoleColor.DarkGray;
+		ConsoleColor sfgcolor = ConsoleColor.Cyan;
 		int x = 0;
 		int y = 0;
 		int maxwidth = 0;
 
+		delegate bool ConKeyEventC (char k);
+		event ConKeyEventC keyEvent;
+		//onkey
+		//processKeys : console.readkey...
+		public void processKeys()
+		{
+			bool exit = false;
+			Console.Clear ();	
+			print ();
+
+			while (!exit) 
+			{
+				char key = Console.ReadKey (true).KeyChar;
+				switch (key) {
+				case 'q':
+					exit = true;
+					break;
+					case 'k':
+						if (selected < elements.Count-1)
+							selected++; else selected = 0;
+					break;
+					case 'i':
+						if (selected > 0)
+							selected--;
+						else
+							selected = elements.Count - 1;
+					break;
+				default:
+						Console.Write (key);
+					break;
+
+				}
+				Console.Clear ();	
+				print ();
+
+			}
+		}
+
 		public ConMenu(){
 			elements = new ArrayList();
+			selected = 0;
 		}
 		public void changeSeparator(string s)
 		{
@@ -46,6 +87,7 @@ namespace cstest1
 		{
 			if (maxwidth < ((MenuElement)elements [elements.Count - 1]).show (separator2).Length)
 				maxwidth = ((MenuElement)elements [elements.Count - 1]).show (separator2).Length;
+			updateMaxFull();
 		}
 		public void add(string s)
 		{
@@ -73,10 +115,7 @@ namespace cstest1
 			a += topframe (h);
 
 			foreach (MenuElement i in elements) {
-				string e = (i.show (this.separator2));
-				string dop = "";
-				for (int j=e.Length; j<h; j++) dop+=' ';
-				a += blockRWall + e + dop + blockRWall + "\n";
+				a += showElem (h, i);
 			}
 			//bottom
 			a += botframe (h);
@@ -100,22 +139,59 @@ namespace cstest1
 			a+=blockCornerRD;
 			return a;
 		}
-		/*int maxW()
+		int updateMaxFull()
 		{
 			int max = 0;
 			foreach (MenuElement e in elements)
 				if ((e.show(this.separator2).Length) > max)
 					max = e.show (this.separator2).Length;
+			maxwidth = max;
 			return max;
-		}*/
+		}
 		//toselected
+		public string inframeToSel(int h)
+		{
+			string a = "";
+			a += topframe (h);
+			if (elements.Count>0)
+			for (int i=0; i<selected;i++) {
+				a += showElem (h, (MenuElement)elements [i]);
+			}
+			return a;
+		}
+		private string showElem(int h, MenuElement e)
+		{
+			string a = "";
+			string s = e.show (separator2);
+			string dop = "";
+			for (int j=s.Length; j<h; j++) dop+=' ';
+			a += blockRWall + s + dop + blockRWall + "\n";
+			return a;
+		}
 		//fromselected
+		public string inframeFromSel(int h)
+		{
+			string a = "";
+			if (elements.Count>0)
+			for (int i=selected+1; i<elements.Count;i++) {
+					a += showElem (h, (MenuElement)elements [i]);
+			}
+			a += botframe (h);
+			return a;
+		}
 		public void print()
 		{
 			Console.BackgroundColor = bkcolor;
 			Console.ForegroundColor = fgcolor;
 			Console.SetCursorPosition (x, y);
-			Console.Write (inframe (this.maxwidth));
+			Console.Write (inframeToSel (maxwidth));
+			//Console.Write (inframe (this.maxwidth));
+			Console.BackgroundColor = sbkcolor;
+			Console.ForegroundColor = sfgcolor;
+			Console.Write (showElem (maxwidth, (MenuElement)elements [selected]));
+			Console.BackgroundColor = bkcolor;
+			Console.ForegroundColor = fgcolor;
+			Console.Write (inframeFromSel (maxwidth));
 		}
 
 
@@ -124,6 +200,7 @@ namespace cstest1
 	{
 		public static void Main (string[] args)
 		{
+
 			Console.BackgroundColor = ConsoleColor.DarkGray;
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.SetCursorPosition (10, 10);
@@ -148,7 +225,8 @@ namespace cstest1
 			Console.Write (m.inframe(26));
 
 			m.print ();
-	
+			//(Console.ReadKey ().KeyChar)=='i' ;
+			m.processKeys ();
 
 		}
 		static void showarray(byte[] a){
