@@ -1,11 +1,22 @@
+function getChar(event) {
+  if (event.which == null) {  // IE
+    if (event.keyCode < 32) return null; // спец. символ
+    return String.fromCharCode(event.keyCode);
+  }
+  if (event.which!==0 && event.charCode!==0) { // все кроме IE
+    if (event.which < 32) return null; // спец. символ
+    return String.fromCharCode(event.which); // остальные
+  }
+  return null; // спец. символ
+}
 var all = {};
 all.a = {f1:1,f2:'fffad',o:{a:1,b:2}};
 //viewall(all.a,'*');
-var log= function(a) {document.writeln(a);} ;
+//var log= function(a) {document.writeln(a);} ;
 function viewall(a,pre){
-  document.writeln('<'+pre +typeof a +' '+a+'><br/>');
+  //document.writeln('<'+pre +typeof a +' '+a+'><br/>');
   for (var name in a) {
-document.writeln(pre + typeof a[name] +' '+ name + ': ' +a[name]+'<br/>');
+//document.writeln(pre + typeof a[name] +' '+ name + ': ' +a[name]+'<br/>');
     if (typeof a[name] === 'object') viewall(a[name],pre+'@ ');
 }}
 ///=====
@@ -14,40 +25,275 @@ var n = document.createElement('canvas');
 n.height='300';n.width='400';
 b.appendChild(n);
 ctx = n.getContext('2d');
-ctx.fillRect(0, 0, n.width, n.height);
+var now = new Date();
+
+function drawInit(){
+  ctx.fillStyle = "#FFA500";
+  ctx.strokeStyle = '#FFA500';
+  ctx.fillStyle = "#909090";
+  all.fontsize = 15;
+ctx.font = "bold "+all.fontsize+"pt Dejavu Sans Mono";
 ctx.fillStyle = "#FFA500";
-ctx.strokeStyle = '#FFA500';
-ctx.clearRect(0, n.height-10, n.width, 5);
-ctx.fillRect(n.width-20, 0, 20, n.height);
-ctx.fillStyle = "#909090";
+ctx.fillStyle = "#09E";
+ctx.strokeStyle = '#09E';
+ctx.lineWidth =2;
+}
+function drawStart(){
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, n.width, n.height);
+  ctx.fillStyle = "#FFA500";
+  ctx.clearRect(0, n.height-10, n.width, 5);
+  ctx.fillRect(n.width-20, 0, 20, n.height);
+  ctx.fillStyle = "#09E";
+  
+  now = new Date();
+  var c=ctx.fillStyle;
+  ctx.fillStyle = '#0D9';
+  var f=ctx.font;
+  ctx.font = "9pt Dejavu Sans";
+  ctx.fillText(now.toLocaleString(),10,285);
+  ctx.font=f;
+  ctx.fillStyle = c;
+}
+
+drawInit();
 //for (var i = 0;i<13;i++) {ctx.fillRect(i*30, n.height-5, 15, 5);}
 
-ctx.strokeRect(5, 2, 45, 50);
-ctx.fillStyle = "#FFA500";
-ctx.fillText("[ele]",10,15);
-ctx.fillText("[2:]",10,27);
 
-//drawlist([1,2],5,70);
-drawListInFrame(new Array('adfa','g','g'),15,70);
-drawListInFrame(new Array('text','(1)with','function on load() #)$(*@'),100,170,140);
+var a = new Array('text','(1)with','function on load() #)$(*@');
+
+//log(ctx.measureText(a[maxInList(a)]).width);
+//drawListInFrame(new Array('adfa','\u2503','g'),15,170);
+//drawListInFrame(a,10,30);
 
 function drawlist(a,x,y){
   for (var i=0;i<a.length;i++) {
-    ctx.fillText(a[i],x,y+i*12);//font size but not 12
+    ctx.fillText(a[i],x,y+i*(all.fontsize+5));//font size but not 12
   }
 }
-function drawListInFrame(a,x,y,w){
+function drawListInFrame(a,x,y){
   drawlist(a,x,y);
 
-  ctx.strokeRect(x-5, y-13, w, 12*a.length+13);
+  ctx.strokeRect(x-5, y-(all.fontsize+5), ctx.measureText(a[maxInList(a)]).width+20, (all.fontsize+5)*a.length+13);
 }
-function maxWidthInList(a){
+function maxInList(a){
   var m=0;
   for (var i =0;i<a.length;i++){
-    if (m<a[i].length) m=a[i].length;
+    if (a[m].length<a[i].length) m=i;
   }
   return m;
 }
+function drawlistselected(a,x,y,sindex){
+  for (var i=0;i<sindex;i++) {
+    ctx.fillText(a[i],x,y+i*(all.fontsize+5));//font size but not 12
+  }
+    ctx.fillStyle = "#3EF";
+    ctx.fillText(a[sindex],x,y+sindex*(all.fontsize+5));
+    ctx.fillStyle = "#08D";
+    for ( i=sindex+1;i<a.length;i++) {
+    ctx.fillText(a[i],x,y+i*(all.fontsize+5));//font size but not 12
+  }
+}
+function drawListInFrameSel(a,x,y,s){
+  drawlistselected(a,x,y,s);
+  ctx.strokeRect(x-5, y-(all.fontsize+5), ctx.measureText(a[maxInList(a)]).width+20, (all.fontsize+5)*a.length+13);
+}
+//log(maxInList.toSource());
+
+var A = {
+    x:100,
+    y:100,
+    h:11;
+    w:11;
+    L:100, //life
+    spd:5,
+    actmov: [],
+    draw: function () {
+        ctx.save();
+        
+        ctx.fillStyle = "#f2f";
+        ctx.font = "Bold 11pt Dejavu Mono Sans";
+        ctx.fillText('a',this.x,this.y);
+        ctx.fillStyle = "#fff";
+        ctx.strokeStyle = '#fff';
+        
+        ctx.font = "8pt Dejavu Mono Sans";
+        ctx.fillText(this.actmov.concat(),this.x+10,this.y+10);  
+        ctx.fillText(this.L,this.x,this.y-10);  
+        
+        ctx.restore();
+        
+    },
+    process: function () {
+        for(var a=0;a<this.actmov.length;a++){
+            this.move(this.actmov[a]);
+            
+        }
+            
+    },
+    moveat: function (dir) {
+        //if (this.actmov.indexOf(dir)===-1)
+            this.actmov.push(dir);
+    },
+    stop: function () {
+            this.actmov = [];
+    },
+    stopat: function (d) {
+            this.actmov.splice(this.actmov.indexOf(d),1);
+    },
+    move: function (dir) {
+        switch (dir) {
+            case 'u': this.y-=this.spd; break;
+            case 'd': this.y+=this.spd; break;
+            case 'l': this.x-=this.spd; break;
+            case 'r': this.x+=this.spd; break;
+        }
+    }
+    
+    };
+
+var menu = {
+  elems: ['start','\u1002pt','h\u1001lp'],
+  x: 10,
+  y: 30,
+  selected: 0,
+  print: function() {
+    drawStart();
+    drawListInFrameSel(menu.elems , menu.x,menu.y,menu.selected);
+   
+    ctx.strokeStyle = "#35A";
+    ctx.beginPath();
+    ctx.arc(150,50,30,0,Math.PI/2,false);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arcTo(150,20,150,70,50);
+    ctx.fill();
+    
+    A.draw();
+    
+  },
+  add: function(a) {this.elems[this.elems.length]=a;},
+  keyhandler: function (e) {
+    e = e || window.event;
+    //var char = getChar(e || window.event); 
+    //menu.add(getChar(e));
+    switch (getChar(e)) {
+      case 'i': if (menu.selected>0) menu.selected--;    
+        else menu.selected = menu.elems.length-1;
+        break;
+      case 'k': if (menu.selected<menu.elems.length-1) menu.selected++; else menu.selected=0; 
+        break;
+      case 'g': alert('gaa!');  break;
+      default: break;
+        
+    }
+
+    
+    menu.print();
+    return false;
+  }
+};
+//menu.elems[3]='new';
+menu.print();
+
+var world = {
+    down: [],
+    blocks: [],
+    
+    maypass: function () {
+            
+            return false;
+    },
+    
+    repaint: function() {
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, n.width, n.height);
+        A.draw();
+        for(var i=0;i<this.blocks.length;i++)
+            this.blocks[i].draw();
+    },
+    
+    process: function() {
+        A.process();
+    },
+    
+    keydown: function (e) {
+    e = e || window.event;
+    if (! world.down[e.keyCode]) 
+        {switch (e.keyCode){
+        case 39: A.moveat('r'); break;
+        case 37: A.moveat('l'); break;
+        case 38: A.moveat('u'); break;
+        case 40: A.moveat('d'); break;
+        default:  break;
+        
+        }}
+        world.down[e.keyCode] = true;
+        //world.process();
+        //world.repaint();
+    },
+    keyup: function (e) {
+    e = e || window.event;
+    world.down[e.keyCode] = false;
+        switch (e.keyCode){
+        case 39: A.stopat('r'); break;
+        case 37: A.stopat('l'); break;
+        case 38: A.stopat('u'); break;
+        case 40: A.stopat('d'); break;
+        default:  break;
+        
+        }
+        world.process();
+        world.repaint();
+        },
+    atTimer: function () {
+        world.process();
+        world.repaint();
+    }
+};
+
+function GObj() {
+    this.x=Math.floor(Math.random()*130);
+    this.y=240;
+    this.w=20;
+    this.h=20;
+    this.pass=false;
+    this.color='#f00';
+    this.fcolor='#000';
+    this.char='B';
+    this.f = "8 pt Dejavu Mono Sans";
+    this.draw = function () {
+        ctx.save();
+
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x,this.y-this.h+2,this.h,this.w);
+        ctx.fillStyle = this.fcolor;
+        ctx.font = this.f;
+        ctx.fillText(this.char,this.x,this.y);
+        
+        ctx.restore();    
+    };
+}
+var block = new GObj();
+world.blocks.push(block);
+world.blocks.push(new GObj());
+
+b.onclick= function () {menu.add('a');menu.print();};
+////b.onkeypress = menu.keyhandler;
+//b.addEventListener('keypress',menu.keyhandler,false);
+b.addEventListener('keydown',world.keydown,false);
+b.addEventListener('keyup',world.keyup,false);
+//var timerId = setInterval(menu.print,1000);
+var timer2 = setInterval(world.atTimer,50);
+//ctx.translate(75,75);
+
+/*
+ * game: A - main char. всё остальное тоже буквы и слова. всё из слов и символов. оружие это буквы от z,y,x...
+ * gravity - G vv. press A make 'a' bigger and destroy . O - circle Shield
+ */
+
 
 
 
