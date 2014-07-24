@@ -10,8 +10,10 @@ namespace game
 		static Player player = new Player ();
 		public static void Main (string[] args)
 		{
-			Console.Clear ();
+			//Console.Clear ();
+			Console.CursorSize = 1;
 			Console.CursorVisible = false;
+
 
 			player.teleport(10,20);
 			//player.symbol = '&';
@@ -25,6 +27,7 @@ namespace game
 
 		public static void draw(){
 			//Console.Clear ();
+			//Console.CursorVisible = false;
 			drawFloor ();
 			foreach (Wall w in walls)
 				w.draw ();
