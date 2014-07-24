@@ -103,23 +103,28 @@ function drawListInFrameSel(a,x,y,s){
 var A = {
     x:100,
     y:100,
-    h:11;
-    w:11;
+    h:11,
+    w:11,
     L:100, //life
     spd:5,
-    actmov: [],
+    f:11,
+    vy:0,
+    g:-5,
+    actmov: ['g'],
     draw: function () {
         ctx.save();
-        
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(this.x,this.y,this.h,this.w);
         ctx.fillStyle = "#f2f";
-        ctx.font = "Bold 11pt Dejavu Mono Sans";
-        ctx.fillText('a',this.x,this.y);
+        ctx.font = "Bold "+this.f+"pt Dejavu Mono Sans";
+        ctx.fillText('a',this.x,this.y+this.f);
         ctx.fillStyle = "#fff";
         ctx.strokeStyle = '#fff';
         
         ctx.font = "8pt Dejavu Mono Sans";
         ctx.fillText(this.actmov.concat(),this.x+10,this.y+10);  
         ctx.fillText(this.L,this.x,this.y-10);  
+       
         
         ctx.restore();
         
@@ -129,7 +134,23 @@ var A = {
             this.move(this.actmov[a]);
             
         }
+        if (this.mayBeAt(this.x,this.y-this.vy)) 
+        this.y-=this.vy;
             
+    },
+        mayBeAt: function (x,y) {
+            for (var i=0; i<world.blocks.length;i++){
+                //alert((this.intersect(world.blocks[i],x,y)));
+                if (this.intersect(world.blocks[i],x,y)) return false;
+            }
+            return true;
+    },
+  intersect: function (b,x,y) {
+            //alert(' bx'+b.x+'x:'+x+' bw'+b.w+'| by'+b.y+' y:'+y+' bh'+b.h+'| w'+this.w+' h'+this.h);
+            return (x>b.x && x<b.x+b.w && y>b.y && y<b.y+b.h) || 
+                ((x+this.w)>b.x && (x+this.w)<b.x+b.w && y>b.y && y<b.y+b.h) || 
+                ((x+this.w)>b.x && (x+this.w)<b.x+b.w && (y+this.h)>b.y && (y+this.h)<b.y+b.h) || 
+                (x>b.x && x<b.x+b.w && (y+this.h)>b.y && (y+this.h)<b.y+b.h);
     },
     moveat: function (dir) {
         //if (this.actmov.indexOf(dir)===-1)
@@ -143,13 +164,26 @@ var A = {
     },
     move: function (dir) {
         switch (dir) {
-            case 'u': this.y-=this.spd; break;
-            case 'd': this.y+=this.spd; break;
-            case 'l': this.x-=this.spd; break;
-            case 'r': this.x+=this.spd; break;
+            case 'u': 
+                if (this.mayBeAt(this.x,this.y-this.spd))
+                 this.y-=this.spd; 
+            break;
+            case 'd': 
+            if (this.mayBeAt(this.x,this.y+this.spd)) this.y+=this.spd;  break;
+            case 'l': 
+            if (this.mayBeAt(this.x-this.spd,this.y)) this.x-=this.spd; break;
+            case 'r': 
+            if (this.mayBeAt(this.x+this.spd,this.y)) this.x+=this.spd; break;
+            case 'j': this.vy=20;
+            this.actmov.splice(this.actmov.indexOf('j'),1);
+             break;
+            //gravity
+            case 'g': 
+            if (this.vy >= this.g)
+                this.vy+=this.g; break;
         }
     }
-    
+
     };
 
 var menu = {
@@ -221,12 +255,15 @@ var world = {
     
     keydown: function (e) {
     e = e || window.event;
+    //alert(e.keyCode);
     if (! world.down[e.keyCode]) 
         {switch (e.keyCode){
         case 39: A.moveat('r'); break;
         case 37: A.moveat('l'); break;
         case 38: A.moveat('u'); break;
         case 40: A.moveat('d'); break;
+        case 74: //alert('J');
+            A.moveat('j'); break;
         default:  break;
         
         }}
@@ -241,7 +278,8 @@ var world = {
         case 39: A.stopat('r'); break;
         case 37: A.stopat('l'); break;
         case 38: A.stopat('u'); break;
-        case 40: A.stopat('d'); break;
+        case 40: A.stopat('d'); break; 
+        //case 74: A.stopat('j'); break; 
         default:  break;
         
         }
@@ -261,24 +299,34 @@ function GObj() {
     this.h=20;
     this.pass=false;
     this.color='#f00';
-    this.fcolor='#000';
-    this.char='B';
-    this.f = "8 pt Dejavu Mono Sans";
+    this.fcolor='#777';
+    this.char='Block';
+    this.f = "9 pt Dejavu Mono Sans";
     this.draw = function () {
         ctx.save();
-
+          
+        //ctx.scale(0.6,0.6);
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x,this.y-this.h+2,this.h,this.w);
+        ctx.fillRect(this.x,this.y,this.w,this.h);
         ctx.fillStyle = this.fcolor;
         ctx.font = this.f;
-        ctx.fillText(this.char,this.x,this.y);
+        
+        //ctx.fillText(this.char,this.x,this.y);
         
         ctx.restore();    
     };
 }
 var block = new GObj();
+block.x=0; block.y=250; block.w = 300; block.h = 20; block.color = '#862';
 world.blocks.push(block);
-world.blocks.push(new GObj());
+block = new GObj(); block.y=160;
+world.blocks.push(block);
+block = new GObj(); block.y=180;
+world.blocks.push(block);
+block = new GObj(); block.y=100;
+world.blocks.push(block);
+block = new GObj(); block.y=120;
+world.blocks.push(block);
 
 b.onclick= function () {menu.add('a');menu.print();};
 ////b.onkeypress = menu.keyhandler;
