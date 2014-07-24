@@ -1,3 +1,5 @@
+"use strict";
+
 var consoleEx = require('cli-color');
 //require('readline');
 
@@ -14,6 +16,13 @@ blank = Array(consoleEx.height*consoleEx.width+1).join('x');
 console.log(consoleEx.blueBright.bgBlack.bold(blank));
 console.log(consoleEx.blueBright.bgBlack.bold('hello node!'));
 
+function clear() {
+    process.stdout.write(consoleEx.moveTo(0, 0));
+    var blank = Array(consoleEx.height*consoleEx.width+1).join('x');
+    console.log(consoleEx.blueBright.bgBlack.bold(blank));
+    process.stdout.write(consoleEx.moveTo(0, 0));
+}
+
 var styleOne = consoleEx.redBright.bgBlack.bold;
 
 
@@ -26,9 +35,10 @@ var util = require('util');
 
 // listen for the "keypress" event
 process.stdin.on('keypress', function (ch, key) {
-  console.log(styleOne(util.format('got "keypress"', key)));
-  if (key && key.ctrl && key.name == 'c') {
-    process.stdin.pause();
+    clear()
+    console.log(styleOne(util.format('got "keypress"', key)));
+    if (key && key.ctrl && key.name == 'c') {
+        process.stdin.pause();
   }
 });
 
@@ -39,25 +49,3 @@ if (typeof process.stdin.setRawMode == 'function') {
 }
 process.stdin.resume();
 
-
-
-
-/*
-var stdin = process.stdin;  
-stdin.setRawMode(true);
-stdin.resume();
-stdin.setEncoding( 'utf8' );
-stdin.on( 'data', function( key ){
-  // ctrl-c ( end of text )
-  if ( key === '\u0003' ) {
-    process.exit();
-  }
-  switch (key)
-  {
-      case '\u000D': key='enter';  break;
-      default: break;
-  }
-  // write the key to stdout all normal like
-  process.stdout.write( '|'+key+'|' );
-});
-*/
