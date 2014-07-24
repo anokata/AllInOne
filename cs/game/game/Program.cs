@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using System.Collections;
+//using System.Collections;
+using System.Collections.Generic;
 
 namespace game
 {
@@ -13,9 +14,11 @@ namespace game
 			Console.CursorVisible = false;
 
 			player.teleport(10,20);
+			Wall w = new Wall (2, 2);
+			walls.Add(w);
+			walls.AddRange(WallConstructor.lineFromTo(3,3,10,5));
 
-			player.draw ();
-			inConsoleWindow (0, 0);
+			//player.draw ();
 			keyProcessAndRepaint ();
 		}
 
@@ -25,6 +28,7 @@ namespace game
 
 
 		}
+		public static List<Wall> walls = new List<Wall>();
 
 		public static void keyProcessAndRepaint(){
 			bool exit = false;
@@ -78,6 +82,10 @@ namespace game
 			Console.Write (symbol);
 
 		}
+		public void teleport(int x, int y){
+			this.x = x;
+			this.y = y;
+		}
 	}
 
 	class Player : GameObj {
@@ -85,10 +93,6 @@ namespace game
 
 		new public void draw() {
 			base.draw();
-		}
-		public void teleport(int x, int y){
-			this.x = x;
-			this.y = y;
 		}
 		public void move(MoveDirection direction){
 			switch (direction) {
@@ -113,7 +117,19 @@ namespace game
 		}
 	}
 	enum MoveDirection {Left, Right, Up, Down };
-	//class 
+	class Wall : GameObj {
+		new bool passable = false;
+		public Wall(int x, int y) {
+			teleport (x, y);
+		}
+	}
+	class WallConstructor {
+			public static List<Wall> lineFromTo(int x, int y, int u, int v){
+			List<Wall> result = new List<Wall>();
+
+			return result;
+		}
+	}
 }
 
 
