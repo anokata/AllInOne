@@ -17,17 +17,19 @@ namespace game
 			//player.symbol = '&';
 			Wall w = new Wall (2, 2);
 			walls.Add(w);
+			w.passable = true;
 			walls.AddRange(WallConstructor.lineFromTo(3,3,10,5));
 
 			keyProcessAndRepaint ();
 		}
 
 		public static void draw(){
-			Console.Clear ();
-			player.draw ();
+			//Console.Clear ();
+			drawFloor ();
 			foreach (Wall w in walls)
 				w.draw ();
 
+			player.draw ();
 		}
 		public static List<Wall> walls = new List<Wall>();
 
@@ -62,9 +64,27 @@ namespace game
 				Game.draw ();
 			}
 		}
+		public static bool canMove(int x, int y){
+			foreach (GameObj i in walls) {
+				if (!i.passable && (i.intersect (x, y)))
+					return false;
+			}
+			return true;
+		}
+
 		public static bool inConsoleWindow (int x, int y) {
 			return (x<Console.WindowWidth && x>=0 && y>=0 && y<Console.WindowHeight);
 		}
+
+		public static void drawFloor(){
+			string floor="";
+			for (int i = 0; i< Console.WindowWidth*Console.WindowHeight; i++)
+				floor += '.';
+
+			Console.SetCursorPosition (0, 0);
+			Console.Write (floor);
+		}
+
 
 	}
 
@@ -72,7 +92,7 @@ namespace game
 		protected int x;
 		protected int y;
 		protected char symbol='*';
-		protected bool passable = true;
+		public bool passable = true;
 		protected ConsoleColor bkcolor = ConsoleColor.Black;
 		protected ConsoleColor fgcolor = ConsoleColor.Blue;
 		protected void draw(){
@@ -85,6 +105,9 @@ namespace game
 		public void teleport(int x, int y){
 			this.x = x;
 			this.y = y;
+		}
+		public bool intersect(int x, int y){
+			return (this.x == x) && (this.y == y);
 		}
 	}
 
@@ -101,18 +124,22 @@ namespace game
 			switch (direction) {
 			case MoveDirection.Left:
 				if (x>0)
+					if (Game.canMove(x-1,y))
 				x--;
 				break;
 			case MoveDirection.Right:
 				if (Game.inConsoleWindow(x+1,y))
+					if (Game.canMove(x+1,y))
 				x++;
 				break;
 			case MoveDirection.Up:
 				if (y>0)
+					if (Game.canMove(x,y-1))
 				y--;
 				break;
 			case MoveDirection.Down:
 				if (Game.inConsoleWindow(x,y+1))
+					if (Game.canMove(x,y+1))
 				y++;
 				break;
 
@@ -121,11 +148,11 @@ namespace game
 	}
 	enum MoveDirection {Left, Right, Up, Down };
 	class Wall : GameObj {
-		new bool passable = false;
-		new public ConsoleColor fgcolor = ConsoleColor.White;
 		public Wall(int x, int y) {
 			teleport (x, y);
 			symbol = '#';
+			fgcolor = ConsoleColor.White;
+			passable = false;
 		}
 		new public void draw() {
 			base.draw();
