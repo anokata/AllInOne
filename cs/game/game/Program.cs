@@ -14,25 +14,26 @@ namespace game
 			Console.CursorVisible = false;
 
 			player.teleport(10,20);
+			//player.symbol = '&';
 			Wall w = new Wall (2, 2);
 			walls.Add(w);
 			walls.AddRange(WallConstructor.lineFromTo(3,3,10,5));
 
-			//player.draw ();
 			keyProcessAndRepaint ();
 		}
 
 		public static void draw(){
 			Console.Clear ();
 			player.draw ();
-
+			foreach (Wall w in walls)
+				w.draw ();
 
 		}
 		public static List<Wall> walls = new List<Wall>();
 
 		public static void keyProcessAndRepaint(){
 			bool exit = false;
-			player.draw ();
+			Game.draw ();
 			while (!exit) {
 				ConsoleKeyInfo keyInfo = Console.ReadKey (true);
 				char keyChar = keyInfo.KeyChar;
@@ -58,7 +59,6 @@ namespace game
 					break;
 				}
 				//
-				//player.draw ();
 				Game.draw ();
 			}
 		}
@@ -71,7 +71,7 @@ namespace game
 	class GameObj {
 		protected int x;
 		protected int y;
-		protected char symbol='.';
+		protected char symbol='*';
 		protected bool passable = true;
 		protected ConsoleColor bkcolor = ConsoleColor.Black;
 		protected ConsoleColor fgcolor = ConsoleColor.Blue;
@@ -90,6 +90,9 @@ namespace game
 
 	class Player : GameObj {
 		protected int life=1;
+		public Player(){
+			symbol = '@';
+		}
 
 		new public void draw() {
 			base.draw();
@@ -119,16 +122,49 @@ namespace game
 	enum MoveDirection {Left, Right, Up, Down };
 	class Wall : GameObj {
 		new bool passable = false;
+		new public ConsoleColor fgcolor = ConsoleColor.White;
 		public Wall(int x, int y) {
 			teleport (x, y);
+			symbol = '#';
+		}
+		new public void draw() {
+			base.draw();
 		}
 	}
 	class WallConstructor {
 			public static List<Wall> lineFromTo(int x, int y, int u, int v){
 			List<Wall> result = new List<Wall>();
+			bool AtEnd = false;
+			int currentX = x;
+			int currentY = y;
+			Random rnd = new Random();
+			int dirX = whereGo (x, u);
+			int dirY = whereGo (y, v);
+			do {
+				Wall wall = new Wall(currentX, currentY);
+				result.Add(wall);
+				//выберем куда повернуть
+				//int leftRightUpDownRate = (currentX - u)/(currentY - v);
+				switch (rnd.Next(0,2)) {
+				case 0: currentX+=dirX;break;
+				case 1: currentY+=dirY;break;
+				}
+				if (currentX == u) dirX = 0;
+				if (currentY == v) dirY = 0;
 
+				AtEnd = (currentX == u) && (currentY == v);
+			} while (!AtEnd);
 			return result;
-		}
+			}
+
+			static int whereGo(int frm, int to){
+			if (frm < to)
+				return 1;
+			else if (frm > to)
+				return -1;
+			else
+				return 0;
+			}
 	}
 }
 
