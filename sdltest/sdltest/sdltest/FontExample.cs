@@ -13,18 +13,17 @@ namespace SdlDotNetExamples.SmallDemos
     {
         Surface text;
         Surface screen;
-        int size = 12;
+        int size = 14;
         int width = 640;
         int height = 480;
         SdlDotNet.Graphics.Font font;
 		string filePath = Path.Combine("..", "..");
-		string fileDirectory = "";//"Data";
+		string fileDirectory = "";
 		//string fileName = "FreeSans.ttf";
 		string fileName = "DejaVuSansMono.ttf";
         Random rand = new Random();
-
-        string[] textArray = { "Hello World!", "This is a test", "FontExample", "SDL.NET" };
-        int[] styleArray = { 0, 1, 2, 4 };
+		string eventText = String.Empty;
+		int curY = 0;
 
         [STAThread]
         public static void Main()
@@ -47,60 +46,26 @@ namespace SdlDotNetExamples.SmallDemos
 
             string file = Path.Combine(Path.Combine(filePath, fileDirectory), fileName);
 			//Console.Write (file);
-            Events.Tick +=
-                new EventHandler<TickEventArgs>(Events_TickEvent);
+            //Events.Tick +=
+              //  new EventHandler<TickEventArgs>(Events_TickEvent);
             Events.KeyboardDown +=
                 new EventHandler<KeyboardEventArgs>(this.KeyboardDown);
             Events.Quit += new EventHandler<QuitEventArgs>(this.Quit);
-
+			//Events.KeyboardUp
             font = new SdlDotNet.Graphics.Font(file, size);
             Video.WindowIcon();
-            Video.WindowCaption = "SDL.NET - Font Example";
+            Video.WindowCaption = "[NOITPAC]";
             screen = Video.SetVideoMode(width, height, true);
 
             Surface surf = screen.CreateCompatibleSurface(width, height, true);
-            surf.Fill(new Rectangle(new Point(0, 0), surf.Size), Color.Black);
+            surf.Fill(new Rectangle(new Point(0, 0), surf.Size), Color.White);
             Events.Run();
         }
 
         private void Events_TickEvent(object sender, TickEventArgs e)
         {
-            try
-            {
-                font.Style = (Styles)styleArray[rand.Next(styleArray.Length)];
-                text = font.Render(
-                    textArray[rand.Next(textArray.Length)],
-                    Color.FromArgb(0, (byte)rand.Next(255),
-                    (byte)rand.Next(255), (byte)rand.Next(255)));
-
-                switch (rand.Next(4))
-                {
-                    case 1:
-                        text = text.CreateFlippedVerticalSurface();
-                        break;
-                    case 2:
-                        text = text.CreateFlippedHorizontalSurface();
-                        break;
-                    case 3:
-                        text = text.CreateRotatedSurface(rand.Next(360));
-                        break;
-                    default:
-                        break;
-                }
-
-                screen.Blit(
-                    text,
-                    new Rectangle(new Point(rand.Next(width - 100), rand.Next(height - 100)),
-                    text.Size));
                 screen.Update();
                 Thread.Sleep(500);
-            }
-            catch
-            {
-                //sdl.Dispose();
-				Console.Write ("error");
-                throw;
-            }
         }
 
         private void KeyboardDown(object sender, KeyboardEventArgs e)
@@ -110,6 +75,12 @@ namespace SdlDotNetExamples.SmallDemos
             {
                 Events.QuitApplication();
             }
+			eventText = "key: " + e.Key.ToString () + " char? " + e.KeyboardCharacter;
+			font.Style = Styles.Bold;
+			text = font.Render(eventText, Color.LightBlue, true);
+			screen.Blit(text,new Rectangle(new Point(0, curY), text.Size));
+			screen.Update();
+			curY += 20;
         }
 
         private void Quit(object sender, QuitEventArgs e)
@@ -121,7 +92,7 @@ namespace SdlDotNetExamples.SmallDemos
         {
             get
             {
-                return "F";
+                return "[ELTIT]";
             }
         }
 
