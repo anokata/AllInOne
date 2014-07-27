@@ -19,9 +19,10 @@ namespace SdlDotNetExamples.SmallDemos
 		static public int size = 14;
 		static int width = 640;
 		static int height = 480;
-		static int tileSize = 15;
-		static int tilesX = width/tileSize;
-		static int tilesY = height/tileSize;
+		public static int tileSize = 15;
+		public static int tilesX = width/tileSize;
+		public static int tilesY = height/tileSize;
+		//public static int tileW = height/tileSize;
 
 		public static SdlDotNet.Graphics.Font font;
 		string filePath = Path.Combine("..", "..");
@@ -30,6 +31,8 @@ namespace SdlDotNetExamples.SmallDemos
 		static public int curY = 0;
 		static Player player;
 		public static List<Wall> walls;
+		public static string floor="";
+		public static Surface floorFace;
 
         [STAThread]
         public static void Main()
@@ -42,13 +45,26 @@ namespace SdlDotNetExamples.SmallDemos
         {
 			string file = Path.Combine(filePath, fileName);
 			font = new SdlDotNet.Graphics.Font(file, size);
-			player = new Player ("A",30,30);
-			player.teleport(10,20);
+			player = new Player ("A",6,6);
+			//player.teleport(6,6);
 			walls = new List<Wall>();
-			//Wall w = new Wall ("#",2, 2);
-			//walls.Add(w);
-			//w.passable = true;
-			//walls.AddRange(WallConstructor.lineFromTo(3,3,10,5));
+			Wall w = new Wall ("#",2, 2);
+			walls.Add(w);
+			w.passable = true;
+			walls.AddRange(WallConstructor.lineFromTo(3,3,10,5));
+
+			floorFace = new Surface (Game.width, Game.height);
+			Surface floorTile = gameMakeFace (Styles.None, ".", Color.Black, Color.Coral);
+			Rectangle rect = new Rectangle (0,0,Game.tileSize,Game.tileSize);
+			for (int i = 0; i< Game.tilesX; i++) {
+				for (int j = 0; j< Game.tilesY; j++) {
+					floorFace.Blit (floorTile, rect);
+					rect.X += Game.tileSize;
+				}
+				rect.Y += Game.tileSize;
+				rect.X = 0;
+			}
+			//floorFace = Game.font.Render (Game.floor,Color.DarkSeaGreen);
 
 
 			Events.KeyboardDown +=
@@ -61,6 +77,8 @@ namespace SdlDotNetExamples.SmallDemos
 
 			Surface surf = screen.CreateCompatibleSurface(width, height, true);
 			surf.Fill(new Rectangle(new Point(0, 0), surf.Size), Color.White);
+			Game.draw ();
+			screen.Update();
 			Events.Run();
         }
 
@@ -72,7 +90,7 @@ namespace SdlDotNetExamples.SmallDemos
 
         private void KeyboardDown(object sender, KeyboardEventArgs e)
         {
-			
+			screen.Fill (new Rectangle (0, 0, width, height), Color.Black);
             // Check if the key pressed was a Q or Escape
             if (e.Key == Key.Escape || e.Key == Key.Q)
             {
@@ -80,21 +98,26 @@ namespace SdlDotNetExamples.SmallDemos
             }
 			eventText = "key: " + e.Key.ToString () + " char? " + e.KeyboardCharacter;
 			font.Style = Styles.Bold;
-			text = font.Render(eventText, Color.LightBlue, true);
+			text = font.Render(eventText, Color.Red, true);
 			screen.Blit(text,new Rectangle(new Point(0, curY), text.Size));
 
 			keyProcessAndRepaint (e.Key);
-
+			Game.draw ();
 			screen.Update();
-			curY += 20;
+			//curY += 20;
         }
 
 		public static void draw(){
-			//drawFloor ();f
+			drawFloor ();
 			foreach (Wall w in walls)
 				w.draw ();
 
 			player.draw ();
+		}
+
+		public static void drawFloor(){
+			Game.screen.Blit(floorFace,new Rectangle(0, 0, 
+			                                         Game.width, Game.height));
 		}
 
 		public static void keyProcessAndRepaint(Key k){
@@ -114,24 +137,30 @@ namespace SdlDotNetExamples.SmallDemos
 					break;
 				}
 				//
-				Game.draw ();
+				//Game.draw ();
 		}
 
 		public static Surface gameMakeFace(Styles style, string symbol, Color bkcolor, Color fgcolor)
 		{
 			Game.font.Style = style;
-			return Game.font.Render(symbol, bkcolor,fgcolor , true);
+			Surface res = new Surface (Game.tileSize, Game.tileSize); //Game.screen.CreateCompatibleSurface(Game.tileSize, Game.tileSize, true);
+			res.Fill(new Rectangle(new Point(0, 0), res.Size), bkcolor);
+			Surface fontSurf = Game.font.Render (symbol, fgcolor, bkcolor, true);
+			Rectangle center = fontSurf.Rectangle;
+			center.X += (Game.tileSize - fontSurf.Width) / 2;
+			res.Blit (fontSurf,center);
+			return res;
 		}
-
+		//Rectangle.intersectWith
 		public static bool isInWindow (int x, int y) {
 			return (x<Game.tilesX && x>=0 && y>=0 && y<Game.tilesY);
 		}
 
 		public static bool canMove(int x, int y){
-			/*foreach (GameObj i in walls) {
+			foreach (GameObj i in walls) {
 				if (!i.passable && (i.intersect (x, y)))
 					return false;
-			}*/
+			}
 			return true;
 		}
 
@@ -197,10 +226,10 @@ namespace SdlDotNetExamples.SmallDemos
 		protected Surface symbolFace;
 		public bool passable = true;
 		protected Color bkcolor = Color.Black;
-		protected Color fgcolor = Color.Blue;
+		protected Color fgcolor = Color.LightGoldenrodYellow;
 		protected void draw(){
-			Game.screen.Blit(symbolFace,new Rectangle(x*Game.size, y*Game.size, 
-			                                                 Game.size, Game.size));
+			Game.screen.Blit(symbolFace,new Rectangle(x*Game.tileSize, y*Game.tileSize, 
+			                                          Game.tileSize, Game.tileSize));
 
 		}
 		public void teleport(int x, int y){
@@ -210,12 +239,15 @@ namespace SdlDotNetExamples.SmallDemos
 		public bool intersect(int x, int y){
 			return (this.x == x) && (this.y == y);
 		}
-		protected GameObj(string symbol, int x, int y){
+		protected GameObj(string symbol, int x, int y, Color bk, Color fg){
 			this.symbol = symbol;
 			this.x = x;
 			this.y = y;
 			//Game.font.Style = Styles.Bold;
 			//		symbolFace = Game.font.Render(symbol, bkcolor,fgcolor , true);
+			symbolFace = Game.gameMakeFace (Styles.Bold, this.symbol, bk, fg);
+		}
+		protected void remakeFace(){
 			symbolFace = Game.gameMakeFace (Styles.Bold, this.symbol, this.bkcolor, this.fgcolor);
 		}
 	
@@ -223,10 +255,12 @@ namespace SdlDotNetExamples.SmallDemos
 
 	class Player : GameObj {
 		protected int life=1;
-		public Player(string symbol, int x, int y) : base(symbol , x ,y)
+		public Player(string symbol, int x, int y) : base(symbol , x ,y, Color.White, Color.Black)
 		{
 			//symbol = "@";
-			bkcolor = Color.AliceBlue;
+			bkcolor = Color.Black;
+			fgcolor = Color.Blue;
+			remakeFace ();
 		}
 
 		new public void draw() {
@@ -260,13 +294,14 @@ namespace SdlDotNetExamples.SmallDemos
 	}
 	enum MoveDirection {Left, Right, Up, Down };
 	public class Wall : GameObj {
-		public Wall(string symbol, int x, int y) : base(symbol , x ,y)
+		public Wall(string symbol, int x, int y) : base(symbol , x ,y, Color.White, Color.ForestGreen)
 		{
 			//teleport (x, y);
 			//symbol = "#";
-			fgcolor = Color.White;
-			bkcolor = Color.Lime;
+			fgcolor = Color.LimeGreen;
+			bkcolor = Color.Black;
 			passable = false;
+			remakeFace ();
 		}
 		new public void draw() {
 			base.draw();
@@ -282,7 +317,7 @@ namespace SdlDotNetExamples.SmallDemos
 			int dirX = whereGo (x, u);
 			int dirY = whereGo (y, v);
 			do {
-				Wall wall = new Wall("#", currentX, currentY);
+				Wall wall = new Wall("T", currentX, currentY);
 				result.Add(wall);
 				//выберем куда повернуть
 				//int leftRightUpDownRate = (currentX - u)/(currentY - v);
