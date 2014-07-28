@@ -120,6 +120,33 @@ end.
 Example testmul: (mult 8 (S (S (S O)))) = 24.
 Proof. reflexivity. Qed.
 
+Fixpoint fac(n:nat):nat :=
+match n with
+| O => S O
+| S m => mul (S m) (fac m)
+end.
+
+Eval compute in fac 8.
+Example testfac1 : fac 3 = 6.
+Proof. reflexivity. Qed.
+Example tetsfac2 : fac 5 = (mult 10 12).
+Proof. reflexivity. Qed.
+
+Notation "x + y" := (plus x y) 
+  (at level 50, left associativity) : nat_scope.
+Notation "x - y" := (minus x y)
+                       (at level 50, left associativity)
+                       : nat_scope.
+Notation "x * y" := (mult x y)
+                       (at level 40, left associativity)
+                       : nat_scope.
+Notation "x !" := (fac x)
+  (at level 60) : nat_scope.
+
+Eval compute in  7 ! + 1.
+Example testnotat: 7 ! + 1 = 50 * 100 + 41.
+Proof. reflexivity. Qed.
+
 
 End Play2.
 
