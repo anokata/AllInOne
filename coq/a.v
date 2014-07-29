@@ -147,7 +147,67 @@ Eval compute in  7 ! + 1.
 Example testnotat: 7 ! + 1 = 50 * 100 + 41.
 Proof. reflexivity. Qed.
 
+Fixpoint eqnat (n m : nat) : bin :=
+match n with
+| O => match m with
+       | O => t
+       | S k => f
+       end
+| S k => match m with
+         | O => f
+         | S l => eqnat k l
+         end
+end.
+Eval compute in eqnat 3 (S (S (S O))).
+Eval compute in eqnat (3*4) (4*3).
+Notation "x == y" := (eqnat x y)
+                       (at level 69, left associativity)
+                       : nat_scope.
+Eval compute in  2*2 == 4.
+Eval compute in  2*2 == 5.
+
+Theorem plusOn : forall n : nat, 0 + n = n.
+Proof. 
+intros n.
+reflexivity.
+Qed.
+Theorem plus1l : forall n:nat, 1 + n = S n.
+Proof.
+ intros n.
+ reflexivity.
+Qed.
+
+Fact mult0l : forall n:nat, 0 * n = 0.
+Proof.
+intros n.
+reflexivity.
+Qed.
+
+Theorem plus_id_exm : forall n m : nat,
+ n = m -> n + n = m + m.
+Proof.
+intros n m.
+intros H.
+rewrite <- H.
+reflexivity. Qed.
+
+Theorem plus_id_ex : forall n m o : nat, 
+ n=m -> m=o -> n+m=m+o.
+Proof.
+intros n m o.
+intros H1.
+intros H2.
+rewrite -> H1.
+rewrite <- H2.
+reflexivity.
+Qed.
+
+
+
 
 End Play2.
+
+
+
 
 
