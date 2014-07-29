@@ -202,6 +202,51 @@ rewrite <- H2.
 reflexivity.
 Qed.
 
+Theorem mult_o_plus : forall n m : nat,
+ (0 + n) * m = n * m.
+Proof.
+intros n m.
+rewrite -> plusOn.
+reflexivity. Qed.
+
+Theorem mult_S_1 : forall n m : nat,
+ m = S n -> m * ( 1 + n ) = m * m.
+Proof.
+intros n m.
+intros H.
+rewrite -> plus1l.
+rewrite <- H.
+reflexivity. 
+Qed.
+
+Theorem plus_1_neq_0_f : forall n : nat,
+  eqnat ( n + 1 ) 0 = f.
+Proof. 
+intros n.
+destruct n as [| k].
+reflexivity.
+reflexivity.
+Qed.
+
+Theorem neg_involut : forall a : bin,
+  nt (nt a) = a.
+Proof.
+intros a.
+destruct a.
+reflexivity.
+reflexivity.
+Qed.
+
+Theorem zero_neq_plus_1 : forall n : nat,
+  eqnat 0 (n + 1) = f.
+Proof.
+intros n.
+destruct n as [|m].
+reflexivity.
+reflexivity.
+Qed.
+
+(* Theorem zeql : 0 = 1. Proof. Admitted. *)
 
 
 
