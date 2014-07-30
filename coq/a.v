@@ -248,9 +248,62 @@ Qed.
 
 (* Theorem zeql : 0 = 1. Proof. Admitted. *)
 
+Theorem identity_fn_applied_twice :
+ forall (f: bin -> bin),
+ (forall (x:bin), f x = x) ->
+ forall(b:bin), f (f b) = b.
+Proof.
+intros f.
+intros H.
+intros b.
+rewrite -> H.
+rewrite -> H.
+reflexivity.
+Qed.
+
+Theorem not_fn_applied_twice :
+ forall (f: bin -> bin),
+ (forall (x:bin), f x = nt x) ->
+ forall(b:bin), f (f b) = b.
+Proof.
+intros f.
+intros H.
+intros b.
+rewrite -> H.
+rewrite -> H.
+rewrite -> neg_involut.
+reflexivity.
+Qed.
+
+Theorem and_eq_not_or:
+forall (a b : bin),
+n a b = nt (v (nt a) (nt b)).
+Proof.
+intros a b.
+destruct a.
+destruct b.
+reflexivity.
+reflexivity.
+reflexivity.
+Qed.
 
 
-End Play2.
+
+Theorem and_eq_or : 
+ forall (b c :bin),
+ (n b c = v b c) -> b = c.
+Proof.
+intros b c.
+destruct b.
+destruct c.
+
+reflexivity.
+reflexivity.
+rewrite -> and_eq_not_or.
+intros H.
+
+
+(* End Play2. *)
 
 
 
