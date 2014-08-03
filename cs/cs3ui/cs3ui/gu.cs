@@ -9,6 +9,9 @@ namespace MWFTestApplication {
 		static Label label;
 		static TextBox text;
 		RichTextBox text2;
+		enum ModKeys {Nok, Ctrl, Shift};
+		static ModKeys mkeys = ModKeys.Nok;
+
 		public MainWindow() {
 
 			ClientSize = new System.Drawing.Size (450, 450);
@@ -36,13 +39,20 @@ namespace MWFTestApplication {
 
 		static void keydownText (object s, KeyEventArgs e){
 			MainWindow.label.Text = e.KeyValue.ToString();
+			if (e.Control)
+				MainWindow.mkeys = ModKeys.Ctrl;
+			else
+				MainWindow.mkeys = ModKeys.Nok;
 			//e.SuppressKeyPress
 			e.Handled = true;
 		}
 		static void keypressText (object s, KeyPressEventArgs e){
 			MainWindow.label.Text += e.KeyChar;
+			if (MainWindow.mkeys != ModKeys.Ctrl)
+				MainWindow.label.Text += "C";
 			//e.SuppressKeyPress
-			e.Handled = true;
+			e.Handled = MainWindow.mkeys != ModKeys.Ctrl;
+
 		}
 
 		public static void Main(string[] args) {
