@@ -1,5 +1,6 @@
 using System;
 
+
 namespace test1
 {
 	class MainClass
