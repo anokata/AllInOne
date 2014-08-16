@@ -11,10 +11,10 @@ import Data.Monoid
 - [ ] Функцию заменяющую тэг с атрибутом с *данным* именем, с текстом на *данный* текст
         тип :: XNode -> String -> String -> XNode
         арг node attrName newText
-            - [ ] сделаем тестовые данные, заменим текст тэга с атрибутом target 
+            - [x] сделаем тестовые данные, заменим текст тэга с атрибутом target 
                 "<not notarget='f'>text</not>"
                 "<tot target='s'>source</tot>" -> "<tot target='s'>dest</tot>"
-        - [ ] функцию проверки тэга :: attrnode tagName tagText :: XNode -> String -> String -> Bool
+        - [x] функцию проверки тэга :: attrnode tagName tagText :: XNode -> String -> String -> Bool
 - [ ] промапить данной функцией всё дерево
 - [ ] Функцию заменяющую тэг с атрибутом с *данным* именем и *данным* значением, с текстом на *данный* текст
 -}
@@ -30,16 +30,42 @@ test1x = P.xread test1
 test1xa = Tree.getNode $ head test1x
 test1xatr = maybe [] id (XN.getAttrl test1xa)
 testA = isThatAttr (head (fromMaybe $ getAttr $ head test1x)) "target" "s"
+testrepltext1 = Tree.getChildren $ head test1x
+testrepltext2 = fromMaybe $ XN.getText $ head  $ Tree.getChildren $ head test1x
+
+test2 = P.xread "<tot otherattr='da' target='s'>source</tot>"
+test2AttrsIs = or $ (fmap (\x-> isThatAttr x "target" "s") (getAttrf $ head test2))
+test3 = replaceTextIn (head test1x) "NEWTEXT"
+test3n = P.xread "<tot otherattr='da' targets='s'>source</tot>"
+test3a = P.xread "<tot otherattr='da' target='a'>source</tot>"
+test3nn = replaceTextIn (head test3n) "NEWTEXT"
+test3aa = replaceTextIn (head test3a) "NEWTEXT"
+
+
+replaceTextIn :: NTree H.XNode -> String -> NTree H.XNode
+replaceTextIn n@(NTree (H.XTag tagName attrList) childWithText) newText = 
+    if (or (fmap (\x-> isThatAttr x "target" "s") attrList)) then 
+        (NTree (H.XTag tagName attrList) (replaceText childWithText newText))
+        else n
+replaceTextIn n _ = n
+
+replaceText :: H.XmlTrees -> String -> H.XmlTrees
+replaceText ((NTree (H.XText _) [])  : other) newText = ((NTree (H.XText newText) [])  : other)
+replaceText n _ = n
+
 
 getAttr :: H.XmlTree -> Maybe H.XmlTrees
 getAttr = XN.getAttrl . Tree.getNode 
+
+getAttrf :: H.XmlTree -> H.XmlTrees
+getAttrf = fromMaybe . XN.getAttrl . Tree.getNode 
 
 fromMaybe :: (Monoid a) => Maybe a -> a
 fromMaybe a = maybe mempty id a
 
 {-NTree (XTag "tot" 
                 [NTree (XAttr "target") 
-                       [NTree (XText "s") []]]) 
+                       [NTree (XText "s") []]])
       [NTree (XText "source") []] -}
 --то есть надо у тэга проверить атрибут и если он подходит то найти текст и если он есть заменить его
 
