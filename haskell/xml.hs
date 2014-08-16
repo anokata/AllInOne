@@ -7,6 +7,8 @@ import qualified Text.XML.HXT.DOM.QualifiedName as QN
 import qualified Text.XML.HXT.DOM.XmlNode as XN
 import Data.Monoid
 import qualified Text.XML.HXT.DOM.ShowXml as SX
+import Data.UUID -- toString fromString
+import Data.UUID.V4 -- nextRandom
 --import qualified Text.XML.HXT.DOM.XmlTreeFilter as R
 {-TODO
 - [x] Функцию заменяющую тэг с атрибутом с *данным* именем, с текстом на *данный* текст
@@ -23,18 +25,18 @@ import qualified Text.XML.HXT.DOM.ShowXml as SX
  - [x] надо сделать замену не текста в этом теге а текста в определённом теге
         Функцию заменяющую содержание текста тегов содержащихся в тэге с атрибутом с *данным* именем и *данным* значением
 - [ ] заменять UUID все на новые
-    - [ ] разобраться с генерацией UUID
+    - [x] разобраться с генерацией UUID
+    - [ ] заменять не просто на текст, а передавать функцию принимающую предыдущее значения текста и возвр. новое
     - [ ] хранить список пар заменённых
     - [ ] заменять одинаковые на одинаковые
 - [ ] опционально заменять versionFirst true/false
 - [ ] заменять время versionStartTime на новое везде
 - [ ] в конце в строке заменять старые уиды(мы же их ещё храним) на новые (в dataSourceRef - uuid)
 - [ ] заменять имена ?
+- [x] добавить комментарии пока я помню что тут творится
+  - [ ] продолжать добавлять комментарии
 -}
-isThatAttr :: NTree H.XNode -> String -> String -> Bool
-isThatAttr (NTree (H.XAttr qname) [NTree (H.XText text) []]) tagName tagText | (QN.qualifiedName qname) == tagName && text == tagText = True
-isThatAttr _ _ _ = False
-
+{-
 tagTextReplace :: H.XNode -> String -> String -> H.XNode
 --tagTextReplace (H.XTag name trees) attrName newText = 
 tagTextReplace x _ _ = x
@@ -53,35 +55,50 @@ test3n = P.xread "<tot otherattr='da' targets='s'>source</tot>"
 test3a = P.xread "<tot otherattr='da' target='a'>source</tot>"
 test3nn = replaceTextIn (head test3n) "NEWTEXT" "targets" "s"
 test3aa = replaceTextIn (head test3a) "NEWTEXT" "target" "s"
+-}
+-- тот ли это атрибут, проверяем по имени и значению
+isThatAttr :: NTree H.XNode -> String -> String -> Bool
+-- сопоставляем со структурой узла аттрибута и проверяем
+isThatAttr (NTree (H.XAttr qname) [NTree (H.XText text) []]) tagName tagText | (QN.qualifiedName qname) == tagName && text == tagText = True
+isThatAttr _ _ _ = False
 
-
+-- заменяем текст в ноде с конкретным аттрибутом
 replaceTextIn :: NTree H.XNode -> String -> String -> String -> NTree H.XNode
+-- сопоставляем структуру узла
 replaceTextIn n@(NTree (H.XTag tagName attrList) childWithText) newText attrName attrVal = 
+-- если там есть хоть один такой аттрибут
     if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
+    -- то заменяем текст в дочерних узлах
         (NTree (H.XTag tagName attrList) (replaceText childWithText newText))
         else (NTree (H.XTag tagName attrList) (fmap (\x-> replaceTextIn x newText attrName attrVal) childWithText)) 
 replaceTextIn n _ _ _ = n
 
+-- замена значений текстовых узлов 
 replaceText :: H.XmlTrees -> String -> H.XmlTrees
+-- сопоставляем и конструируем туже структуру но с новым значением
 replaceText ((NTree (H.XText _) [])  : other) newText = ((NTree (H.XText newText) [])  : other)
 replaceText n _ = n
 
+-- заменяем текст в дочерних узлах с конкретным именем, в ноде с конкретным аттрибутом
 replaceTextInChild :: NTree H.XNode -> String -> String -> String -> String -> NTree H.XNode
 replaceTextInChild n@(NTree (H.XTag tagName attrList) childs) newText attrName attrVal inTag = 
+-- аналогично, но применяем мап заменой
     if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
         (NTree (H.XTag tagName attrList) (fmap (\x-> replaceTextChild x newText inTag) childs ))
         else (NTree (H.XTag tagName attrList) (fmap (\x-> replaceTextInChild x newText attrName attrVal inTag ) childs)) 
 replaceTextInChild n _ _ _ _ = n
 
+-- замена текста в одном дочернем узле с определённым именем
 replaceTextChild :: H.XmlTree -> String -> String -> H.XmlTree
 replaceTextChild n@(NTree (H.XTag tagName a) childWithText) newText inTag | (QN.qualifiedName tagName) == inTag = 
     (NTree (H.XTag tagName a) (replaceText childWithText newText))
 replaceTextChild n _ _ = n
 
+-- применяет замену по всему дереву
 replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -> [NTree H.XNode]
 replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
 
-
+{-
 getAttr :: H.XmlTree -> Maybe H.XmlTrees
 getAttr = XN.getAttrl . Tree.getNode 
 
@@ -93,13 +110,13 @@ fromMaybe a = maybe mempty id a
 
 replaceInTree :: H.XmlTrees -> String -> String -> String -> H.XmlTrees
 replaceInTree tree text attrName attrVal = fmap (\x-> replaceTextIn x text attrName attrVal ) tree
-
+-}
 {-NTree (XTag "tot" 
                 [NTree (XAttr "target") 
                        [NTree (XText "s") []]])
       [NTree (XText "source") []] -}
 --то есть надо у тэга проверить атрибут и если он подходит то найти текст и если он есть заменить его
-
+-- всякие тесты
 testXMLs = "<a><A y='Y'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e:e><f:f t:t='t'><v>val</v><v:v>val2</v:v></f:f></e:e></c>"
 testXML = P.xread testXMLs
 b = F.formatXmlTree $ head testXML
@@ -132,7 +149,5 @@ mtest = do
     print "ok"
 
 main = do 
-    
-    
     
     print "end."
