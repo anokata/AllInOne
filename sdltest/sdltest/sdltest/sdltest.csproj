@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>sdltest</RootNamespace>
     <AssemblyName>sdltest</AssemblyName>
-    <StartupObject>SdlDotNetExamples.SmallDemos.FontExample</StartupObject>
+    <StartupObject>SdlDotNetExamples.SmallDemos.Game</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,9 +45,8 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FontExample.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="FontExample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FreeSans.ttf" />
