@@ -17,10 +17,10 @@ import qualified Text.XML.HXT.DOM.ShowXml as SX
                 "<tot target='s'>source</tot>" -> "<tot target='s'>dest</tot>"
         - [x] функцию проверки тэга :: attrnode tagName tagText :: XNode -> String -> String -> Bool
 - [x] Функцию заменяющую тэг с атрибутом с *данным* именем и *данным* значением, с текстом на *данный* текст
-- [?] промапить данной функцией всё дерево, вглубь
-    - [ ] надо лучше протестировать
+- [x] промапить данной функцией всё дерево, вглубь
+    - [x] надо лучше протестировать
 - [ ] скопировать и почистить исходник от тестового хлама
- - [ ] надо сделать замену не текста в этом теге а текста в определённом теге
+ - [x] надо сделать замену не текста в этом теге а текста в определённом теге
         Функцию заменяющую содержание текста тегов содержащихся в тэге с атрибутом с *данным* именем и *данным* значением
 - [ ] заменять UUID все на новые
     - [ ] разобраться с генерацией UUID
@@ -32,7 +32,7 @@ import qualified Text.XML.HXT.DOM.ShowXml as SX
 - [ ] заменять имена ?
 -}
 isThatAttr :: NTree H.XNode -> String -> String -> Bool
-isThatAttr (NTree (H.XAttr qname) [NTree (H.XText text) []]) tagName tagText | (QN.localPart qname) == tagName && text == tagText = True
+isThatAttr (NTree (H.XAttr qname) [NTree (H.XText text) []]) tagName tagText | (QN.qualifiedName qname) == tagName && text == tagText = True
 isThatAttr _ _ _ = False
 
 tagTextReplace :: H.XNode -> String -> String -> H.XNode
@@ -66,17 +66,20 @@ replaceText :: H.XmlTrees -> String -> H.XmlTrees
 replaceText ((NTree (H.XText _) [])  : other) newText = ((NTree (H.XText newText) [])  : other)
 replaceText n _ = n
 
-replaceTextInChilds :: NTree H.XNode -> String -> String -> String -> String -> NTree H.XNode
-replaceTextInChilds n@(NTree (H.XTag tagName attrList) childs) newText attrName attrVal inTag = 
+replaceTextInChild :: NTree H.XNode -> String -> String -> String -> String -> NTree H.XNode
+replaceTextInChild n@(NTree (H.XTag tagName attrList) childs) newText attrName attrVal inTag = 
     if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
         (NTree (H.XTag tagName attrList) (fmap (\x-> replaceTextChild x newText inTag) childs ))
-        else (NTree (H.XTag tagName attrList) (fmap (\x-> replaceTextInChilds x newText attrName attrVal inTag ) childs)) 
-replaceTextInChilds n _ _ _ _ = n
+        else (NTree (H.XTag tagName attrList) (fmap (\x-> replaceTextInChild x newText attrName attrVal inTag ) childs)) 
+replaceTextInChild n _ _ _ _ = n
 
 replaceTextChild :: H.XmlTree -> String -> String -> H.XmlTree
-replaceTextChild n@(NTree (H.XTag tagName a) childWithText) newText inTag | (QN.localPart tagName) == inTag = 
+replaceTextChild n@(NTree (H.XTag tagName a) childWithText) newText inTag | (QN.qualifiedName tagName) == inTag = 
     (NTree (H.XTag tagName a) (replaceText childWithText newText))
 replaceTextChild n _ _ = n
+
+replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -> [NTree H.XNode]
+replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
 
 
 getAttr :: H.XmlTree -> Maybe H.XmlTrees
@@ -97,7 +100,7 @@ replaceInTree tree text attrName attrVal = fmap (\x-> replaceTextIn x text attrN
       [NTree (XText "source") []] -}
 --то есть надо у тэга проверить атрибут и если он подходит то найти текст и если он есть заменить его
 
-testXMLs = "<a><A y='Y'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e><f t='t'><v>val</v><v>val2</v></f></e></c>"
+testXMLs = "<a><A y='Y'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e:e><f:f t:t='t'><v>val</v><v:v>val2</v:v></f:f></e:e></c>"
 testXML = P.xread testXMLs
 b = F.formatXmlTree $ head testXML
 c = putStrLn b
@@ -117,13 +120,15 @@ ftest = fmap (\x-> replaceTextIn x "" "" "" ) testXML
 ftesta a b c = fmap (\x-> replaceTextIn x a b c ) testXML
 ptest a b c = showx (ftesta a b c)
 
-rtest a b c d = fmap (\x-> replaceTextInChilds x a b c d) 
-rr a b c d = 
+rtest a b c d = fmap (\x-> replaceTextInChild x a b c d) 
+rr a b c d e = showx (rtest a b c d e)
 
 mtest = do 
     con <- readFile "/home/ksi/dev/testweb/1.xml"
-    let res = replaceInTree (P.xread con) "NEWTEXT" "sv:name" "jcr:uuid"
-    writeFile "/home/ksi/dev/testweb/out.xml" (SX.xshow res)
+    let res = replaceTextInChilds (P.xread con) "NEWTEXT" "sv:name" "jcr:uuid" "sv:value"
+    let res' = replaceTextInChilds res "NEWVERSION" "sv:name" "fm:versionName" "sv:value"
+    
+    writeFile "/home/ksi/dev/testweb/out.xml" (SX.xshow res')
     print "ok"
 
 main = do 
