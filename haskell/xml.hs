@@ -9,6 +9,7 @@ import Data.Monoid
 import qualified Text.XML.HXT.DOM.ShowXml as SX
 import Data.UUID -- toString fromString
 import Data.UUID.V4 -- nextRandom
+import Data.Text(count, pack)
 --import qualified Text.XML.HXT.DOM.XmlTreeFilter as R
 {-TODO
 - [x] Функцию заменяющую тэг с атрибутом с *данным* именем, с текстом на *данный* текст
@@ -31,8 +32,11 @@ import Data.UUID.V4 -- nextRandom
     - [ ] заменять одинаковые на одинаковые
 - [ ] опционально заменять versionFirst true/false
 - [ ] заменять время versionStartTime на новое везде
+    - [ ] узнать как получить текущее время
+    - [ ] перевести его в нужный формат
 - [ ] в конце в строке заменять старые уиды(мы же их ещё храним) на новые (в dataSourceRef - uuid)
 - [ ] заменять имена ?
+- [ ] специально обрабатывать первую строку
 - [x] добавить комментарии пока я помню что тут творится
   - [ ] продолжать добавлять комментарии
 -}
@@ -56,6 +60,8 @@ test3a = P.xread "<tot otherattr='da' target='a'>source</tot>"
 test3nn = replaceTextIn (head test3n) "NEWTEXT" "targets" "s"
 test3aa = replaceTextIn (head test3a) "NEWTEXT" "target" "s"
 -}
+-- тип для списка уидов, найденных и на что заменённых
+type Uids = [(UUID,UUID)]
 -- тот ли это атрибут, проверяем по имени и значению
 isThatAttr :: NTree H.XNode -> String -> String -> Bool
 -- сопоставляем со структурой узла аттрибута и проверяем
@@ -97,7 +103,35 @@ replaceTextChild n _ _ = n
 -- применяет замену по всему дереву
 replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -> [NTree H.XNode]
 replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
+-- функции замены для UUID
+type TextNodeChgFun = String -> String
 
+replaceUUIDInChild ::  TextNodeChgFun -> String -> String -> String -> NTree H.XNode -> NTree H.XNode
+replaceUUIDInChild newUuidFun attrName attrVal inTag n@(NTree (H.XTag tagName attrList) childs) = 
+    if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
+        (NTree (H.XTag tagName attrList) (fmap (replaceUUIDChild newUuidFun inTag) childs ))
+        else (NTree (H.XTag tagName attrList) (fmap (replaceUUIDInChild newUuidFun attrName attrVal inTag) childs)) 
+replaceUUIDInChild _ _ _ _ n = n
+
+replaceUUIDChild :: TextNodeChgFun -> String -> H.XmlTree -> H.XmlTree
+replaceUUIDChild newUuidFun inTag n@(NTree (H.XTag tagName a) childWithText) | (QN.qualifiedName tagName) == inTag = 
+    (NTree (H.XTag tagName a) (replaceUUID childWithText newUuidFun))
+replaceUUIDChild _ _ n = n
+
+replaceUUID :: H.XmlTrees -> TextNodeChgFun -> H.XmlTrees
+replaceUUID ((NTree (H.XText t) [])  : other) f = ((NTree (H.XText (f t)) [])  : other)
+replaceUUID n _ = n
+
+replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String -> [NTree H.XNode]
+replaceUUIDInChilds nodes t a v n = fmap (replaceUUIDInChild t a v n) nodes
+-- ---
+countUUIDs :: String -> Int
+countUUIDs input = count (pack "uuid") (pack input)
+
+genEnoghUUIDs :: String -> IO [UUID]
+genEnoghUUIDs xml = mapM (\_->nextRandom) [1..(countUUIDs xml)]
+    
+                       
 {-
 getAttr :: H.XmlTree -> Maybe H.XmlTrees
 getAttr = XN.getAttrl . Tree.getNode 
@@ -117,8 +151,7 @@ replaceInTree tree text attrName attrVal = fmap (\x-> replaceTextIn x text attrN
       [NTree (XText "source") []] -}
 --то есть надо у тэга проверить атрибут и если он подходит то найти текст и если он есть заменить его
 -- всякие тесты
-testXMLs = "<a><A y='Y'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e:e><f:f t:t='t'><v>val</v><v:v>val2</v:v></f:f></e:e></c>"
-testXML = P.xread testXMLs
+testXML = P.xread "<a><A y='uuid'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e:e><f:f t:t='t'><v>val</v><v:v>val2</v:v></f:f></e:e></c>"
 b = F.formatXmlTree $ head testXML
 c = putStrLn b
 
@@ -127,7 +160,6 @@ e = mapM putStrLn d
 showx x = mapM putStrLn (fmap F.formatXmlTree x)
 
 f = head testXML
---g H.XTag x = x
 g (H.XText x) = H.XText $ "new" ++ x
 g x = x 
 h = fmap g f
@@ -139,6 +171,8 @@ ptest a b c = showx (ftesta a b c)
 
 rtest a b c d = fmap (\x-> replaceTextInChild x a b c d) 
 rr a b c d e = showx (rtest a b c d e)
+
+--testUUIDreplace = replaceUUIDInChilds testXML (\_->nextRandom) "" "" ""
 
 mtest = do 
     con <- readFile "/home/ksi/dev/testweb/1.xml"
