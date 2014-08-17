@@ -151,14 +151,37 @@ replaceUUID f =
 replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String  -> UUIDState -> [NTree H.XNode]
 replaceUUIDInChilds nodes t a v n rs = fmap (replaceUUIDInChild t a v n rs) nodes
 
-может обойдёмся без состояния? можно например сделать двух проходно:
+может обойдёмся без состояния? можно например сделать двухпроходно:
 сначала пройтись и собрать (результат не дерево а только список) все уиды(уникальные только)
 подсчитать их, сгенерить нужное количество новых, собрав в список замен их. и с этими данными
 запустить другой обход, который и заменит соответственным образом.
 получится?
 - [ ] попробовать данным образом сделать
+  - [ ] первый проход. сбор значений в список\множество nub
+    - [ ] сделать нормальный общий обход fold и саккумулировать уже что надо. как только его сделать условным? это уже есть и зипер тож
+       есть фмап. фолд. можно ещё больше декомпозировать:
+        * обойти и собрать нужные узлы (с атрибутом требуемым)
+        * извлечь из них нужные данные
 
+
+mapXml :: H.XmlTrees -> (H.XNode -> a) -> [NTree a]
+mapXml t f = fmap (\x->fmap f x) t -- mapXml f = fmap . fmap f
+filterXml :: H.XmlTrees -> (H.XNode -> Bool) -> H.XmlTrees
+filterXml t f = mapXml t (\x-> if (f x) then x else H.XCmt "")
+
+getThatAttrNode :: H.XmlTrees -> String -> String -> H.XmlTrees
+getThatAttrNode t attrName attrVal = filterXml t (\x-> isThatAttr x attrName attrVal)
+-- а вот надо обойти не ноды а все деревья и поддеревья в XTag
 -}
+mapXMLtags :: H.XmlTrees -> (H.XmlTree -> H.XmlTrees) -> H.XmlTrees
+mapXMLtags (h:t) f = (everyNTree h) ++ (mapXMLtags t f)
+    where everyNTree t@(NTree (H.XTag qname attrs) other) = (f t) ++ (mapXMLtags other f) -- ++ (mapXML other f)
+          everyNTree x = []
+mapXMLtags [] _ = []
+
+testMapXml a b = mapXMLtags testXML (\x->if isThatAttr x a b then [x] else [])
+t = testMapXml "z" "Z"
+
 -- ---
 countUUIDs :: String -> Int
 countUUIDs input = count (pack "uuid") (pack input)
