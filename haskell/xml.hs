@@ -105,35 +105,50 @@ replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -
 replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
 
 -- тип для списка уидов, найденных и на что заменённых
-type Uids = [(UUID,UUID)]
+type OldUUIDs = [(UUID,UUID)]
 -- список уидов и индекс последнего использованного
-type UuidsI = ([UUID], Int)
+type NewUUIDs = ([UUID], Int)
 -- функции замены для UUID
-type TextNodeChgFun = String -> ReplaceState -> (String, ReplaceState)
-type ReplaceState = (UuidsI, Uids)
-type XmlTreeState = (H.XmlTrees, ReplaceState)
+--type TextNodeChgFun = String -> ReplaceState -> (String, ReplaceState)
+type UUIDState = State UUIDchgState UUIDchgState
+type TextNodeChgFun = UUIDState
+--type ReplaceState = (NewUUIDs, OldUUIDs)
+--type XmlTreeState = (H.XmlTrees, ReplaceState)
+type UUIDchgState = (H.XmlTrees, NewUUIDs, OldUUIDs, NTree H.XNode)
+four (_,_,_,x)=x
 
-replaceUUIDInChild :: TextNodeChgFun -> String -> String -> String -> XmlTreeState -> NTree H.XNode
-replaceUUIDInChild newUuidFun attrName attrVal inTag (rs, n@(NTree (H.XTag tagName attrList) childs)) = 
-    if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
-        (NTree (H.XTag tagName attrList) (fmap (replaceUUIDChild newUuidFun inTag rs) childs )) -- надо делать фмап правильно передающий состояние? или что для этого исп? надо исм монаду State!
-        else (NTree (H.XTag tagName attrList) (fmap (replaceUUIDInChild newUuidFun attrName attrVal inTag rs) childs)) 
-replaceUUIDInChild _ _ _ _ n = n
+f :: TextNodeChgFun
+f = get >>= \all@(a,nu,ou, node) -> case node of
+        ((NTree (H.XText t) [])  : o) -> return (a,nu,ou,((NTree (H.XText t) [])  : o))
+        _ -> all
 
-replaceUUIDChild :: TextNodeChgFun -> String  -> XmlTreeState -> H.XmlTree
-replaceUUIDChild newUuidFun inTag (rs, n@(NTree (H.XTag tagName a) childWithText) ) 
-    | (QN.qualifiedName tagName) == inTag = 
-        let (xtree, state) = replaceUUID (childWithText, rs) newUuidFun in
-            ( (NTree (H.XTag tagName a) xtree) , state)
-replaceUUIDChild _ _ n = n
+replaceUUIDInChild :: TextNodeChgFun -> String -> String -> String -> UUIDState
+replaceUUIDInChild newUuidFun attrName attrVal inTag = 
+    get >>= \allstate@(xt, nu, ou, node)-> case node of
+        n@(NTree (H.XTag tagName attrList) childs)) -> 
+            if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
+                (NTree (H.XTag tagName attrList) (sequence (modify (\x-> replaceUUIDChild newUuidFun inTag ) childs )) 
+            else (NTree (H.XTag tagName attrList) (sequence (replaceUUIDInChild newUuidFun attrName attrVal inTag rs) childs)) 
+        otherwise -> allstate
+   
 
-replaceUUID :: XmlTreeState -> TextNodeChgFun -> XmlTreeState
-replaceUUID ( ((NTree (H.XText t) [])  : other), rs) f = 
-    let (newUUID, newState) = f t rs in
-        ( ((NTree (H.XText newUUID) [])  : other), newState)
-replaceUUID n _ = n
 
-replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String  -> ReplaceState -> [NTree H.XNode]
+replaceUUIDChild :: TextNodeChgFun -> String  -> UUIDState
+replaceUUIDChild f inTag =
+    get >>= \all@(a,b,c, node) -> case node of
+        n@(NTree (H.XTag tagName a) childWithText)
+            | (QN.qualifiedName tagName) == inTag ->
+                replaceUUID f
+                    ( (NTree (H.XTag tagName a) xtree) , state)
+        _ -> all
+
+replaceUUID :: TextNodeChgFun -> UUIDState
+replaceUUID f = 
+    get >>= \all@(_,_,_, node) -> case node of
+        ((NTree (H.XText _) [])  : _) -> f all
+        _ -> all
+
+replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String  -> UUIDState -> [NTree H.XNode]
 replaceUUIDInChilds nodes t a v n rs = fmap (replaceUUIDInChild t a v n rs) nodes
 -- ---
 countUUIDs :: String -> Int
