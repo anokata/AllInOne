@@ -27,8 +27,10 @@ import Data.Text(count, pack)
         Функцию заменяющую содержание текста тегов содержащихся в тэге с атрибутом с *данным* именем и *данным* значением
 - [ ] заменять UUID все на новые
     - [x] разобраться с генерацией UUID
-    - [ ] заменять не просто на текст, а передавать функцию принимающую предыдущее значения текста и возвр. новое
-    - [ ] хранить список пар заменённых
+    - [.] заменять не просто на текст, а передавать функцию принимающую предыдущее значения текста и возвр. новое
+    - [.] хранить список пар заменённых
+        - [ ] сделать с помощью монады State
+          - [ ] понять Monad State
     - [ ] заменять одинаковые на одинаковые
 - [ ] опционально заменять versionFirst true/false
 - [ ] заменять время versionStartTime на новое везде
@@ -60,8 +62,6 @@ test3a = P.xread "<tot otherattr='da' target='a'>source</tot>"
 test3nn = replaceTextIn (head test3n) "NEWTEXT" "targets" "s"
 test3aa = replaceTextIn (head test3a) "NEWTEXT" "target" "s"
 -}
--- тип для списка уидов, найденных и на что заменённых
-type Uids = [(UUID,UUID)]
 -- тот ли это атрибут, проверяем по имени и значению
 isThatAttr :: NTree H.XNode -> String -> String -> Bool
 -- сопоставляем со структурой узла аттрибута и проверяем
@@ -103,35 +103,53 @@ replaceTextChild n _ _ = n
 -- применяет замену по всему дереву
 replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -> [NTree H.XNode]
 replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
--- функции замены для UUID
-type TextNodeChgFun = String -> String
 
-replaceUUIDInChild ::  TextNodeChgFun -> String -> String -> String -> NTree H.XNode -> NTree H.XNode
-replaceUUIDInChild newUuidFun attrName attrVal inTag n@(NTree (H.XTag tagName attrList) childs) = 
+-- тип для списка уидов, найденных и на что заменённых
+type Uids = [(UUID,UUID)]
+-- список уидов и индекс последнего использованного
+type UuidsI = ([UUID], Int)
+-- функции замены для UUID
+type TextNodeChgFun = String -> ReplaceState -> (String, ReplaceState)
+type ReplaceState = (UuidsI, Uids)
+type XmlTreeState = (H.XmlTrees, ReplaceState)
+
+replaceUUIDInChild :: TextNodeChgFun -> String -> String -> String -> XmlTreeState -> NTree H.XNode
+replaceUUIDInChild newUuidFun attrName attrVal inTag (rs, n@(NTree (H.XTag tagName attrList) childs)) = 
     if (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) then 
-        (NTree (H.XTag tagName attrList) (fmap (replaceUUIDChild newUuidFun inTag) childs ))
-        else (NTree (H.XTag tagName attrList) (fmap (replaceUUIDInChild newUuidFun attrName attrVal inTag) childs)) 
+        (NTree (H.XTag tagName attrList) (fmap (replaceUUIDChild newUuidFun inTag rs) childs )) -- надо делать фмап правильно передающий состояние? или что для этого исп? надо исм монаду State!
+        else (NTree (H.XTag tagName attrList) (fmap (replaceUUIDInChild newUuidFun attrName attrVal inTag rs) childs)) 
 replaceUUIDInChild _ _ _ _ n = n
 
-replaceUUIDChild :: TextNodeChgFun -> String -> H.XmlTree -> H.XmlTree
-replaceUUIDChild newUuidFun inTag n@(NTree (H.XTag tagName a) childWithText) | (QN.qualifiedName tagName) == inTag = 
-    (NTree (H.XTag tagName a) (replaceUUID childWithText newUuidFun))
+replaceUUIDChild :: TextNodeChgFun -> String  -> XmlTreeState -> H.XmlTree
+replaceUUIDChild newUuidFun inTag (rs, n@(NTree (H.XTag tagName a) childWithText) ) 
+    | (QN.qualifiedName tagName) == inTag = 
+        let (xtree, state) = replaceUUID (childWithText, rs) newUuidFun in
+            ( (NTree (H.XTag tagName a) xtree) , state)
 replaceUUIDChild _ _ n = n
 
-replaceUUID :: H.XmlTrees -> TextNodeChgFun -> H.XmlTrees
-replaceUUID ((NTree (H.XText t) [])  : other) f = ((NTree (H.XText (f t)) [])  : other)
+replaceUUID :: XmlTreeState -> TextNodeChgFun -> XmlTreeState
+replaceUUID ( ((NTree (H.XText t) [])  : other), rs) f = 
+    let (newUUID, newState) = f t rs in
+        ( ((NTree (H.XText newUUID) [])  : other), newState)
 replaceUUID n _ = n
 
-replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String -> [NTree H.XNode]
-replaceUUIDInChilds nodes t a v n = fmap (replaceUUIDInChild t a v n) nodes
+replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String  -> ReplaceState -> [NTree H.XNode]
+replaceUUIDInChilds nodes t a v n rs = fmap (replaceUUIDInChild t a v n rs) nodes
 -- ---
 countUUIDs :: String -> Int
 countUUIDs input = count (pack "uuid") (pack input)
 
 genEnoghUUIDs :: String -> IO [UUID]
 genEnoghUUIDs xml = mapM (\_->nextRandom) [1..(countUUIDs xml)]
-    
-                       
+
+{- стандартная фун замены uuid. должна: 
+    - [ ] поискать в сохранённых уидах текущий. если есть взять тот на который его надо заменить.
+    - [ ] иначе взять следующий уид. изменить состояние
+    - [ ] выдать полученный uuid и новое состояние.
+-}
+--uuidChgFun :: TextNodeChgFun
+--uuidChgFun t (u,s) = 
+
 {-
 getAttr :: H.XmlTree -> Maybe H.XmlTrees
 getAttr = XN.getAttrl . Tree.getNode 
