@@ -103,7 +103,7 @@ replaceTextChild n _ _ = n
 -- применяет замену по всему дереву
 replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -> [NTree H.XNode]
 replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
-
+{-
 -- тип для списка уидов, найденных и на что заменённых
 type OldUUIDs = [(UUID,UUID)]
 -- список уидов и индекс последнего использованного
@@ -150,6 +150,15 @@ replaceUUID f =
 
 replaceUUIDInChilds :: [NTree H.XNode] -> TextNodeChgFun -> String -> String -> String  -> UUIDState -> [NTree H.XNode]
 replaceUUIDInChilds nodes t a v n rs = fmap (replaceUUIDInChild t a v n rs) nodes
+
+может обойдёмся без состояния? можно например сделать двух проходно:
+сначала пройтись и собрать (результат не дерево а только список) все уиды(уникальные только)
+подсчитать их, сгенерить нужное количество новых, собрав в список замен их. и с этими данными
+запустить другой обход, который и заменит соответственным образом.
+получится?
+- [ ] попробовать данным образом сделать
+
+-}
 -- ---
 countUUIDs :: String -> Int
 countUUIDs input = count (pack "uuid") (pack input)

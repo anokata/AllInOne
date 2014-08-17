@@ -31,6 +31,27 @@ testStateChgs :: TestStateVal
 testStateChgs= execState (chg) startStateVal 
     where chg = sequence [put ('B',3,"D") , modify (\(a,b,c)->(a,b*3,c++"D"))]
 
+-- - [x] напишем пример попроще. обработка списка с состоянием. просто суммируем в состоянии элементы.
+list = [1..20] :: [Int]
+type LStateVal = (Int, [Int])
+type LState = State LStateVal LStateVal
+sumlist :: LStateVal -> LStateVal
+sumlist l = evalState sumlist' l
+sumlist' :: LState
+sumlist' = do 
+                a@(sum, list) <- get
+                case list of 
+                    (h:t) -> do 
+                        put ((sum + h), t)
+                        sumlist'
+                    [] -> return a
+ilist = (0, list) :: LStateVal
+sumtest = sumlist ilist
+
+
+
+
+
 
 
 
