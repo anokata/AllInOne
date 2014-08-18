@@ -175,12 +175,16 @@ getThatAttrNode t attrName attrVal = filterXml t (\x-> isThatAttr x attrName att
 -}
 mapXMLtags :: H.XmlTrees -> (H.XmlTree -> H.XmlTrees) -> H.XmlTrees
 mapXMLtags (h:t) f = (everyNTree h) ++ (mapXMLtags t f)
-    where everyNTree t@(NTree (H.XTag qname attrs) other) = (f t) ++ (mapXMLtags other f) -- ++ (mapXML other f)
+    where everyNTree t@(NTree (H.XTag qname attrs) other) = (f t) ++ (mapXMLtags other f) -- ++ [NTree (H.XText "hello") []] -- ++ (mapXML other f)
+          -- атрибут То !! тоже надо проходить и др?
           everyNTree x = []
 mapXMLtags [] _ = []
 
-testMapXml a b = mapXMLtags testXML (\x->if isThatAttr x a b then [x] else [])
+testMapXml a b = mapXMLtags testXML (\x->if (isThatAttr x a b) then [NTree (H.XText "**YES**") []] else [])
 t = testMapXml "z" "Z"
+r = testMapXml "x" "X"
+y = mapXMLtags testXML (\x->[x])
+
 
 -- ---
 countUUIDs :: String -> Int
