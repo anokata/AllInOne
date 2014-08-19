@@ -10,6 +10,7 @@ import qualified Text.XML.HXT.DOM.ShowXml as SX
 import Data.UUID -- toString fromString
 import Data.UUID.V4 -- nextRandom
 import Data.Text(count, pack)
+import Data.List(nub,delete)
 --import qualified Text.XML.HXT.DOM.XmlTreeFilter as R
 {-TODO
 - [x] Функцию заменяющую тэг с атрибутом с *данным* именем, с текстом на *данный* текст
@@ -27,11 +28,13 @@ import Data.Text(count, pack)
         Функцию заменяющую содержание текста тегов содержащихся в тэге с атрибутом с *данным* именем и *данным* значением
 - [ ] заменять UUID все на новые
     - [x] разобраться с генерацией UUID
-    - [.] заменять не просто на текст, а передавать функцию принимающую предыдущее значения текста и возвр. новое
-    - [.] хранить список пар заменённых
-        - [ ] сделать с помощью монады State
-          - [ ] понять Monad State
-    - [ ] заменять одинаковые на одинаковые
+    - [+] заменять не просто на текст, а передавать функцию принимающую предыдущее значения текста и возвр. новое
+    - [+] хранить список пар заменённых
+        - [-] сделать с помощью монады State
+          - [-] понять Monad State
+    - [.] заменять одинаковые на одинаковые
+    - [ ] и в ссылках тоже
+    - [ ] и в тексте тож
 - [ ] опционально заменять versionFirst true/false
 - [ ] заменять время versionStartTime на новое везде
     - [ ] узнать как получить текущее время
@@ -62,6 +65,8 @@ test3a = P.xread "<tot otherattr='da' target='a'>source</tot>"
 test3nn = replaceTextIn (head test3n) "NEWTEXT" "targets" "s"
 test3aa = replaceTextIn (head test3a) "NEWTEXT" "target" "s"
 -}
+eqQNameStr :: QN.QName -> String -> Bool
+eqQNameStr q s = (QN.qualifiedName q) == s
 -- тот ли это атрибут, проверяем по имени и значению
 isThatAttr :: NTree H.XNode -> String -> String -> Bool
 -- сопоставляем со структурой узла аттрибута и проверяем
@@ -103,12 +108,12 @@ replaceTextChild n _ _ = n
 -- применяет замену по всему дереву
 replaceTextInChilds :: [NTree H.XNode] -> String -> String -> String -> String -> [NTree H.XNode]
 replaceTextInChilds nodes t a v n = fmap (\x-> replaceTextInChild x t a v n) nodes
-{-
+
 -- тип для списка уидов, найденных и на что заменённых
-type OldUUIDs = [(UUID,UUID)]
+type OldUUIDs = [(String,UUID)]
 -- список уидов и индекс последнего использованного
-type NewUUIDs = ([UUID], Int)
--- функции замены для UUID
+{-type NewUUIDs = ([UUID], Int)
+ -- функции замены для UUID
 --type TextNodeChgFun = String -> ReplaceState -> (String, ReplaceState)
 type UUIDState = State UUIDchgState UUIDchgState
 type TextNodeChgFun = UUIDState
@@ -157,12 +162,14 @@ replaceUUIDInChilds nodes t a v n rs = fmap (replaceUUIDInChild t a v n rs) node
 запустить другой обход, который и заменит соответственным образом.
 получится?
 - [ ] попробовать данным образом сделать
-  - [ ] первый проход. сбор значений в список\множество nub
-    - [ ] сделать нормальный общий обход fold и саккумулировать уже что надо. как только его сделать условным? это уже есть и зипер тож
+  - [x] первый проход. сбор значений в список\множество nub
+    - [x] сделать нормальный общий обход fold и саккумулировать уже что надо. как только его сделать условным? это уже есть и зипер тож
        есть фмап. фолд. можно ещё больше декомпозировать:
-        * обойти и собрать нужные узлы (с атрибутом требуемым)
-        * извлечь из них нужные данные
-
+        [x] обойти и собрать нужные узлы (с атрибутом требуемым)
+        [x] извлечь из них нужные данные
+  - [x] сделать список замен
+  - [ ] обход использующий список замен
+    - [x] фун - взять нужный уид для замены
 
 mapXml :: H.XmlTrees -> (H.XNode -> a) -> [NTree a]
 mapXml t f = fmap (\x->fmap f x) t -- mapXml f = fmap . fmap f
@@ -174,17 +181,48 @@ getThatAttrNode t attrName attrVal = filterXml t (\x-> isThatAttr x attrName att
 -- а вот надо обойти не ноды а все деревья и поддеревья в XTag
 -}
 mapXMLtags :: H.XmlTrees -> (H.XmlTree -> H.XmlTrees) -> H.XmlTrees
-mapXMLtags (h:t) f = (everyNTree h) ++ (mapXMLtags t f)
-    where everyNTree t@(NTree (H.XTag qname attrs) other) = (f t) ++ (mapXMLtags other f) -- ++ [NTree (H.XText "hello") []] -- ++ (mapXML other f)
-          -- атрибут То !! тоже надо проходить и др?
-          everyNTree x = []
+mapXMLtags (h:t) f = (everyNTree h f) ++ (mapXMLtags t f)
 mapXMLtags [] _ = []
 
-testMapXml a b = mapXMLtags testXML (\x->if (isThatAttr x a b) then [NTree (H.XText "**YES**") []] else [])
-t = testMapXml "z" "Z"
+everyNTree :: NTree H.XNode -> (H.XmlTree -> H.XmlTrees) -> H.XmlTrees
+everyNTree t@(NTree (H.XTag qname attrs) other) f = (f t) ++ (mapXMLtags other f) ++ (mapXMLtags attrs f) 
+everyNTree t@(NTree (H.XAttr qname) text) f = (f t) 
+everyNTree x f = []
+
+-- TODO и с проверкой имени
+testNodeWithAttr :: NTree H.XNode -> (NTree H.XNode -> String -> String -> Bool) -> String -> String -> [NTree H.XNode]
+testNodeWithAttr t@(NTree (H.XTag qname attrList) other) f  attrName attrVal
+	| (or (fmap (\x-> isThatAttr x attrName attrVal) attrList)) = [t]
+	| otherwise = []
+testNodeWithAttr _ _ _ _ = []
+
+testMapXml a b = mapXMLtags testXML (\x->testNodeWithAttr x isThatAttr a b)
+
 r = testMapXml "x" "X"
 y = mapXMLtags testXML (\x->[x])
+tf a b = (\x->if (isThatAttr x a b) then [NTree (H.XText "**YES**") []] else [])
 
+mapXML tagName tagVal xml = mapXMLtags xml (\x->testNodeWithAttr x isThatAttr tagName tagVal)
+t = mapXML "y" "uuid" testXML
+testCount = length (mapXML "y" "uuid" testXML)
+
+extractUUIDs :: H.XmlTrees -> [String]
+extractUUIDs nodes = delete "" $ nub $ concat (fmap getXText nodes)
+
+extractUUIDv nodes tagName = delete "" $ nub $ concat (fmap (getSubTagXText tagName) nodes )
+
+getSubTagXText :: String -> NTree H.XNode -> [String]
+getSubTagXText tagName (NTree (H.XTag _ _) tags) = concat $ fmap getXText (filter (\x->case x of (NTree (H.XTag qname _) _) -> eqQNameStr qname tagName; _ -> False) tags)
+getSubTagXText _ _ = []
+
+
+getXText :: NTree H.XNode -> [String]
+getXText (NTree (H.XTag _ _) texts) = fmap extractText texts
+getXText _ = []
+extractText :: NTree H.XNode -> String
+extractText (NTree (H.XText text) _) = text
+extractText _ = ""
+ex = extractUUIDs t
 
 -- ---
 countUUIDs :: String -> Int
@@ -192,6 +230,12 @@ countUUIDs input = count (pack "uuid") (pack input)
 
 genEnoghUUIDs :: String -> IO [UUID]
 genEnoghUUIDs xml = mapM (\_->nextRandom) [1..(countUUIDs xml)]
+
+makeUUIDmap :: [String] -> IO OldUUIDs
+makeUUIDmap us = mapM (\x-> nextRandom >>= \new-> return (x, new)) us
+
+takeUUID :: String -> OldUUIDs -> String
+takeUUID s u = (toString . snd . head) (filter (\(x,y)->s==x) u)
 
 {- стандартная фун замены uuid. должна: 
     - [ ] поискать в сохранённых уидах текущий. если есть взять тот на который его надо заменить.
@@ -220,7 +264,7 @@ replaceInTree tree text attrName attrVal = fmap (\x-> replaceTextIn x text attrN
       [NTree (XText "source") []] -}
 --то есть надо у тэга проверить атрибут и если он подходит то найти текст и если он есть заменить его
 -- всякие тесты
-testXML = P.xread "<a><A y='uuid'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e:e><f:f t:t='t'><v>val</v><v:v>val2</v:v></f:f></e:e></c>"
+testXML = P.xread "<a><A y='uuid'>tx</A></a><b z='Z'>ss</b><c x='X' xx='_'><e:e><f:f y='uuid'><v>val</v><v:v>val2</v:v></f:f></e:e></c>"
 b = F.formatXmlTree $ head testXML
 c = putStrLn b
 
@@ -241,8 +285,27 @@ ptest a b c = showx (ftesta a b c)
 rtest a b c d = fmap (\x-> replaceTextInChild x a b c d) 
 rr a b c d e = showx (rtest a b c d e)
 
+xmlheader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" -- уже flatten должен быть
+magicNumber = length xmlheader
 --testUUIDreplace = replaceUUIDInChilds testXML (\_->nextRandom) "" "" ""
+filetest = do 
+			con <- readFile "d:\\Q\\2123\\test.xml"
+			let cona = drop magicNumber con
+			return $ P.xread cona
+tgetsvuuid = filetest >>= \x-> return $ (mapXML "sv:name" "jcr:uuid" x)
+tgetsvuuide = filetest >>= \x-> return $ extractUUIDs (mapXML "sv:name" "jcr:uuid" x)
+textractUUIDv = tgetsvuuid >>= \x-> return $ extractUUIDv x "sv:value" -- !!
+tmakeUUIDmap = textractUUIDv >>= makeUUIDmap
+ttakeUUID = tmakeUUIDmap >>= \x-> return $ takeUUID "ada3d887-c693-4375-9c8e-b9a73cb80c69" x
 
+extest = do 
+    con <- readFile "d:\\Q\\2123\\test.xml"
+    let res = extractUUIDs (mapXML "sv:name" "jcr:uuid" (P.xread con))  
+    
+    --writeFile "d:\\Q\\2123\\testout.xml" (SX.xshow res)
+    print res
+    print "ok"
+    
 mtest = do 
     con <- readFile "/home/ksi/dev/testweb/1.xml"
     let res = replaceTextInChilds (P.xread con) "NEWTEXT" "sv:name" "jcr:uuid" "sv:value"
