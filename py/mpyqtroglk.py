@@ -1,3 +1,4 @@
+#TODO 
 import sys, random
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
@@ -5,12 +6,12 @@ from PyQt5.QtCore import Qt, QRect
 
 def makeArray2D(w, h, initVal):
     return [[initVal for x in range(w)] for x in range(h)]
-
+#У нас есть тайлы
 class Tile(object):
     symbol = ' '
     fcolor = QColor(0, 0, 0)
     bcolor = QColor(0, 0, 0, 0)
-
+#из тайлов состоит поле прямоугольное
 class Field(object):
     w = 10
     h = 10
@@ -26,7 +27,7 @@ class Field(object):
         self.tiles[1][1].symbol = 'A'
         self.tiles[1][1].fcolor = QColor(0, 0, 220)
         
-
+#просто главный класс-окно-приложение
 class Example(QWidget):
     
     def __init__(self):
@@ -34,7 +35,8 @@ class Example(QWidget):
         self.setGeometry(100, 100, 580, 470)
         self.setWindowTitle('[]')
         self.show()   
-        
+    
+    # а тут рисуем
     def paintEvent(self, event):
         qp = QPainter()
         qp.begin(self)
