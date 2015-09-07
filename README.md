@@ -1,5 +1,5 @@
 #### Для текущего занятия
-https://github.com/anokata/AllInOne/blob/master/py/mpyqtroglk.py
+<a href="https://github.com/anokata/AllInOne/blob/master/py/mpyqtroglk.py">py</a>
 ===
 TODO
 - [ ] обработка ввода
