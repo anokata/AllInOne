@@ -33,7 +33,12 @@ class Field(object):
         b.symbol = 'B'
         b.fcolor = QColor(0, 0, 220)
         self.tiles[2][2] = b
-               
+        
+        for x in range(10):
+          n = Tile()
+          n.symbol = str(x)
+          n.color = QColor(random.randint(10,200), random.randint(10,200), random.randint(10,200))
+          self.tiles[x][random.randint(0,self.h-1)] = n
         
         
 #просто главный класс-окно-приложение
@@ -58,7 +63,7 @@ class Example(QWidget):
         qp.setPen(Qt.red)
         #size = self.size()
         #qp.drawPoint(2, 2)
-        qp.setBrush(QColor(200, 0, 0))
+        qp.setBrush(QColor(100, 100, 150))
         #qp.drawRect(10, 15, 90, 60)
         pen = QPen(Qt.black, 2, Qt.SolidLine)
         qp.setPen(pen)
@@ -68,8 +73,9 @@ class Example(QWidget):
         for x in range(field.w):
             for y in range(field.h):
                 qp.setPen(field.tiles[x][y].fcolor)
-                print(x, y)
-                qp.drawText(QRect(field.tileWidth*x, field.tileHeight*y, field.tileWidth, field.tileHeight), Qt.AlignLeft, field.tiles[x][y].symbol) 
+                r = QRect(field.tileWidth*x, field.tileHeight*y, field.tileWidth, field.tileHeight)
+                qp.drawRect(r)
+                qp.drawText(r, Qt.AlignCenter, field.tiles[x][y].symbol) 
         
         #тест многострочного текста        
         qp.setBrush(QColor(0, 0, 0))
@@ -84,6 +90,7 @@ class Example(QWidget):
         pass
      
 #main
+random.seed()
 field = Field()
 app = QApplication(sys.argv)
 ex = Example()
