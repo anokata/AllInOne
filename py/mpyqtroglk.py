@@ -56,18 +56,10 @@ class Example(QWidget):
         qp = QPainter()
         qp.begin(self)
         # тесты
-        qp.setPen(QColor(1, 100, 200))
         qp.setFont(QFont('Lucida Console', 14))
-        #qp.drawText(event.rect(), Qt.AlignLeft, "Score: ")   
-        #qp.drawText(10,100, "Score: \nSecond line\n#..T..#\n##..#.#\n#TTT..#")   
-        qp.setPen(Qt.red)
         #size = self.size()
-        #qp.drawPoint(2, 2)
         qp.setBrush(QColor(100, 100, 150))
-        #qp.drawRect(10, 15, 90, 60)
-        pen = QPen(Qt.black, 2, Qt.SolidLine)
-        qp.setPen(pen)
-        #qp.drawLine(20, 40, 250, 40)
+        qp.setPen(QPen(Qt.black, 2, Qt.SolidLine))
         
         #drawTiles of field. Рисуем тайлы - Вынести в функции(какого класса?)
         for x in range(field.w):
@@ -76,11 +68,6 @@ class Example(QWidget):
                 r = QRect(field.tileWidth*x, field.tileHeight*y, field.tileWidth, field.tileHeight)
                 qp.drawRect(r)
                 qp.drawText(r, Qt.AlignCenter, field.tiles[x][y].symbol) 
-        
-        #тест многострочного текста        
-        qp.setBrush(QColor(0, 0, 0))
-        qp.setPen(QColor(100,0,0))
-        #qp.drawText(QRect(0,0,200,200), Qt.AlignLeft, "Score: \nSecond line\n#..T..#\n##..#.#\n#TTT..#")   
         
         # финализация
         qp.end()
