@@ -1,9 +1,9 @@
 #### Для текущего занятия
 https://github.com/anokata/AllInOne/blob/master/py/mpyqtroglk.py
-<a href="https://github.com/anokata/AllInOne/blob/master/py/mpyqtroglk.py"/>
 ===
 TODO
 - [ ] обработка ввода
+- [ ] чтение карты из файла
 
 ###### тут
 * лежит всё вместе
