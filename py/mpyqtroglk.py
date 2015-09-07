@@ -1,4 +1,4 @@
-#TODO 
+#TODO чтение карты из файла. обработка ввода. персонаж. вещи. сохранение карты.
 import sys, random
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
