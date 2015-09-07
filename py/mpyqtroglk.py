@@ -24,8 +24,17 @@ class Field(object):
         self.h = h
         blankTile = Tile()
         self.tiles = makeArray2D(w, h, blankTile)
-        self.tiles[1][1].symbol = 'A'
-        self.tiles[1][1].fcolor = QColor(0, 0, 220)
+        # тестовые тайлы
+        a = Tile()
+        a.symbol = 'A'
+        a.fcolor = QColor(0, 0, 220)
+        self.tiles[1][1] = a
+        b = Tile()
+        b.symbol = 'B'
+        b.fcolor = QColor(0, 0, 220)
+        self.tiles[2][2] = b
+               
+        
         
 #просто главный класс-окно-приложение
 class Example(QWidget):
@@ -48,23 +57,24 @@ class Example(QWidget):
         #qp.drawText(10,100, "Score: \nSecond line\n#..T..#\n##..#.#\n#TTT..#")   
         qp.setPen(Qt.red)
         #size = self.size()
-        qp.drawPoint(2, 2)
+        #qp.drawPoint(2, 2)
         qp.setBrush(QColor(200, 0, 0))
-        qp.drawRect(10, 15, 90, 60)
+        #qp.drawRect(10, 15, 90, 60)
         pen = QPen(Qt.black, 2, Qt.SolidLine)
         qp.setPen(pen)
-        qp.drawLine(20, 40, 250, 40)
+        #qp.drawLine(20, 40, 250, 40)
         
         #drawTiles of field. Рисуем тайлы - Вынести в функции(какого класса?)
         for x in range(field.w):
             for y in range(field.h):
                 qp.setPen(field.tiles[x][y].fcolor)
-                qp.drawText(event.rect(), Qt.AlignCenter, field.tiles[x][y].symbol) 
+                print(x, y)
+                qp.drawText(QRect(field.tileWidth*x, field.tileHeight*y, field.tileWidth, field.tileHeight), Qt.AlignLeft, field.tiles[x][y].symbol) 
         
         #тест многострочного текста        
         qp.setBrush(QColor(0, 0, 0))
         qp.setPen(QColor(100,0,0))
-        qp.drawText(QRect(0,0,200,200), Qt.AlignLeft, "Score: \nSecond line\n#..T..#\n##..#.#\n#TTT..#")   
+        #qp.drawText(QRect(0,0,200,200), Qt.AlignLeft, "Score: \nSecond line\n#..T..#\n##..#.#\n#TTT..#")   
         
         # финализация
         qp.end()
