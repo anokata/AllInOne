@@ -1,5 +1,5 @@
-#TODO чтение карты из файла. обработка ввода. персонаж. вещи. сохранение карты.
-import sys, random
+#TODO чтение карты из файла(Сериализация pickle) сохранение карты OK. обработка ввода - процедура. персонаж. вещи. редактор.
+import sys, random, pickle
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
 from PyQt5.QtCore import Qt, QRect
@@ -115,8 +115,20 @@ class Example(QWidget):
             self.close()
         if e.key() == Qt.Key_W:
             field.player.y -= 1
+        if e.key() == Qt.Key_1:
+            self.safeMap()
+        if e.key() == Qt.Key_2:
+            self.loadMap()
             
         self.update()
+        
+    def safeMap(self):
+        with open('mpytestmap.pmp', 'wb') as f:
+            pickle.dump(field, f)
+    def loadMap(self):
+        with open('mpytestmap.pmp', 'rb') as f:
+            global field
+            field = pickle.load(f)
             
              
 #main
