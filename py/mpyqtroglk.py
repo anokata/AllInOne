@@ -11,6 +11,31 @@ class Tile(object):
     symbol = ' '
     fcolor = QColor(0, 0, 0)
     bcolor = QColor(0, 0, 0, 0)
+    
+    def __init__(self, s = ' ', f = QColor(0, 0, 0), b = QColor(100, 100, 0)):
+        self.symbol = s
+        self.fcolor = f
+        self.bcolor = b
+    
+# подвижный тайл
+class DynamicTile(Tile):
+    x = 0
+    y = 0
+    
+    def __init__(self, s = ' ', x = 0, y = 0, f = QColor(0, 0, 0)):
+        self.symbol = s
+        self.x = x
+        self.y = y
+        self.fcolor = f
+    
+class Player(DynamicTile):
+    symbol = '@'
+    
+    def __init__(self, x = 0, y = 0):
+        self.x = x
+        self.y = y
+        self.fcolor = QColor(200, 0, 0)
+    
 #из тайлов состоит поле прямоугольное. Поле - массив тайлов, параметры поля.
 class Field(object):
     w = 10
@@ -18,15 +43,19 @@ class Field(object):
     tileWidth = 20
     tileHeight = 20
     tiles = []
+    dynamicTiles = []
+    player = 0
     # создание изначального поля
     def __init__(self, w = 10,h = 10):
         self.w = w
         self.h = h
         blankTile = Tile()
         self.tiles = makeArray2D(w, h, blankTile)
+        self.dynamicTiles.append(DynamicTile('q',1,4, QColor(0, 200, 90)))
+        self.player = Player(4,5)
+        
         # тестовые тайлы
-        a = Tile()
-        a.symbol = 'A'
+        a = Tile('D', QColor(0, 0, 0), QColor(100, 100, 250))
         a.fcolor = QColor(0, 0, 220)
         self.tiles[1][1] = a
         b = Tile()
@@ -64,18 +93,32 @@ class Example(QWidget):
         #drawTiles of field. Рисуем тайлы - Вынести в функции(какого класса?)
         for x in range(field.w):
             for y in range(field.h):
-                qp.setPen(field.tiles[x][y].fcolor)
-                r = QRect(field.tileWidth*x, field.tileHeight*y, field.tileWidth, field.tileHeight)
-                qp.drawRect(r)
-                qp.drawText(r, Qt.AlignCenter, field.tiles[x][y].symbol) 
+                self.drawTile(qp, field.tiles[x][y], x, y)
+        # рисуем динамические объекты
+        for x in field.dynamicTiles:
+            self.drawTile(qp, x, x.x, x.y) 
+        self.drawTile(qp, field.player, field.player.x, field.player.y)
         
         # финализация
         qp.end()
         
     # функция рисования тайла
-    def drawTile(t):
-        pass
-     
+    def drawTile(self, qp, t, x, y):
+        qp.setPen(t.fcolor)
+        qp.setBrush(t.bcolor)
+        r = QRect(field.tileWidth*x, field.tileHeight*y, field.tileWidth, field.tileHeight)
+        qp.drawRect(r)
+        qp.drawText(r, Qt.AlignCenter, t.symbol) 
+    
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Escape:
+            self.close()
+        if e.key() == Qt.Key_W:
+            field.player.y -= 1
+            
+        self.update()
+            
+             
 #main
 random.seed()
 field = Field()
