@@ -78,17 +78,18 @@ class Log(object):
     maxLines = 9
     height = 200
     visible = True
+    statusWidht = 200
     #вывод строк. добавление в лог.
     def add(self, line):
         self.log.append(line)
         if len(self.log) > self.maxLines:
             self.log.popleft()
-        
+    # режимы status
 
 #просто главный класс-окно-приложение
 class Example(QWidget):
 
-    width = 580
+    width = 680
     height = 470
     #log = 0
     # настройка окна
@@ -140,7 +141,14 @@ class Example(QWidget):
             for line in self.log.log:
                 lines += line + '\n'
             qp.drawText(logRect, Qt.AlignLeft, lines)
-                
+            #status
+            qp.setPen(QPen(Qt.white, 2, Qt.SolidLine))
+            qp.drawLine(self.width-self.log.statusWidht, self.height-self.log.height, \
+            self.width-self.log.statusWidht, self.height)
+            qp.drawText(QRect(self.width-self.log.statusWidht, self.height-self.log.height, \
+            self.log.statusWidht, 20), Qt.AlignCenter, 'status:')
+            qp.drawText(QRect(self.width-self.log.statusWidht, self.height-self.log.height+20, \
+            self.log.statusWidht, 20), Qt.AlignCenter, 'cursor at(x,y):')
             
         # финализация
         qp.end()
