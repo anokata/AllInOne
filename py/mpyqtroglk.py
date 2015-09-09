@@ -1,4 +1,5 @@
-#TODO чтение карты из файла(Сериализация pickle) сохранение карты OK. обработка ввода - процедура. персонаж. вещи. редактор.
+#TODO обработка ввода - процедура. персонаж. вещи. редактор.
+# область вывода инфы с автопрокруткой, лог
 import sys, random, pickle
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
@@ -68,16 +69,34 @@ class Field(object):
           n.symbol = str(x)
           n.color = QColor(random.randint(10,200), random.randint(10,200), random.randint(10,200))
           self.tiles[x][random.randint(0,self.h-1)] = n
-        
-        
+
+# лог область        
+class Log(object):
+    log = [] # список строк
+    maxLines = 4
+    height = 200
+    visible = True
+    #вывод строк. добавление в лог.
+
 #просто главный класс-окно-приложение
 class Example(QWidget):
+
+    width = 580
+    height = 470
+    #log = 0
     # настройка окна
     def __init__(self):
         super().__init__()
-        self.setGeometry(100, 100, 580, 470)
+        self.setGeometry(100, 100, self.width, self.height)
         self.setWindowTitle('[]')
+        self.log = Log()
+        self.log.log.append('test line')
+        self.log.log.append('second line')
         self.show()   
+    
+    def resizeEvent(self,resizeEvent):
+        self.height = resizeEvent.size().height()
+        self.width = resizeEvent.size().width()
     
     # а тут рисуем
     def paintEvent(self, event):
@@ -98,6 +117,12 @@ class Example(QWidget):
         for x in field.dynamicTiles:
             self.drawTile(qp, x, x.x, x.y) 
         self.drawTile(qp, field.player, field.player.x, field.player.y)
+        
+        # лог
+        if self.log.visible:
+            qp.setBrush(QColor(50, 50, 100))
+            qp.setPen(QPen(Qt.black, 0, Qt.SolidLine))
+            qp.drawRect(QRect(0, self.height-self.log.height, self.width, self.log.height))
         
         # финализация
         qp.end()
