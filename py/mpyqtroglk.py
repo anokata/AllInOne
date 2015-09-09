@@ -1,9 +1,11 @@
+# делай, до конца. посмотрим что будет. как угодно.
 #TODO обработка ввода - процедура. персонаж. вещи. редактор.
 # область вывода инфы с автопрокруткой, лог
 import sys, random, pickle
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QColor, QFont, QPen
 from PyQt5.QtCore import Qt, QRect
+from collections import deque
 # функция создания двухмерного массива(списка списков) с начальным значением
 def makeArray2D(w, h, initVal):
     return [[initVal for x in range(w)] for x in range(h)]
@@ -72,11 +74,16 @@ class Field(object):
 
 # лог область        
 class Log(object):
-    log = [] # список строк
-    maxLines = 4
+    log = deque([]) # очередь строк
+    maxLines = 9
     height = 200
     visible = True
     #вывод строк. добавление в лог.
+    def add(self, line):
+        self.log.append(line)
+        if len(self.log) > self.maxLines:
+            self.log.popleft()
+        
 
 #просто главный класс-окно-приложение
 class Example(QWidget):
@@ -90,8 +97,11 @@ class Example(QWidget):
         self.setGeometry(100, 100, self.width, self.height)
         self.setWindowTitle('[]')
         self.log = Log()
-        self.log.log.append('test line')
-        self.log.log.append('second line')
+        self.log.add('test line')
+        self.log.add('second line')
+        self.log.add('3 line')
+        self.log.add('4 line')
+        self.log.add('5 line')
         self.show()   
     
     def resizeEvent(self,resizeEvent):
@@ -120,10 +130,18 @@ class Example(QWidget):
         
         # лог
         if self.log.visible:
-            qp.setBrush(QColor(50, 50, 100))
-            qp.setPen(QPen(Qt.black, 0, Qt.SolidLine))
-            qp.drawRect(QRect(0, self.height-self.log.height, self.width, self.log.height))
-        
+            qp.setBrush(QColor(30, 30, 60))
+            qp.setPen(QPen(Qt.white, 0, Qt.SolidLine))
+            logRect = QRect(0, self.height-self.log.height, self.width, self.log.height)
+            qp.drawRect(logRect)
+            lines = ''
+            #rlog = self.log.log
+            #rlog.reverse()
+            for line in self.log.log:
+                lines += line + '\n'
+            qp.drawText(logRect, Qt.AlignLeft, lines)
+                
+            
         # финализация
         qp.end()
         
@@ -136,6 +154,7 @@ class Example(QWidget):
         qp.drawText(r, Qt.AlignCenter, t.symbol) 
     
     def keyPressEvent(self, e):
+        self.log.add(str(e.key()))
         if e.key() == Qt.Key_Escape:
             self.close()
         if e.key() == Qt.Key_W:
