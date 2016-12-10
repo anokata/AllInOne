@@ -1,0 +1,58 @@
+{
+"qestions": [
+    {"text":"how?", 
+     "variants":[
+        {"text": "1", "points":1},
+        {"text": "2", "points":-1}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    },
+    {"text":"where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where? where?", 
+     "variants":[
+        {"text": "there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there, there!", "points":0},
+        {"text": "here", "points":2}
+              ]
+    }
+        ]
+}

@@ -1,0 +1,11 @@
+{
+"maxscore": 3,
+"qestions": [
+    {"text":"чего?", 
+     "variants": [
+        {"text": "1", "points":1},
+        {"text": "2", "points":-1}
+              ]
+    }
+        ]
+}
