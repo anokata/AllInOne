@@ -1,0 +1,24 @@
+win
+ctrl-shift-alt-g geany
+ctrl-shift-alt-t totalcmd
+ctrl-shift-alt-x chrome
+ctrl-shift-alt-c cubexplore
+
+browser myscript
+in editor
+ctrl-shift-a genUUID
+ctrl-shift-j pretty Json
+ctrl-shift-x close all tabs
+ctrl-shift-leftArrow select left tab
+ctrl-shift-rightArrow select right tab
+ctrl-shift-f open Reports & close left panel
+ctrl-shift-w close current tab
+ctrl-shift-R new resours (with auto fill for png)//need once open Create menu
+ctrl-shift-I get UUID from panel & paste in text
+ctrl-shift-V get VersionStr from panel & paste in text
+ctrl-shift-1 get UUID & Verion from panel & paste in text in JSON
+ctrl-shift-2 get UUID & Verion from panel & name & paste in text in JSON
+ctrl-shift-K change theme epbs/krista
+
+//save
+//toggle left panel

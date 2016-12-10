@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+
+  "name": "Qfun",
+  "description": "some key shortcut functions",
+  "version": "1.0",
+
+  
+    "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": [ "Math.uuid.js", "myscript.js"]
+    }
+  ]
+}
