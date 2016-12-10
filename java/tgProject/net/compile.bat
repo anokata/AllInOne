@@ -1,0 +1,2 @@
+javac nettest.java
+pause

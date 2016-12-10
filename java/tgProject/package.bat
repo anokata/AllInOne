@@ -1,0 +1,1 @@
+jar cvmf manifest.mf helloWorld.jar -C ./classes mypackage

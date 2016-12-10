@@ -1,0 +1,22 @@
+сделать видео из кадров
+ffmpeg -r 96 -f image2 -i cam.jpg.%d cam1_28.01.2016_rate96_07-30--15-30.mpg
+ffmpeg -r 96 -f image2 -i cam2.jpg.%d cam2_28.01.2016_rate96_07-30--15-30.mpg
+ffmpeg -r 24 -f image2 -i cam.jpg.%d cam1_28.01.2016_rate24_07-30--15-30.mpg
+ffmpeg -r 24 -f image2 -i cam2.jpg.%d cam2_28.01.2016_rate24_07-30--15-30.mpg
+
+Повернуть видео на 90°
+ffmpeg -vf transpose=1 -i file.avi file1.avi
+
+
+Склейка 2х и более видео в один.
+Если ролики в одинаковых форматах с одинаковыми параметрами:
+ffmpeg -i "concat:input1.mpg|input2.mpg|input3.mpg" -c copy output.mpg
+Если разные:
+ffmpeg -i input1.mp4 -i input2.webm \
+-filter_complex '[0:0] [0:1] [1:0] [1:1] concat=n=2:v=1:a=1 [v] [a]' \
+-map '[v]' -map '[a]' <encoding options> output.mkv
+
+Вот вам захват видео с экрана:
+ffmpeg -f x11grab -s cif -r 25 -i :0.0+10,20 /tmp/out.mpg
+здесь -s cif — размер, 0.0 — экран, 10,20 — это смещение относительно верхнего левого угла экрана
+

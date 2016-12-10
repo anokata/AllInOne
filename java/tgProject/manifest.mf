@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Created-By: 1.6.0_19 (Sun Microsystems Inc.)
+Main-Class: mypackage.HelloWorld
+Class-Path: lib/velocity-1.4.jar lib/log4j-1.2.8.jar

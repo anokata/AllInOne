@@ -1,0 +1,1 @@
+for /L %%i in (0,1,86400) do g1.bat
