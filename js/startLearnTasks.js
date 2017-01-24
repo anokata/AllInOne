@@ -12,6 +12,7 @@ const testAll = () => { // Make fun snippet
     assertAndLog(sumArray, [[1]], 1);
     assertAndLog(sumArray, [[1,2]], 3);
     assertAndLog(sumArray, [[1,2,0,10]], 13);
+    assertAndLog(avgArray, [[1,1,0,10]], 3);
 }
 //1.0  написать функцию sumArray принимающую массив целых чисел и вычисляющих сумму.
 function sumArray(arr) {
@@ -22,6 +23,13 @@ function sumArray(arr) {
     return sum;
 }
 //1.1  написать функцию avgArray принимающую массив целых чисел и вычисляющих среднее арифметическое.
+const avgArray = (arr) => {
+    var sum = 0;
+    for (var item of arr) {
+        sum += item;
+    }
+    return sum/arr.length;
+}
 //1.2  написать функцию lenString вычисляющую длинну переданной строки.
 //2.0  Написать функцию max2 возвращающую большее из двух чисел.
 //2.1  Написать функцию max3 принимающую 3 числа и возвращающую максимальное.
