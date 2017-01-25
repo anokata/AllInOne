@@ -131,6 +131,14 @@ for (let key in obj)
 Object.keys(obj).length
 arr [] 
   pop push shift unshift конец и начало
+  split same as python
+  join new Array(3).join('str') -> ['str', 'str' ...]
+  splice delete from middle of array and insert
+  slice copy [start:end]
+  sort, reverse, indexOf, lastIndexOf
+  concat
+можно перебором элементов создать объект с полями такими как значения и получить Множество(или словарь даже)
+!! Написать функцию преобразования массива в множество. Фун преобразования массива по парам в словарь(объект)
 Надо узнать:
     переменное кол-во аргументов.
   */
