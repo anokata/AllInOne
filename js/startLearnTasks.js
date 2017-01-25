@@ -111,6 +111,14 @@ isFinite not NaN not Inf
 +num -> convert to Number
 round : ~~num num^0 
 toLocaleString
+`xxx ${somevar} xxx`
+''.slice()
+let a = {};
+a.a = 1; delete a.a; if 'a' in a
+for (let key in obj)
+Object.keys(obj).length
+arr [] 
+  pop push shift unshift конец и начало
 Надо узнать:
     переменное кол-во аргументов.
   */
