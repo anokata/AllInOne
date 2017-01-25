@@ -107,4 +107,13 @@ NaN не равен себе. есть isNaN()
 isZero isPositive 
 sort сортирует в виде строк - надо задавать функцию для чисел (a,b) => {return a-b}
 num.toFixed(n);
+isFinite not NaN not Inf
++num -> convert to Number
+round : ~~num num^0 
+toLocaleString
+Надо узнать:
+    переменное кол-во аргументов.
   */
+function isNumeric(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+}
