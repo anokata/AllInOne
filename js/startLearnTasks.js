@@ -1,11 +1,30 @@
 'use strict';
 const assert = require('assert');
+const log = console.log;
+function solution(A) {
+    if (A.length < 3) return 0;
+    A.sort((a,b) => {return a-b});
+    for (let i = 0; i < A.length - 2; i++) {
+        if (A[i] + A[i+1] > A[i+2]) return 1;
+    }
+    return 0;
+}
+log(solution([1,10, 50, 5]));
+const isPrime = (x) => {
+  if (x === 2) return true;
+  if (x === 1) return false;
+  for (let i = 2; i <= x / 2; i++) {
+    if (x % i === 0) return false;
+  }
+  return true;
+}
 //0.0  Написать процедуру тестирующую все следующие функции, и выводящую отчёт.
 assert(1==1);
 const assertAndLog = (fun, args, val) => {
     var result = fun.apply(null, args);
-    console.log(fun.name, result, ' ?= ', val);
-    assert(result == val);
+    console.log(fun.name, result, args, ' ?= ', val);
+    //assert(result == val);
+    assert.equal(result, val, 'not ok');
     console.log('ok');
 }
 const testAll = () => { // Make fun snippet
@@ -13,6 +32,19 @@ const testAll = () => { // Make fun snippet
     assertAndLog(sumArray, [[1,2]], 3);
     assertAndLog(sumArray, [[1,2,0,10]], 13);
     assertAndLog(avgArray, [[1,1,0,10]], 3);
+    assertAndLog(isPrime, [1], false);
+    assertAndLog(isPrime, [10], false);
+    assertAndLog(isPrime, [12], false);
+    assertAndLog(isPrime, [8], false);
+    assertAndLog(isPrime, [2], true);
+    assertAndLog(isPrime, [3], true);
+    assertAndLog(isPrime, [7], true);
+    assertAndLog(isPrime, [13], true);
+    assertAndLog(isPrime, [83], true);
+    assertAndLog(isPrime, [81], false);
+    assertAndLog(isPrime, [24], false);
+    assertAndLog(isPrime, [4], false);
+    assertAndLog(isPrime, [1], false);
 }
 //1.0  написать функцию sumArray принимающую массив целых чисел и вычисляющих сумму.
 function sumArray(arr) {
@@ -31,6 +63,9 @@ const avgArray = (arr) => {
     return sum/arr.length;
 }
 //1.2  написать функцию lenString вычисляющую длинну переданной строки.
+function lenString(str) {
+
+}
 //2.0  Написать функцию max2 возвращающую большее из двух чисел.
 //2.1  Написать функцию max3 принимающую 3 числа и возвращающую максимальное.
 //2.2  Написать функцию sortArray принимающую массив чисел и сортирующую его с помощью функции max2
@@ -68,4 +103,8 @@ testAll();
 /*
 >= приводит тип к числу 
 === не приводит типы.
+NaN не равен себе. есть isNaN()
+isZero isPositive 
+sort сортирует в виде строк - надо задавать функцию для чисел (a,b) => {return a-b}
+num.toFixed(n);
   */
