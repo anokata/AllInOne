@@ -1,6 +1,18 @@
 'use strict';
 const assert = require('assert');
 const log = console.log;
+function factors(N) {
+    let n = N;
+    if (n < 3) return n; // 1 - 1; 2 - (1,2);
+    let f = 2; // (1 and n)
+    let sq = Math.ceil(Math.sqrt(n));
+    if (sq*sq === n) f++;
+    for (let candidate = 2; candidate < sq; candidate++) {
+        //console.log(candidate);
+        if (n%candidate === 0) f += 2;
+    }
+    return f;
+}
 function solution(A) {
     if (A.length < 3) return 0;
     A.sort((a,b) => {return a-b});
