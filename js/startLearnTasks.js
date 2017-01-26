@@ -147,6 +147,19 @@ Array.prototype.max = function() {return Math.max.apply(null, this);};
 !! Написать функцию преобразования массива в множество. Фун преобразования массива по парам в словарь(объект)
 Надо узнать:
     переменное кол-во аргументов.
+
+DOM
+Навигация по всем узлам:
+  document, document.body, .parentNode, previousSibling, nextSibling, childNodes
+только по элементам:
+  .parentElement, .previousElementSibling, nextElementSibling, children
+Специальные для таблицы: table.rows tr.cells ...
+Спецальные для формы: ...
+elem.querySelectorAll(css) по css селектору, querySelector если только один.
+ elem.matches(css)  удовлетворяется ли селектору, для фильтрации.
+elem node -> innerHTML
+text node -> data
+console.dir
   */
 function isNumeric(n) {
       return !isNaN(parseFloat(n)) && isFinite(n);
