@@ -1,0 +1,137 @@
+<!DOCTYPE html>\n<html><head><title>Codility test</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> 
+<script>
+//const log = console.log;
+
+function color3to6(color) {
+    let color6 = '#';
+    if (color.length === 4) {
+        color6 += color[1] + color[1];
+        color6 += color[2] + color[2];
+        color6 += color[3] + color[3];
+    } else return color;
+    return color6;
+}
+
+function solution() {
+    let tds = document.getElementsByTagName('td');
+    let result = '';
+    for (let i = 0; i < tds.length; i++) {
+        td = tds[i];
+        // if colors like #FF0000 and #ff0000, use Upper
+        // if may colors like #fa8 then make it #FFAA88
+        let fgColor = color3to6(td.style.color.toUpperCase());
+        let bgColor = color3to6(td.style.backgroundColor.toUpperCase());
+        if (fgColor !== bgColor) {
+            result += td.textContent;
+        }
+    }
+    return result;
+}
+const log = console.log;
+
+function getRoots(arr) {
+    let roots = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].parentNode.nodeName == 'BODY') {
+            roots.push(arr[i]);
+        }
+    }
+    return roots;
+}
+
+function getMaxLev(elem, curlev, max) {
+    if (elem.tagName == 'UL' || elem.tagName == 'OL') {
+        curlev++;
+    }
+    if (curlev > max) max = curlev;
+    let children = elem.children;
+    //log(elem.tagName, curlev, children.length);
+    if (!children) return curlev;
+    let lev = 0;
+    
+    for (let i = 0; i < children.length; i++) {
+        lev = getMaxLev(children[i], curlev, max);
+        if (lev > max) max = lev;
+    }
+
+    return max;
+}
+
+function getMaxUlOlLevel(elems) {
+    let maxLevel = 0;
+    let curLevel = 0;  
+     for (let i = 0; i < elems.length; i++) {
+        curLevel = getMaxLev(elems[i], 0, 0);
+        if (maxLevel < curLevel) maxLevel = curLevel;
+     }
+    return maxLevel;
+}
+
+function solution3() {
+    let uls = document.getElementsByTagName('ul');
+    let ols = document.getElementsByTagName('ol');
+    let rootUls = getRoots(uls);
+    let rootOls = getRoots(ols);  
+    let olLevel = getMaxUlOlLevel(rootOls);
+    let ulLevel = getMaxUlOlLevel(rootUls);
+    return Math.max(olLevel, ulLevel);
+}
+</script>
+    </head><body>\n    <table>\n
+            <tbody>\n        <tr>\n            <td style="color: #ff00ff;
+            background-color:#FFFFFF">Q</TD>\n            <td style="background-color:
+            #442244; color: #442244">Y</td>\n            <td style="color: #FFFF00;
+            background-color:#442244">A</td>\n        
+</tr>\n        <tr>\n            <td
+                                                             style="color: #FFEEFE;
+                                                             background-color:#990000">Q</td>\n
+                                                         <td style="color: #FFFF00;
+                                                         background-color:#FF0">M</td>\n
+                                                     <td style="color: #000000;
+                                                     background-color:#FF7777">O</td>\n
+                    </tr>
+</tr>\n        <tr>\n            <td
+                                                             style="color: #FFEEFE;
+                                                             background-color:#990000">1</td>\n
+                                                         <td style="color: #FFFF00;
+                                                         background-color:#FF0">2</td>\n
+                                                     <td style="color: #000000;
+                                                     background-color:#FF7777">3</td>\n
+                    </tr>
+\n        </tbody>\n    </table>\n
+<ul>
+<ol></ol>
+  <li>Item:
+     <ol>
+
+<ul>
+<ul>
+<ul>
+<ul>
+<ul>
+</ul>
+</ul>
+</ul>
+</ul>
+</ul>
+       <li>Point:
+         <div>
+           <ul>
+             <li>elem1</li>
+           </ul>
+         </div>
+       </li>
+     </ol>
+  </li>
+  <li>elem2
+
+
+</li>
+</ul>
+<ul>
+  <li>simple list1</li>
+</ul>
+<ul>
+</ul>
+</body></html>

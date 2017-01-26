@@ -137,6 +137,12 @@ arr []
   slice copy [start:end]
   sort, reverse, indexOf, lastIndexOf
   concat
+  forEach(fun, this) : fun(item, i, arr)
+  filter, map, every, some, reduce
+Math.max()
+Math.max.apply(null, numArray);
+Array.prototype.max = function() {return Math.max.apply(null, this);};
+
 можно перебором элементов создать объект с полями такими как значения и получить Множество(или словарь даже)
 !! Написать функцию преобразования массива в множество. Фун преобразования массива по парам в словарь(объект)
 Надо узнать:
