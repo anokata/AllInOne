@@ -160,6 +160,10 @@ elem.querySelectorAll(css) по css селектору, querySelector если �
 elem node -> innerHTML
 text node -> data
 console.dir
+hasAttribute, getAttribute, setAttribute, .attributes
+className (attr class) and classList
+
+TASK: rewrite and add new features, move to py - bookmarks
   */
 function isNumeric(n) {
       return !isNaN(parseFloat(n)) && isFinite(n);
