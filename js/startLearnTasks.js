@@ -145,8 +145,16 @@ Array.prototype.max = function() {return Math.max.apply(null, this);};
 
 можно перебором элементов создать объект с полями такими как значения и получить Множество(или словарь даже)
 !! Написать функцию преобразования массива в множество. Фун преобразования массива по парам в словарь(объект)
-Надо узнать:
-    переменное кол-во аргументов.
+переменное кол-во аргументов.  в объекте arguments хранятся аргументы по позициям, и есть lenght.
+Date object, new Date(); new Date(datestring); 
+new Date(year, month, date, hours, minutes, seconds, ms)
+getFullYear
+date.toLocaleString("ru",
+toISOString() 
+console.time('label'); console.timeEnd('label');
+console.time('label'); console.timeEnd('label');
+Date.parse(str)
+
 
 DOM
 Навигация по всем узлам:
@@ -168,3 +176,14 @@ TASK: rewrite and add new features, move to py - bookmarks
 function isNumeric(n) {
       return !isNaN(parseFloat(n)) && isFinite(n);
 }
+function make() { 
+	function res() {
+		return res.n;
+	}
+	res.n = 1;
+	return res;
+}
+let a = make();
+let b = make();
+a.n = 2;
+console.log(a, b, a(), b(), a.n, b.n);
