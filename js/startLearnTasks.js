@@ -170,6 +170,7 @@ text node -> data
 console.dir
 hasAttribute, getAttribute, setAttribute, .attributes
 className (attr class) and classList
+addEventListener
 
 TASK: rewrite and add new features, move to py - bookmarks
   */
