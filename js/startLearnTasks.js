@@ -188,3 +188,24 @@ let a = make();
 let b = make();
 a.n = 2;
 console.log(a, b, a(), b(), a.n, b.n);
+function sum(a) {
+  return function (b) {
+    return a + b;
+  }
+}
+log(sum, sum(2), sum(2)(3));
+function makeBuffer() {
+      let acc = '';
+      function bufAdd(x) {
+        if (x === undefined) {
+          return acc;
+        };
+        acc += x;
+        return acc;
+      }
+      bufAdd.clear = function () {
+        acc = '';
+      }
+      return bufAdd;
+    }
+    var buffer = makeBuffer();
