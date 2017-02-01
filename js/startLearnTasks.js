@@ -155,6 +155,8 @@ console.time('label'); console.timeEnd('label');
 console.time('label'); console.timeEnd('label');
 Date.parse(str)
 
+Object.create(null); без прототипа
+.prototype у конструктора.
 
 DOM
 Навигация по всем узлам:
