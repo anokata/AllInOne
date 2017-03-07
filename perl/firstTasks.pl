@@ -1,8 +1,9 @@
 use Carp::Assert;
+use strict;
 #Define a function max() that takes two numbers as arguments and returns the largest of them. Use the if-then-else construct
 sub max{
-    $x = shift;
-    $y = shift;
+    #my ($x, $y) = (shift, shift);
+    my ($x, $y) = @_;
     if ($x > $y) {
         return $x;
     } else { 
@@ -10,14 +11,89 @@ sub max{
     }
 }
 assert(max(1,2) == 2);
-assert(max(3,2) == 3);
-
+assert((max 7,2) == 7);
+print max 65, 46;
+# @ push pop
 #Define a function max_of_three() that takes three numbers as arguments and returns the largest of them.
-#
-#Define a function that computes the length of a given list or string. (It is true that Python has the len() function built in, but writing it yourself is nevertheless a good exercise.)
-#
+sub max3{
+    my ($x, $y, $z) = (shift, shift, shift);
+    $x = max $x, $y;
+    return $z if $x < $z;
+    return $x;
+}
+assert((max3 5,4,1) == 5);
+assert((max3 2,4,8) == 8);
+assert((max3 2,4,1) == 4);
+#Define a function that computes the length of a given list or string. 
+sub lens{
+    my $string = shift;
+    my @chars = split("", $string);
+    my $len = 0;
+    foreach my $c (@chars) {
+        $len++;
+    }
+    return $len;
+}
+print("\n Len is: ". lens('abcde') . "\n");
+assert(lens('a') == 1);
+assert(lens('ab') == 2);
+assert(lens('') == 0);
 #Write a function that takes a character (i.e. a string of length 1) and returns True if it is a vowel, False otherwise.
-#
+sub is_vowel{
+    my $char = shift;
+    my @vowels = qw{a e i o u};
+    foreach my $vowel (@vowels) {
+        if ($char eq $vowel) {
+            return 1;
+        }
+    }
+    return 0;
+}
+sub reg_is_vowel {
+    my $char = shift;
+    return $char =~ m/(a|e|i|o|u)/;
+}
+print(is_vowel('a'));
+print(is_vowel('b'));
+assert(is_vowel('a') == 1);
+assert(is_vowel('b') == 0);
+print(reg_is_vowel('b'));
+print "$_ " for(qw/1 2 3 4 5/);
+print "$_ " for('a'..'aa');
+
+sub readandsum {
+    my $sum = 0;
+    while (my $line = <STDIN>) {
+        chomp($line);
+        last if ($line eq "exit" or $line eq '');
+        #print "Entered: $line\n";
+        $sum += $line;
+    }
+    return $sum;
+}
+sub readandsum2 {
+    my $sum = 0;
+    while (<STDIN>) { # save to $_
+        chomp;
+        last if ($_ eq "exit" or $_ eq '');
+        #print "Entered: $line\n";
+        $sum += $_;
+    }
+    return $sum;
+}
+#print readandsum2;
+sub readfile {
+    open FD, "tasks.pl"
+        or die "open: $!\n";
+    my $i = 0;
+    #print($i++ . ": $_") while (<FD>);
+    while (<FD>) {
+        chomp;
+        print("[[".$i++ . ": $_]]\n"); 
+        last if ($i > 5);
+    }
+}
+readfile;
 #Write a function translate() that will translate a text into "rövarspråket" (Swedish for "robber's language"). That is, double every consonant and place an occurrence of "o" in between. For example, translate("this is fun") should return the string "tothohisos isos fofunon".
 #
 #Define a function sum() and a function multiply() that sums and multiplies (respectively) all the numbers in a list of numbers. For example, sum([1, 2, 3, 4]) should return 10, and multiply([1, 2, 3, 4]) should return 24.
