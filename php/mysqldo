@@ -1,0 +1,7 @@
+mysql_secure_install
+sudo mysql -u root mysql -p
+create user 'test'@'localhost' identified by 'password';
+select user,host,password from mysql.user;
+create database mor;
+grant all on mor.* to 'test'@'localhost'
+source mor.sql
