@@ -4,3 +4,18 @@ thead {
     border-color: #BBB;
     border-style: solid;
 }
+
+td {
+    background-color: #EEE;
+    text-align: center;
+}
+
+tr {
+    border-color: #DDD;
+}
+
+table {
+    margin: auto;
+    width: 50%;
+    border: 3px solid green;
+}
