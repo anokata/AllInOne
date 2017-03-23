@@ -1,5 +1,38 @@
 <?php
-//0.1
+//0.0 печать
+print("start\n");
+//0.1 значения основных типов.
+$i = 1;
+$s = 'str1';
+$d = 0.2;
+$b = true;
+print("i=$i \t s=$s \nd=$d\t b=$b \n");
+var_dump($i);
+//0.2 сравнение. условия
+var_dump($i == $i);
+var_dump($s >= '1', 0.1 + 0.1 + 0.2 === 0.4);
+if ($i > 0) {
+    print("i>0\n");
+}
+//0.3 арифметика
+print(++$i**20);
+$s .= 'add:';
+print($s . 'some' . 'str' .'concat'."\n");
+//0.4 циклы
+for ($k = 1; $k < 10; $k++) {
+    print("loop k[$k]\n");
+}
+//0.5 функции. id. 
+function id($arg) {
+    print("-- fun id. arg=$arg\n");
+    return $arg;
+}
+id('etst');
+//0.6 составные типы
+//0.7 типы времени
+$t = new \DateTime;
+var_dump($t);
+print($t->format('Y-m-d H:m'));
 
 /*
 0.0  Написать процедуру тестирующую все следующие функции, и выводящую отчёт.
