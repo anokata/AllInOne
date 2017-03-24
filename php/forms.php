@@ -1,4 +1,30 @@
 <?php
+
+function make_head($title, $style) {
+    echo "<html><head><title>$title</title>";
+    echo '<link rel="stylesheet" type="text/css" href="'. $style .'">';
+    echo '</head><body>';
+}
+
+function make_table($rows, $fields) 
+{
+    echo '<table><thead><tr>';
+    foreach ($fields as $head_name) {
+        echo "<th>$head_name</th>";
+    }
+    echo '</tr><thead>';
+    
+    echo '<tbody>';
+    foreach ($rows as $row) {
+        echo '<tr>';
+        foreach ($fields as $head_name) {
+            echo '<td>'. $row{$head_name} .'</td>';
+        }
+        echo '</tr>';
+    }
+    echo '</tbody>';
+}
+
 function make_add_form() {
 ?>
 <div id="addForm">
