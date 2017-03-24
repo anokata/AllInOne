@@ -7,9 +7,10 @@
 <span id="result" >
 <?php
 $founded = false;
+$phone = $_POST['phone'];
 foreach ($rows as $row) {
     //print("'".$_POST['phone']."' ?=? ".'"'.$row['phone'].'"'."\n");
-    if ($row['phone'] === $_POST['phone']) {
+    if ($row['phone'] === $phone) {
         print('Founded: '. $row['name'] . ' with phone ' . $row['phone'] );
     }
 }

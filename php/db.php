@@ -22,6 +22,20 @@ function get_name_id($connection, $name) {
     return $row['id'];
 }
 
+function get_namephone_id($connection, $name, $phone) {
+    $id = get_name_id($connection, $name);
+    if ($id) {
+        $query = $connection->prepare(
+            'select id from phones where people_id = ? and phone = ?');
+        $query->bindParam(1, $id);
+        $query->bindParam(2, $phone);
+        $query->execute();
+        $row = $query->fetch();
+        return $row['id'];
+    }
+    return false;
+}
+
 function insert_name_phone($connection, $people_id, $phone) {
     $query = $connection->prepare(
         'INSERT INTO phones (id, phone, people_id) VALUES ("null", ?, ?)');
@@ -34,6 +48,13 @@ function insert_name($connection, $name) {
     $query = $connection->prepare(
         'INSERT INTO people (id, name) VALUES ("null", ?)');
     $query->bindParam(1, $name);
+    $query->execute();
+}
+
+function delete_namephone_byid($connection, $id) {
+    $query = $connection->prepare(
+        'delete from phones where id = ?');
+    $query->bindParam(1, $id);
     $query->execute();
 }
 

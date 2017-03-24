@@ -42,3 +42,10 @@ table {
     background-color: #EEE;
     margin-bottom: 10pt;
 }
+
+.deleteForm {
+    display: inline;
+}
+.deleteForm form {
+    display: inline;
+}
