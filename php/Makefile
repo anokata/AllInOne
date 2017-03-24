@@ -7,4 +7,6 @@ phone:
 phonebd:
 	mysql -u test -p phonebook < phone.sql
 urldb:
-	psql -h localhost test test -f urls.sql
+	psql -h localhost -d urls -U test -f urls.sql
+urls:
+	php urls.php

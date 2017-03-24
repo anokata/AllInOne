@@ -1,4 +1,23 @@
 <?php
+
+function db_connect($sdb, $host, $dbname, $user, $pass) {
+    $connection = new PDO("$sdb:host=$host;dbname=$dbname", $user, $pass);
+    if (!$connection) {
+        exit(1);
+    }
+    return $connection;
+}
+
+function db_select($conn, $fields, $table) {
+    $qry = 'select ';
+    foreach ($fields as $field) {
+        $qry .= $field;
+    }
+    $qry .= " from $table";
+    $query = $conn->query($qry);
+    return $query->fetchAll();
+}
+
 function connect() {
     $connection = new PDO('mysql:host=localhost;dbname=phonebook', 'test', 'test');
     if (!$connection) {
