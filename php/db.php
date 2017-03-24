@@ -7,6 +7,12 @@ function connect() {
     return $connection;
 }
 
+function db_select_people($connection) {
+    $query = $connection->query(
+        'select id, name from people');
+    return $query->fetchAll();
+}
+
 function get_phonebook($connection) {
     $query = $connection->query(
         'select name, phone from people inner join phones where people.id = phones.people_id');
