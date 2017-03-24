@@ -6,16 +6,28 @@ thead {
 }
 
 td {
-    background-color: #EEE;
     text-align: center;
 }
 
 tr {
     border-color: #DDD;
+    background-color: #EEE;
 }
 
 table {
     margin: auto;
     width: 50%;
     border: 3px solid green;
+}
+
+#search {
+    border: 3px solid green;
+    margin: auto;
+    width: 50%;
+    background-color: #EEE;
+    margin-bottom: 10pt;
+}
+
+#found {
+    background-color: #ECC;
 }
