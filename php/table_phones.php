@@ -1,8 +1,25 @@
+<?php
+
+function make_delete_form($connection, $name, $phone) {
+?>
+<div class="deleteForm">
+<form action="<?php print($_SERVER['PHP_SELF']);?>" method="post">
+    <input type="submit" name="submit" value="delete" />
+    <input type="hidden" name="name" value="<?php echo $name; ?>" />
+    <input type="hidden" name="phone" value="<?php echo $phone; ?>" />
+    <input type="hidden" name="method" value="delete" />
+    <input type="hidden" name="id" value="" />
+</form></div>
+<?php
+}
+
+function make_table($connection, $rows, $phone) {
+?>
 <table> <thead>
 <tr><th>Name</th><th>Phone</th><th>Actions</th></tr>
 </thead>
 <?php
-$phone = $_POST['phone'];
+$phone = isset($_POST['phone']) ? $_POST['phone'] : NULL;
 foreach ($rows as $row) {
     if ($row['phone'] === $phone) {
         ?> <tr id="found"><td> <?php
@@ -20,3 +37,6 @@ foreach ($rows as $row) {
     }
 ?>
 </table>
+<?php
+}
+?>

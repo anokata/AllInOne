@@ -5,60 +5,23 @@
 </head>
 <body>
 <?php
-// TODO view peop, search by num, add, del.
+// TODO ajax/ peoples crud, avatar
 require('db.php');
+require('post.php');
+require('forms.php');
+require('table_phones.php');
 
 $connection = connect();
+$name = isset($_POST['name']) ? $_POST['name'] : NULL;
+$phone = isset($_POST['phone']) ? $_POST['phone'] : NULL;
+$method = isset($_POST['method']) ? $_POST['method'] : NULL;
 
-function make_delete_form($connection, $name, $phone) {
-?>
-<div class="deleteForm">
-<form action="<?php print($_SERVER['PHP_SELF']);?>" method="post">
-    <input type="submit" name="submit" value="delete" />
-    <input type="hidden" name="name" value="<?php echo $name; ?>" />
-    <input type="hidden" name="phone" value="<?php echo $phone; ?>" />
-    <input type="hidden" name="method" value="delete" />
-    <input type="hidden" name="id" value="" />
-</form></div>
-<?php
-}
-
-function handle_post_method($connection) {
-// TODO secure!
-// TODO not add if exists!
-    $name = $_POST['name'];
-    $phone = $_POST['phone'];
-
-    if ($_POST['method'] === 'add') {
-        $id = get_name_id($connection, $name);
-        if ($phone && $id) {
-            insert_name_phone($connection, $id, $phone);
-        } elseif ($phone && !$id) {
-            insert_name($connection, $name);
-            $id = get_name_id($connection, $name);
-            insert_name_phone($connection, $id, $phone);
-        } elseif ($name && !$id) {
-            insert_name($connection, $name);
-            // TODO tell user success added
-        }
-    }
-    if ($_POST['method'] === 'delete') {
-        //print("del $name $phone");
-        print(get_namephone_id($connection, $name, $phone));
-        delete_namephone_byid($connection, get_namephone_id($connection, $name, $phone));
-    }
-}
-
-handle_post_method($connection);
+handle_post_method($connection, $method, $name, $phone);
 
 $rows = get_phonebook($connection);
-require('search_form.php');
-require('add_form.php');
-require('table_phones.php');
-?>
-
-<?php
-$query = null;
+make_search_form($rows, $phone);
+make_add_form();
+make_table($connection, $rows, $phone);
 $connection = null;
 ?>
 
