@@ -2,6 +2,7 @@
 <form action="<?php print($_SERVER['PHP_SELF']);?>" method="post">
     Phone:  <input type="text" name="phone" />
     <input type="submit" name="submit" value="Search" />
+    <input type="hidden" name="method" value="find" />
 </form>
 <span id="result" >
 <?php

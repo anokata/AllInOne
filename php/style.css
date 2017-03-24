@@ -34,3 +34,11 @@ table {
 #fuzzy {
     background-color: #CCE;
 }
+
+#addForm {
+    border: 3px solid red;
+    margin: auto;
+    width: 50%;
+    background-color: #EEE;
+    margin-bottom: 10pt;
+}
