@@ -21,7 +21,7 @@ handle_post_method($connection, $method, $name, $phone);
 $rows = get_phonebook($connection);
 make_search_form($rows, $phone);
 make_add_form();
-make_table($connection, $rows, $phone);
+make_tablep($connection, $rows, $phone);
 $connection = null;
 ?>
 

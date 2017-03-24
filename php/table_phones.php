@@ -13,7 +13,7 @@ function make_delete_form($connection, $name, $phone) {
 <?php
 }
 
-function make_table($connection, $rows, $phone) {
+function make_tablep($connection, $rows, $phone) {
 ?>
 <table> <thead>
 <tr><th>Name</th><th>Phone</th><th>Actions</th></tr>

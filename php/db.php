@@ -44,7 +44,7 @@ function get_namephone_id($connection, $name, $phone) {
 
 function insert_name_phone($connection, $people_id, $phone) {
     $query = $connection->prepare(
-        'INSERT INTO phones (id, phone, people_id) VALUES ("null", ?, ?)');
+        'INSERT INTO phones (id, phone, people_id) VALUES (null, ?, ?)');
     $query->bindParam(1, $phone);
     $query->bindParam(2, $people_id);
     $query->execute();
@@ -52,7 +52,7 @@ function insert_name_phone($connection, $people_id, $phone) {
 
 function insert_name($connection, $name) {
     $query = $connection->prepare(
-        'INSERT INTO people (id, name) VALUES ("null", ?)');
+        'INSERT INTO people (id, name) VALUES (null, ?)');
     $query->bindParam(1, $name);
     $query->execute();
 }
