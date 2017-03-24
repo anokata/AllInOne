@@ -2,7 +2,7 @@
 <body>
 <?php
 //print("hello cruel world :( Hi $argv[1]\n");
-//phpinfo();
+phpinfo();
 /*
 $pdo = new PDO('mysql:host=localhost;dbname=mor', 'test', 'test');
 var_dump($pdo);
@@ -19,11 +19,6 @@ foreach ($sth as $row) {
 $sth = null;
 $pdo = null;
  */
-$s = NULL;
-function g() {
-    print($s);
-}
-g();
 ?>
 </body>
 </html>

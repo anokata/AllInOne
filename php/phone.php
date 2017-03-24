@@ -5,7 +5,7 @@
 </head>
 <body>
 <?php
-// TODO ajax/ peoples crud, avatar
+// TODO ajax/ peoples crud, avatar, sort, filter
 require('db.php');
 require('post.php');
 require('forms.php');
