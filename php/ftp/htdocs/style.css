@@ -1,0 +1,51 @@
+thead {
+    background-color: #AAA;
+    border-width: 1px;
+    border-color: #BBB;
+    border-style: solid;
+}
+
+td {
+    text-align: center;
+}
+
+tr {
+    border-color: #DDD;
+    background-color: #EEE;
+}
+
+table {
+    margin: auto;
+    width: 50%;
+    border: 3px solid green;
+}
+
+#search {
+    border: 3px solid green;
+    margin: auto;
+    width: 50%;
+    background-color: #EEE;
+    margin-bottom: 10pt;
+}
+
+#found {
+    background-color: #ECC;
+}
+#fuzzy {
+    background-color: #CCE;
+}
+
+#addForm {
+    border: 3px solid red;
+    margin: auto;
+    width: 50%;
+    background-color: #EEE;
+    margin-bottom: 10pt;
+}
+
+.deleteForm {
+    display: inline;
+}
+.deleteForm form {
+    display: inline;
+}
