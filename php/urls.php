@@ -1,11 +1,15 @@
 <?php
-require('db.php');
-require('forms.php');
-require('settings.php');
+require_once('db.php');
+require_once('forms.php');
+require_once('settings.php');
 make_head("URLS", 'style.css');
-print("<i>before connect<br>");
+//print("<i>before connect<br>");
 $connection = db_connect($dbdriver, $dbhost, $dbname, $dbuser, $db_password);
-print("after connect<br>");
+$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+//print("after connect<br>");
+//var_dump($connection);
+//print_r($connection->errorInfo());
+
 $name = isset($_POST['name']) ? $_POST['name'] : NULL;
 $method = isset($_POST['method']) ? $_POST['method'] : NULL;
 $rows = db_select($connection, array('*'), 'urls');

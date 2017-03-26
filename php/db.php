@@ -38,21 +38,17 @@ function db_insert($connection, $table, $fields) {
         $i++;
     }
     $vals .= '?';
-
     $field .= ')';
     $vals .= ')';
     $q .= $field . $vals;
     $i = 1;
-    print($q);
+    //print($q);
     $query = $connection->prepare($q);
-    foreach ($fields as $name => $val) {
-        print("<BR> bind $i $val");
+    foreach ($fields as $name => &$val) {
         $query->bindParam($i, $val);
         $i++;
     }
-    print_r($query);
     $r = $query->execute();
-    print_r($r);
 }
 
 function connect() {
