@@ -21,6 +21,8 @@ function make_form($formname, $action, $inputs) {
     print('</form></div>');
 }
 
+make_form('addForm', 'urls_add.php', array('Name' => 'name', 'URL' => 'url'));
+
 make_table($rows, array('id', 'name', 'url'));
 
 $connection = null;

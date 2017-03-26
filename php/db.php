@@ -18,6 +18,43 @@ function db_select($conn, $fields, $table) {
     return $query->fetchAll();
 }
 
+function db_insert($connection, $table, $fields) {
+    $q = "INSERT INTO $table ";
+    $field = '(';
+    $vals = ' VALUES (';
+    $i = 1;
+    $l = count($fields);
+    foreach ($fields as $name => $val) {
+        if (is_string($name)) {
+            //$field .= "'". $name ."'";
+            $field .= $name; 
+        } else {
+            $field .= $name; 
+        }
+        if ($i < $l) {
+            $field .= ', '; 
+            $vals .= '?, ';
+        }
+        $i++;
+    }
+    $vals .= '?';
+
+    $field .= ')';
+    $vals .= ')';
+    $q .= $field . $vals;
+    $i = 1;
+    print($q);
+    $query = $connection->prepare($q);
+    foreach ($fields as $name => $val) {
+        print("<BR> bind $i $val");
+        $query->bindParam($i, $val);
+        $i++;
+    }
+    print_r($query);
+    $r = $query->execute();
+    print_r($r);
+}
+
 function connect() {
     $connection = new PDO('mysql:host=localhost;dbname=phonebook', 'test', 'test');
     if (!$connection) {
