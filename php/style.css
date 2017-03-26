@@ -1,5 +1,5 @@
 thead {
-    background-color: #AAA;
+    background-color: #AAC;
     border-width: 1px;
     border-color: #BBB;
     border-style: solid;
@@ -16,8 +16,9 @@ tr {
 
 table {
     margin: auto;
-    width: 50%;
-    border: 3px solid green;
+    /*width: 50%;*/
+    border: 2px solid #99B;
+    border-radius: 2%;
 }
 
 #search {
@@ -26,6 +27,7 @@ table {
     width: 50%;
     background-color: #EEE;
     margin-bottom: 10pt;
+    border-radius: 2%;
 }
 
 #found {
@@ -36,16 +38,21 @@ table {
 }
 
 #addForm {
-    border: 3px solid red;
+    border: 2px solid #C99;
     margin: auto;
-    width: 50%;
     background-color: #EEE;
     margin-bottom: 10pt;
+    border-radius: 2%;
+    padding: 5pt;
 }
 
 .deleteForm {
     display: inline;
+    border-radius: 2%;
 }
 .deleteForm form {
     display: inline;
+}
+tr:hover {
+    background-color: #CCE;
 }

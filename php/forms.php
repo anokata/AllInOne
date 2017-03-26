@@ -1,17 +1,17 @@
 <?php
 
-function make_form($formname, $action, $inputs, $title='ok', $hidden=false) {
+function make_form($formname, $action, $inputs, $butitle, $hidden=false) {
     print("<div id='$formname'>");
     print("<form action='$action' method='post'>");
     if ($inputs)
     foreach ($inputs as $title => $name) {
-        print("$title: <input type='text' name='$name' />");
+        print("$title: <input type='text' name='$name' /> &nbsp");
     }
     if ($hidden)
     foreach ($hidden as $name => $val) {
         print("<input type='hidden' name='$name' value='$val' />");
     }
-    print("<input type='submit' name='submit' value='$title' />");
+    print("<input type='submit' name='submit' value='$butitle' />");
     print('</form></div>');
 }
 
@@ -35,7 +35,7 @@ function make_table($rows, $fields, $link_fiedl_name='')
         foreach ($fields as $head_name) {
             echo '<td>';
             if ($head_name == 'DELETE') {
-                make_form('delForm', 'urls_delete.php', false, 'delete', array('id' => $row['id']));
+                make_form('deleteForm', 'urls_delete.php', false, 'delete', array('id' => $row['id']));
             } else {
                 if (strcmp($link_fiedl_name, $head_name) === 0) {
                     echo '<a href="' . $row[$head_name] . '">';
