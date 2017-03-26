@@ -15,7 +15,7 @@ $method = isset($_POST['method']) ? $_POST['method'] : NULL;
 $rows = db_select($connection, array('*'), 'urls');
 
 
-make_form('addForm', 'urls_add.php', array('Name' => 'name', 'URL' => 'url'));
+make_form('addForm', 'urls_add.php',  array('Name' => 'name', 'URL' => 'url'), 'ok', 0);
 
 make_table($rows, array('DELETE', 'id', 'name', 'url'), 'url');
 
