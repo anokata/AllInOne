@@ -10,3 +10,5 @@ urldb:
 	psql -h localhost -d urls -U test -f urls.sql
 urls:
 	php urls.php
+deploy:
+	sudo ./deploy.sh
