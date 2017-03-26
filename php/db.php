@@ -51,6 +51,14 @@ function db_insert($connection, $table, $fields) {
     $r = $query->execute();
 }
 
+
+function db_delete_by_id($connection, $table, $id) {
+    $query = $connection->prepare(
+        "delete from $table where id = ?");
+    $query->bindParam(1, $id);
+    $query->execute();
+}
+
 function connect() {
     $connection = new PDO('mysql:host=localhost;dbname=phonebook', 'test', 'test');
     if (!$connection) {

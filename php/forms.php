@@ -1,12 +1,15 @@
 <?php
 
-function make_form($formname, $action, $inputs) {
+function make_form($formname, $action, $inputs, $title='ok', $hidden) {
     print("<div id='$formname'>");
     print("<form action='$action' method='post'>");
     foreach ($inputs as $title => $name) {
         print("$title: <input type='text' name='$name' />");
     }
-    print("<input type='submit' name='submit' value='OK' />");
+    foreach ($hidden as $name => $val) {
+        print("<input type='hidden' name='$name' value='$val' />");
+    }
+    print("<input type='submit' name='submit' value='$title' />");
     print('</form></div>');
 }
 
@@ -29,12 +32,16 @@ function make_table($rows, $fields, $link_fiedl_name='')
         echo '<tr>';
         foreach ($fields as $head_name) {
             echo '<td>';
-            if (strcmp($link_fiedl_name, $head_name) === 0) {
-                echo '<a href="' . $row[$head_name] . '">';
-                echo $row[$head_name];
-                echo '</a>';
+            if ($head_name == 'DELETE') {
+                make_form('delForm', 'urls_delete.php', 0, 'delete', array('id' => $row['id']));
             } else {
-                echo $row{$head_name};
+                if (strcmp($link_fiedl_name, $head_name) === 0) {
+                    echo '<a href="' . $row[$head_name] . '">';
+                    echo $row[$head_name];
+                    echo '</a>';
+                } else {
+                    echo $row{$head_name};
+                }
             }
             echo '</td>';
         }

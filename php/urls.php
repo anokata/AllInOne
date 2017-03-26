@@ -17,7 +17,7 @@ $rows = db_select($connection, array('*'), 'urls');
 
 make_form('addForm', 'urls_add.php', array('Name' => 'name', 'URL' => 'url'));
 
-make_table($rows, array('id', 'name', 'url'), 'url');
+make_table($rows, array('DELETE', 'id', 'name', 'url'), 'url');
 
 $connection = null;
 ?>
