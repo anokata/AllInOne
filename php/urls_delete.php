@@ -1,14 +1,14 @@
 <?php
 require_once('db.php');
 require_once('settings.php');
-$name = isset($_POST['name']) ? $_POST['name'] : NULL;
-$url = isset($_POST['url']) ? $_POST['url'] : NULL;
+$id = isset($_POST['id']) ? $_POST['id'] : NULL;
+//if not id
 
 $connection = db_connect($dbdriver, $dbhost, $dbname, $dbuser, $db_password);
 print_r($_POST);
 $db_urltable = 'urls';
-db_insert($connection, $db_urltable, array('name' => $name, 'url' => $url));
-print("ok insert");
+db_delete_by_id($connection, $db_urltable, $id);
+print("ok delete id:$id");
 $connection = null;
 
 require('urls.php');
