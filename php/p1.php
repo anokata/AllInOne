@@ -11,7 +11,13 @@ Author: ksi
 Version: 1.0
 Author URI: 
 */
-
+?>
+<style>
+table {
+    border: solid #88B;
+}
+</style>
+<?php
 add_action('admin_menu', 'mymenu');
 function mymenu() {
     add_menu_page('Mymenu', 'mymenu Settings', 'administrator', __FILE__, 
@@ -30,27 +36,39 @@ $args = array(
 	'post_type'   => 'page',
 	'suppress_filters' => true,
 );
-print_r($_POST);echo '<br>';
+//print_r($_POST);echo '<br>';
 $posts = get_posts( $args );
 $i = 1;
+echo '<table border=1 cellspacing=0>';
+echo '<thead><th>ID</th><th>Заголовок страницы</th><th>Количество просмотров</th><thead><tbody>';
 foreach($posts as $post){ 
 	setup_postdata($post);
-	echo $i.') ID['.$post->ID.']  ';
+    echo '<tr>';
+    echo '<td>';
+    echo $post->ID;
+    echo '</td>';
+	//echo $i.') ID['.$post->ID.']  ';
+    echo '<td>';
     print($post->post_title);
-	echo "&nbsp";
+    echo '</td>';
 	//print($post->post_date);
 	$i++;
-	print_r(get_post_meta( $post->ID, 'counter_data' ));
+	echo "&nbsp";
+    $count = get_post_meta( $post->ID, 'counter_data', true); 
+    echo '<td>';
+    echo $count;
+    echo '</td>';
 	//delete_post_meta($post->ID, 'counter_data');
-	print('<br>');
+    echo '</tr>';
 }
+echo '</tbody></table>';
 
 wp_reset_postdata(); // сброс
 
 //echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post"><input type="submit" value="Удалить всю"/></form>';
 }
 
-function a($t) {
+function count_view($t) {
 	global $post;
 	$id = $post->ID;
 	$counter = get_post_meta($id, 'counter_data', true);
@@ -65,6 +83,6 @@ function a($t) {
 	return $t;
 }
 
-add_action( 'wp_head', 'a' );
+add_action( 'wp_head', 'count_view' );
 
 ?>
