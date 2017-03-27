@@ -4,9 +4,9 @@
  * @version 1.0
  */
 /*
-Plugin Name: P1
+Plugin Name: Prosto Plugin
 Plugin URI: http://
-Description: 
+Description: Просто плагин
 Author: ksi
 Version: 1.0
 Author URI: 
@@ -21,42 +21,50 @@ function mymenu() {
 }
 
 function mymenu_settings_page() {
-?>
-<div class="wrap">
-<h2>my Plugin </h2>
-
-<?php
+	
 $args = array(
-	'numberposts' => 5,
-	'orderby'     => 'date',
+	'numberposts' => 0,
+	'orderby'     => 'id',
+	'order'       => 'ASC',
+	'meta_key'    => 'counter_data',
 	'post_type'   => 'page',
-	'suppress_filters' => true
+	'suppress_filters' => true,
 );
-
+print_r($_POST);echo '<br>';
 $posts = get_posts( $args );
-
 $i = 1;
-print("<ul>");
-foreach($posts as $post){ setup_postdata($post);
-    print("<li> $i) </li>");
-$i++;
+foreach($posts as $post){ 
+	setup_postdata($post);
+	echo $i.') ID['.$post->ID.']  ';
+    print($post->post_title);
+	echo "&nbsp";
+	//print($post->post_date);
+	$i++;
+	print_r(get_post_meta( $post->ID, 'counter_data' ));
+	//delete_post_meta($post->ID, 'counter_data');
+	print('<br>');
 }
-print("</ul>");
 
 wp_reset_postdata(); // сброс
 
-
-?>
-
-</div>
-<?php }
-
-
-function a($t) {
+//echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post"><input type="submit" value="Удалить всю"/></form>';
 }
 
-//add_action( 'admin_notices', '' );
-//add_action( 'admin_head', '' );
-add_action( 'the_title', 'a' );
+function a($t) {
+	global $post;
+	$id = $post->ID;
+	$counter = get_post_meta($id, 'counter_data', true);
+	
+	if (empty($counter)) {
+		add_post_meta($id, 'counter_data', 1);
+	} else {
+		$counter = $counter + 1;
+		update_post_meta($id, 'counter_data', $counter);
+	}
+
+	return $t;
+}
+
+add_action( 'wp_head', 'a' );
 
 ?>
