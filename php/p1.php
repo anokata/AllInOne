@@ -1,14 +1,14 @@
 <?php
 /**
- * @package P1
+ * @package pcu
  * @version 1.0
  */
 /*
-Plugin Name: Prosto Plugin
-Plugin URI: http://
-Description: Просто плагин
-Author: ksi
-Version: 1.0
+Plugin Name: Page view count
+Plugin URI: 
+Description: Подсчёт количества просмотров пользователями
+Author: R
+Version: 1.1
 Author URI: 
 */
 ?>
@@ -20,14 +20,11 @@ table {
 <?php
 add_action('admin_menu', 'mymenu');
 function mymenu() {
-    add_menu_page('Mymenu', 'mymenu Settings', 'administrator', __FILE__, 
-        'mymenu_settings_page',plugins_url('/images/icon.png', __FILE__));
-
-	//add_action( 'admin_init', 'register_mysettings' );
+    add_menu_page('Mymenu', 'Статистика просмотров', 'administrator', __FILE__, 
+        'mymenu_page',plugins_url('/images/icon.png', __FILE__));
 }
 
-function mymenu_settings_page() {
-	
+function mymenu_page() {
 $args = array(
 	'numberposts' => 0,
 	'orderby'     => 'id',
@@ -38,7 +35,6 @@ $args = array(
 );
 //print_r($_POST);echo '<br>';
 $posts = get_posts( $args );
-$i = 1;
 echo '<table border=1 cellspacing=0>';
 $head = array('ID','Заголовок страницы','Количество просмотров','Пользователь', 'Дата');
 echo '<thead>';
@@ -49,36 +45,35 @@ foreach ($head as $title) {
 }
 echo '</thead>';
 echo '<tbody>';
-//echo '<thead><th>ID</th><th>Заголовок страницы</th><th>Количество просмотров</th><th>Пользователь</th><thead><tbody>';
 foreach($posts as $post){ 
 	//delete_post_meta($post->ID, 'counter_data');
 	setup_postdata($post);
-    echo '<tr>';
-    echo '<td>';
-    echo $post->ID;
-    echo '</td>';
-	//echo $i.') ID['.$post->ID.']  ';
-    echo '<td>';
-    print($post->post_title);
-    echo '</td>';
-	//print($post->post_date);
-	$i++;
-	echo "&nbsp";
     $counter = get_post_meta( $post->ID, 'counter_data', true); 
-    $count = $counter['count'];
-    $user_id = $counter['userid'];
-    $user = get_user_by('id', $user_id);
-    echo '<td>';
-    echo $count;
-    echo '</td>';
-    echo '<td>';
-    //echo $user->data->user_login;
-    echo $user->data->display_name;
-    echo '</td>';
-    echo '<td>';
-    echo $post->post_date;
-    echo '</td>';
-    echo '</tr>';
+    foreach ($counter as $user_id => $count) {
+        $user = get_user_by('id', $user_id);
+        echo '<tr>';
+        echo '<td>';
+        echo $post->ID;
+        echo '</td>';
+        echo '<td>';
+        echo '<a href="';
+        echo get_permalink( $post->ID );
+        echo '">';
+        print($post->post_title);
+        echo '</a>';
+        echo '</td>';
+        echo "&nbsp";
+        echo '<td>';
+        echo $count;
+        echo '</td>';
+        echo '<td>';
+        echo $user->data->display_name;
+        echo '</td>';
+        echo '<td>';
+        echo $post->post_date;
+        echo '</td>';
+        echo '</tr>';
+    }
 }
 echo '</tbody></table>';
 
@@ -104,10 +99,8 @@ function count_view($t) {
         }
 		update_post_meta($id, 'counter_data', $counter);
 	}
-
 	return $t;
 }
-
 add_action( 'wp_head', 'count_view' );
 
 ?>
