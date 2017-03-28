@@ -52,6 +52,22 @@ public class Hello {
 			System.out.println("fact (" + i + ") = " + factorial(i));
 		}
 		System.out.println(Arrays.toString(mergeArrays(new int[] {1,2,5}, new int[] {1, 3, 4})));
+		String [] roles= {
+"Городничий","Аммос Федорович",
+"Артемий Филиппович",
+"Лука Лукич"};
+String [] textLines={
+"Городничий: Я пригласил вас, господа, с тем, чтобы сообщить вам пренеприятное известие: к нам едет ревизор.",
+"Аммос Федорович: Как ревизор?",
+"Артемий Филиппович: Как ревизор?",
+"Городничий: Ревизор из Петербурга, инкогнито. И еще с секретным предписаньем.",
+"Аммос Федорович: Вот те на!",
+"Артемий Филиппович: Вот не было заботы, так подай!",
+"Лука Лукич: Господи боже! еще и с секретным предписаньем!"};
+		System.out.println(printTextPerRole(roles, textLines));
+		Direction d1;
+		d1 = Direction.UP;
+		System.out.println(d1.name());
     }
     static void types() {
         // 4 primitive types; as values
@@ -192,4 +208,31 @@ public class Hello {
 		}
 		return a;
 	}
+	private static String printTextPerRole(String[] roles, String[] textLines) {
+		String out = "";
+		StringBuilder acc = new StringBuilder();
+		for (String role : roles) {
+			out += role + ":\n";
+			int i = 1;
+			for (String r : textLines) {
+				if (r.startsWith(role+":")) {
+					acc.append(Integer.toString(i) + ") ");
+					acc.append(r.substring(r.indexOf(role) + role.length() + 2));
+					acc.append("\n");
+				}
+				i++;
+			}
+			acc.append("\n");
+			out += acc.toString();
+			acc = new StringBuilder();
+		}
+		return out; 
+	}
+
+}
+enum Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
 }
