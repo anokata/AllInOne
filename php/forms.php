@@ -1,11 +1,11 @@
 <?php
 
-function make_form($formname, $action, $inputs, $butitle, $hidden=false) {
+function make_form($formname, $action, $inputs, $butitle, $hidden=false, $type='text') {
     print("<div id='$formname'>");
     print("<form action='$action' method='post'>");
     if ($inputs)
     foreach ($inputs as $title => $name) {
-        print("$title: <input type='text' name='$name' /> &nbsp");
+        print("$title<input type='$type' name='$name' /> &nbsp");
     }
     if ($hidden)
     foreach ($hidden as $name => $val) {
@@ -35,7 +35,8 @@ function make_table($rows, $fields, $link_fiedl_name='')
         foreach ($fields as $head_name) {
             echo '<td>';
             if ($head_name == 'DELETE') {
-                make_form('deleteForm', 'urls_delete.php', false, 'delete', array('id' => $row['id']));
+                //make_form('deleteForm', 'urls_delete.php', false, 'delete', array('id' => $row['id']));
+                make_form('deleteForm', 'urls_delete.php', array(''=>''), 'del', array('id' => $row['id']), 'checkbox');
             } else {
                 if (strcmp($link_fiedl_name, $head_name) === 0) {
                     echo '<a href="' . $row[$head_name] . '">';

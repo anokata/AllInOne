@@ -37,7 +37,7 @@ table {
     background-color: #CCE;
 }
 
-#addForm {
+#addForm ,#categoryForm{
     border: 2px solid #C99;
     margin: auto;
     background-color: #EEE;
