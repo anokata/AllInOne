@@ -40,8 +40,18 @@ $args = array(
 $posts = get_posts( $args );
 $i = 1;
 echo '<table border=1 cellspacing=0>';
-echo '<thead><th>ID</th><th>Заголовок страницы</th><th>Количество просмотров</th><thead><tbody>';
+$head = array('ID','Заголовок страницы','Количество просмотров','Пользователь', 'Дата');
+echo '<thead>';
+foreach ($head as $title) {
+    echo '<th>';
+    echo $title;
+    echo '</th>';
+}
+echo '</thead>';
+echo '<tbody>';
+//echo '<thead><th>ID</th><th>Заголовок страницы</th><th>Количество просмотров</th><th>Пользователь</th><thead><tbody>';
 foreach($posts as $post){ 
+	//delete_post_meta($post->ID, 'counter_data');
 	setup_postdata($post);
     echo '<tr>';
     echo '<td>';
@@ -54,11 +64,20 @@ foreach($posts as $post){
 	//print($post->post_date);
 	$i++;
 	echo "&nbsp";
-    $count = get_post_meta( $post->ID, 'counter_data', true); 
+    $counter = get_post_meta( $post->ID, 'counter_data', true); 
+    $count = $counter['count'];
+    $user_id = $counter['userid'];
+    $user = get_user_by('id', $user_id);
     echo '<td>';
     echo $count;
     echo '</td>';
-	//delete_post_meta($post->ID, 'counter_data');
+    echo '<td>';
+    //echo $user->data->user_login;
+    echo $user->data->display_name;
+    echo '</td>';
+    echo '<td>';
+    echo $post->post_date;
+    echo '</td>';
     echo '</tr>';
 }
 echo '</tbody></table>';
@@ -69,14 +88,20 @@ wp_reset_postdata(); // сброс
 }
 
 function count_view($t) {
+    if ( !is_user_logged_in() ) return $t;
 	global $post;
 	$id = $post->ID;
 	$counter = get_post_meta($id, 'counter_data', true);
+    $user_id = get_current_user_id();
 	
 	if (empty($counter)) {
-		add_post_meta($id, 'counter_data', 1);
-	} else {
-		$counter = $counter + 1;
+		add_post_meta($id, 'counter_data', array($user_id => 1));
+    } else {
+        if (empty($counter[$user_id])) {
+            $counter[$user_id] = 1;
+        } else {
+            $counter[$user_id]++;
+        }
 		update_post_meta($id, 'counter_data', $counter);
 	}
 

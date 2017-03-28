@@ -2,6 +2,8 @@
 require_once('db.php');
 require_once('forms.php');
 require_once('settings.php');
+// TODO: categorys. login+cookie. uploader. date, edit
+// debug hided block
 make_head("URLS", 'style.css');
 //print("<i>before connect<br>");
 $connection = db_connect($dbdriver, $dbhost, $dbname, $dbuser, $db_password);
