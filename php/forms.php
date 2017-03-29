@@ -64,9 +64,10 @@ function make_form($formname, $action, $inputs, $butitle, $hidden=false, $type='
     print('</form></div>');
 }
 
-function make_head($title, $style) {
+function make_head($title, $style, $js='') {
     echo "<html><head><title>$title</title>";
     echo '<link rel="stylesheet" type="text/css" href="'. $style .'">';
+    echo "<script href='$js'></script>";
     echo '</head><body>';
 }
 

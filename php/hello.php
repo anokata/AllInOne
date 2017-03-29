@@ -19,13 +19,29 @@ foreach ($sth as $row) {
 $sth = null;
 $pdo = null;
  */
-function a() {
-    echo 'some fun a';
+class HtmlElement {
+    private $html;
+    private $end;
+    public function HtmlElement($tag) {
+        $this->html = "<$tag>";
+        $this->end = "</$tag>";
+    }
+    public function compile() {
+        return $this->html . $this->end;
+    }
+    public function add($content) {
+        $this->html .= $content;
+    }
+    public function add_html($content) {
+        $this->html .= $content->compile();
+    }
 }
-function b(&$fun) {
-    $fun();
-}
-b(&$a);
+
+$h = new HtmlElement('div');
+$d = new HtmlElement('DIV');
+$h->add_html($d);
+echo $h->compile();
+
 ?>
 </body>
 </html>
