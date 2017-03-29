@@ -1,5 +1,54 @@
 <?php
 
+function make_select($list, $selected, $name) {
+    $html = '';
+    $html .= "<select name='$name'>";
+    foreach ($list as $item) {
+        if ($selected == trim($item))
+            $html .= '<option selected>';
+        else 
+            $html .= '<option>';
+        $html .= $item;
+        $html .= '</option>';
+    }
+    $html .= '</select>';
+    return $html;
+}
+
+
+function make_form_h($formname, $action, $content) {
+    $html = '';
+    $html .= "<form id='$formname' action='$action' method='post'>";
+    $html .= $content;
+    $html .= '</form>';
+    return $html;
+}
+
+function make_input($type, $name, $val='', $title='') {
+    $html = "$title<input type='$type' name='$name' value='$val' />";
+    return $html;
+}
+
+function make_select_form($list, $selected, $name) {
+    $thispage = $_SERVER['PHP_SELF'];
+    $select = make_select($list, $selected, $name);
+    $submit = make_input('submit', 'submit', 'view', 'View: ');
+    $html = make_form_h("$name", $thispage, $select . $submit);
+    return $html;
+}
+
+function make_check_form($list, $name) {
+    $thispage = $_SERVER['PHP_SELF'];
+    $check = '';
+    foreach ($list as $n) {
+        $check .= make_input('checkbox', "check_$n");
+    }
+    $submit = make_input('submit', 'submit', 'action', 'Make: ');
+    $html = make_form_h("$name", $thispage, $check);
+    return $html;
+}
+
+// -------
 function make_form($formname, $action, $inputs, $butitle, $hidden=false, $type='text') {
     print("<div id='$formname'>");
     print("<form action='$action' method='post'>");

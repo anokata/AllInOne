@@ -17,26 +17,11 @@ $method = isset($_POST['method']) ? $_POST['method'] : NULL;
 $catg = isset($_POST['category']) ? $_POST['category'] : NULL;
 $urls = db_select($connection, array('*'), 'urls');
 $categories = db_select($connection, array('name'), 'categories');
-$thispage = $_SERVER['PHP_SELF'];
 
-print("<div id='categoryForm'>");
-print("<form action='$thispage' method='post'>");
-echo 'Категория:';
-echo '<select name="category">';
-echo '<option>';
-echo 'No';
-echo '</option>';
-foreach ($categories as $cat) {
-    if ($catg == trim($cat['name']))
-        echo '<option selected>';
-    else 
-        echo '<option>';
-    echo $cat['name'];
-    echo '</option>';
-}
-echo '</select>';
-print("<input type='submit' name='submit' value='view' />");
-print('</form></div>');
+
+echo make_select_form(array_column($categories, 'name'), $catg, 'categoryForm');
+echo make_select(array('delete', 'move'), 'move', 'action', 'name');
+echo make_check_form(array('1', '2'), 'a');
 
 make_form('addForm', 'urls_add.php',  array('Name: ' => 'name', 'UrL: ' => 'url'), 'Добавить', 0);
 

@@ -6,13 +6,13 @@ CREATE SEQUENCE seq1;
 
 CREATE TABLE categories (
     id INTEGER PRIMARY KEY DEFAULT NEXTVAL('seq1'), 
-    name CHAR(32)
+    name CHAR(32) UNIQUE
 );
 
 CREATE TABLE urls (
     id INTEGER PRIMARY KEY DEFAULT NEXTVAL('seq1'), 
     name CHAR(32),
-    url CHAR(256),
+    url CHAR(256) UNIQUE,
     cat_id INTEGER,
     FOREIGN KEY (cat_id) REFERENCES categories(id)
 );
