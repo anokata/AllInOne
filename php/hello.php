@@ -1,15 +1,22 @@
 <?php
+function utf8_strrev($str){
+    preg_match_all('/./us', $str, $ar);
+    return join('',array_reverse($ar[0]));
+}
+
 function is_palindrome($str) {
-    $str = strtolower($str);
-    return $str === strrev($str);
+    $str = preg_replace('/\s+/', '', $str);
+    $str = mb_strtolower($str);
+    if (mb_strlen($str) < 2) return false;
+    return $str === utf8_strrev($str);
 }
 
 function all_sub_palindromes($str) {
-    $length = strlen($str);
-    for ($max_len = $length - 1; $max_len > 0; $max_len--) {
+    $length = mb_strlen($str);
+    for ($max_len = $length - 1; $max_len > 1; $max_len--) {
         for ($start = 0; $start + $max_len <= $length; $start++) {
-            if (is_palindrome(substr($str, $start, $max_len))) {
-                return substr($str, $start, $max_len);
+            if (is_palindrome(mb_substr($str, $start, $max_len))) {
+                return mb_substr($str, $start, $max_len);
             }
         }
     }
@@ -19,34 +26,35 @@ function all_sub_palindromes($str) {
 function palindrome($str) {
     if (is_palindrome($str)) {
         echo $str;
-        echo "\n";
     } else {
         $sub = all_sub_palindromes($str);
         if ($sub) {
             echo $sub;
-            echo " <sub\n";
         } else {
-            echo $str[0];
-            echo "\n";
+            echo mb_substr($str, 0, 1);;
         }
     }
 }
-palindrome("Sum summus mus");
-palindrome("sumusyzzsuslarararalaa");
-palindrome("sumusyzzsuslarararal");
-palindrome("yzzsus");
-palindrome("zzzsusx");
-palindrome("susax");
-palindrome("xsusax");
-palindrome("xxsusax");
-/*
-palindrome("some other emos");
-palindrome("");
-palindrome("x");
-palindrome("xx");
-palindrome("aaa");
-palindrome("zx");
-palindrome("Zxz");
-palindrome("axz");
- */
+
+
+palindrome("Sum summus mus"); echo "o<BR>\n";
+palindrome("Аргентина манит негра"); echo "o<BR>\n";
+palindrome("sumusyzzsuslarararal"); echo "o<BR>\n";
+palindrome("yzzsus"); echo "o<BR>\n";
+palindrome("zzzsusx"); echo "o<BR>\n";
+palindrome("susax"); echo "o<BR>\n";
+palindrome("xsusax"); echo "o<BR>\n";
+palindrome("xxsusax"); echo "o<BR>\n";
+palindrome("A:xsz xusax"); echo "-<BR>\n";
+
+palindrome("some  emos");echo "o<BR>\n";
+palindrome("some other_emos");echo "-<BR>\n";
+palindrome("");echo "-<BR>\n";
+palindrome("x");echo "-<BR>\n";
+palindrome("xx");echo "o<BR>\n";
+palindrome("aaa");echo "o<BR>\n";
+palindrome("zx");echo "-<BR>\n";
+palindrome("Zxz");echo "o<BR>\n";
+palindrome("axz");echo "-<BR>\n";
+
 ?>
