@@ -12,3 +12,8 @@ urls:
 	php urls.php
 deploy:
 	sudo ./deploy.sh
+dbtest1:
+	psql -h localhost -d urls -U test -f dbtest1.sql
+db1:
+	psql -h localhost -d urls -U test -f db1.sql
+
