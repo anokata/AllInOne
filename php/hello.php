@@ -56,5 +56,14 @@ palindrome("aaa");echo "o<BR>\n";
 palindrome("zx");echo "-<BR>\n";
 palindrome("Zxz");echo "o<BR>\n";
 palindrome("axz");echo "-<BR>\n";
-
+$a = 1;
+echo "{${"a"}}";
+if (array(1) < array(2)) { echo 'a';};
+$a += ++$a;
+echo $a;
+$ar[] = "abc";
+echo $ar;
+$ar = (array) $a;
+echo $ar[0];
+$b = array(&$a => 1);
 ?>
