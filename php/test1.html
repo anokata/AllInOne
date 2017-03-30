@@ -1,0 +1,57 @@
+<html>
+
+<style>
+table .c { color: red }
+.a .c { color: green }
+</style>
+
+<script>
+function methodOne() {
+    let table = document.getElementById("t");
+    table.className = "a";
+}
+function methodTwo() {
+    let table = document.getElementById("t");
+    table.setAttribute("class", "a");
+}
+function methodThree() {
+    let tds = document.getElementsByTagName("td");
+    for (let i = 0; i < tds.length; i++) {
+        tds[i].style.color = "green";
+    }
+}
+function methodFour() {
+    let table = document.querySelector("#t")
+    table.className = "a";
+}
+function methodFive() {
+    let table = document.querySelector("#t td")
+    table.style.color = "green";
+}
+function methodSix() {
+    let css = 'td.c { color: green; }',
+    head = document.querySelector("head")
+    style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    head.appendChild(style);
+}
+
+function ready() {
+    //methodTwo();
+    //methodThree();
+    //methodFour();
+    //methodFour();
+    //methodFive();
+}
+
+document.addEventListener("DOMContentLoaded", ready);
+</script>
+
+<table id="t">
+    <tr>
+        <td class="c">Текст</td>
+    </tr>
+</table>
+
+</html>
