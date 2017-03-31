@@ -17,3 +17,5 @@ dbtest1:
 db1:
 	psql -h localhost -d urls -U test -f db1.sql
 
+socium:
+	php socium.php
