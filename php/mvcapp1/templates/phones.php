@@ -8,4 +8,5 @@ Phones:
     </tr>
 <?php endforeach ?>
 </table>
+<a href="phones/Add">Add</a>
 </article>

@@ -1,6 +1,6 @@
 <?php
 
-function view_commit($data) {
-    $template = 'templates/phones.php';
+function view_commit($name, $data) {
+    $template = 'templates/' . $name . '.php';
     require($template);
 }
