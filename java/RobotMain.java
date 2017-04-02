@@ -2,11 +2,83 @@ import java.math.*;
 import java.util.Arrays;
 
 public class RobotMain {
+
+    public interface RobotConnection extends AutoCloseable {
+        void moveRobotTo(int x, int y);
+        @Override
+        void close();
+    }
+
+    public interface RobotConnectionManager {
+        RobotConnection getConnection();
+    }
+
+    static class RobCon implements RobotConnection {
+
+        public RobCon() {
+            System.out.println("create conn");
+        }
+
+        public void moveRobotTo(int x, int y) {
+            System.out.println("go to " + x + " " + y);
+            //throw new RuntimeException("");
+            //throw new RobotConnectionException("");
+        }
+
+        @Override
+        public void close() {
+            System.out.println("conn close");
+            throw new RobotConnectionException("");
+        }
+    }
+
+    static class RobConManager implements RobotConnectionManager {
+        public RobotConnection getConnection() {
+            return new RobCon();
+        }
+    }
+
+    static public class RobotConnectionException extends RuntimeException {
+
+        public RobotConnectionException(String message) {
+            super(message);
+        }
+
+        public RobotConnectionException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    public static void moveRobot(RobotConnectionManager robotConnectionManager, int toX, int toY) {
+        int i = 4;
+        RobotConnection rc = null;
+        boolean ok = false;
+        while (i > 0 && !ok) {
+            ok = true;
+            i--;
+            if (i == 0) throw new RobotConnectionException("");
+            try {
+                rc = robotConnectionManager.getConnection();
+                rc.moveRobotTo(toX, toY);
+            } catch (RobotConnectionException e) {
+                ok = false;
+            } finally {
+                if (rc != null) 
+                    try {
+                        rc.close();
+                    } catch (Exception e) {
+
+                    }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         Robot robot = new Robot(0,0, Direction.DOWN);
         robot.view();
         moveRobot(robot, -10, 20);
         robot.view();
+        moveRobot(new RobConManager(), 2, 3);
     }
 
     public enum Direction {
