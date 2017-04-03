@@ -1,7 +1,11 @@
 import java.math.*;
 import java.util.Arrays;
+import java.util.logging.*;
 
 public class RobotMain {
+
+    public static final Logger LOGGER = 
+        Logger.getLogger(RobotMain.class.getName());
 
     public interface RobotConnection extends AutoCloseable {
         void moveRobotTo(int x, int y);
@@ -16,6 +20,7 @@ public class RobotMain {
     static class RobCon implements RobotConnection {
 
         public RobCon() {
+            LOGGER.log(Level.INFO, "Connect");
             System.out.println("create conn");
         }
 
