@@ -5,13 +5,16 @@ import java.nio.file.*;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.*;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.util.Arrays;
+import java.io.Reader;
+import java.io.InputStreamReader;
 
 class Main {
-    static public void main(String[] args) {
+    static public void main(String[] args) throws IOException {
         //crlftolf(System.in, System.out);
         //System.out.flush()
         byte[] b = {13,1,13,2,10,1,10,2,10,13,4,13,10,65, 13, 10, 10, 13, 64, 62, 10, 13, 2};
@@ -20,6 +23,28 @@ class Main {
         crlftolf(new ByteArrayInputStream(b), out);
         System.out.println(Arrays.toString(out.toByteArray()));
         System.out.println("end");
+        test_reader();
+    }
+
+    static public void test_reader() throws IOException, FileNotFoundException, UnsupportedEncodingException {
+        System.out.println("* Test Reader");
+        InputStream in = new FileInputStream("FileIO.java");
+        Reader r = new InputStreamReader(in, "UTF-8");
+        char[] buf = new char[100];
+        r.read(buf);
+        System.out.println(new String(buf));
+        r.close();
+
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("Oop.java"))) {
+            String line = "";
+            int i = 3;
+            while (i-- > 0 && line != null) {
+                System.out.println(i + ") " + line);
+                line = reader.readLine();
+            }
+        }
+        System.out.println("+ Test Reader");
+
     }
 
     static public void crlftolf(InputStream in, OutputStream out) {
