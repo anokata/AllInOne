@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for SwingSet2 Demo Application -->
+<jnlp spec="6.0+" codebase="http://urls.eu.ai/" href="hw.jnlp">
+  <information>
+    <title>Application</title>
+    <vendor>Inc.</vendor>
+    <homepage href=""/>
+    <description>Application</description>
+    <description kind="short"> </description>
+    <icon href=""/>
+    <icon kind="splash" href="images/splash.gif"/>
+    <offline-allowed/> 
+    <association mime-type="application-x/swingset2-file"  extensions="swingset2"/> 
+    <shortcut online="false" install="false">
+      <desktop/>
+      <menu submenu="Apps"/>
+    </shortcut>
+  </information>
+  <information os="linux">   
+    <title> Linux </title>
+    <homepage href="">
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.6+" java-vm-args="-esa -Xnoclassgc"/>
+    <jar href="jn.jar"/>
+  </resources>
+  <application-desc main-class="SwingSet2"/>
+</jnlp> 

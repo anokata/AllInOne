@@ -8,3 +8,7 @@ CL:
 	javac CL.java && java CL
 RobotMain:
 	javac RobotMain.java && java RobotMain
+
+TestJnlp:
+	javac -cp /usr/share/icedtea-web/netx.jar ./TestJnlp.java  && \
+	java -cp /usr/share/icedtea-web/netx.jar:. TestJnlp
