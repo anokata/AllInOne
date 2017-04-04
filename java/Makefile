@@ -14,5 +14,7 @@ TestJnlp:
 	java -cp /usr/share/icedtea-web/netx.jar:. TestJnlp
 
 HelloWorld:
-	javac ai/eu/work/train0/HelloWorld.java && java ai.eu.work.train0.HelloWorld
+	javac -cp .:subtest.jar ai/eu/work/train0/HelloWorld.java && java -cp .:subtest.jar ai.eu.work.train0.HelloWorld
 	# need learn maven
+SubTest:
+	javac ai/eu/work/train0/SubTest.java 
