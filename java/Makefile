@@ -17,7 +17,8 @@ HelloWorld:
 	javac -cp .:subtest.jar ai/eu/work/train0/HelloWorld.java && java -cp .:subtest.jar ai.eu.work.train0.HelloWorld
 	# need learn maven
 SubTest:
-	javac ai/eu/work/train0/SubTest.java 
+	javac ai/eu/work/train0/SubTest.java && \
+		java -cp . ai.eu.work.train0.SubTest
 
 java:
 	javac $(JavaSource) && \
