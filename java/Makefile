@@ -12,3 +12,7 @@ RobotMain:
 TestJnlp:
 	javac -cp /usr/share/icedtea-web/netx.jar ./TestJnlp.java  && \
 	java -cp /usr/share/icedtea-web/netx.jar:. TestJnlp
+
+HelloWorld:
+	javac ai/eu/work/train0/HelloWorld.java && java ai.eu.work.train0.HelloWorld
+	# need learn maven
