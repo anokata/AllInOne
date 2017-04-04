@@ -18,3 +18,7 @@ HelloWorld:
 	# need learn maven
 SubTest:
 	javac ai/eu/work/train0/SubTest.java 
+
+java:
+	javac $(JavaSource) && \
+	java $(JavaClass)
