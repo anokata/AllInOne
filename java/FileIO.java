@@ -12,7 +12,13 @@ import java.io.DataInputStream;
 import java.util.Arrays;
 import java.io.Reader;
 import java.io.InputStreamReader;
+import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
+/**
+ *
+ * */
 class Main {
     static public void main(String[] args) throws IOException {
         //crlftolf(System.in, System.out);
@@ -24,6 +30,70 @@ class Main {
         System.out.println(Arrays.toString(out.toByteArray()));
         System.out.println("end");
         test_reader();
+        test_scanner();
+        byte[] testb = {48, 49, 50, 51, 10, 49, 49};
+        System.out.println(readAsString(new ByteArrayInputStream(testb), StandardCharsets.US_ASCII));
+
+        inDoubleSum(new StringBufferInputStream("123.12\n8.08\na2\n1\n2asf 100"));
+    }
+
+    static public void test_scanner() throws IOException, FileNotFoundException {
+        Reader reader = new StringReader("123,231,some");
+        Scanner scanner = new Scanner(reader)
+            .useDelimiter(",");
+        int i = scanner.nextInt();
+        System.out.println(i);
+        i = scanner.nextInt();
+        System.out.println(i);
+        String s = scanner.next();
+        System.out.println(s);
+
+        InputStream in = new FileInputStream("input");
+        i = in.read();
+        System.out.println(i);
+        i = in.read();
+        System.out.println(i);
+        i = in.read();
+        System.out.println(i);
+        in.close();
+
+        Writer writer = new OutputStreamWriter(System.out, StandardCharsets.US_ASCII);
+        writer.write("ЯЧС");
+        writer.write("123");
+        writer.flush();
+    }
+
+    public static void sumDouble() {
+        inDoubleSum(System.in);
+    }
+
+    public static void inDoubleSum(InputStream in) {
+        double sum = 0;
+        try (Scanner scan = new Scanner(new InputStreamReader(in))) {
+            while (scan.hasNext()) {
+                String s = scan.next();
+                try {
+                    sum += Double.parseDouble(s);
+                } catch (NumberFormatException e) {}
+            }
+        } 
+        System.out.printf("%.6f", sum);
+    }
+
+    public static String readAsString(InputStream inputStream, Charset charset) throws IOException {
+        String out = "";
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, charset))) {
+            char c;
+            int i;
+            do {
+                i = in.read();
+                c = (char)i;
+                if (i > 0)
+                    out += c;
+            }
+            while (i > 0);
+        }
+        return out;
     }
 
     static public void test_reader() throws IOException, FileNotFoundException, UnsupportedEncodingException {
