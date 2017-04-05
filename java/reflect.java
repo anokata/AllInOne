@@ -42,7 +42,21 @@ class reflect {
             System.out.println(f.toGenericString());
         }
 
-    }
+        final Package[] packages = Package.getPackages();
+        java.util.Arrays.sort(packages, (x, y) -> x.getName().compareTo(y.getName()));
+        for (Package pkg : packages) {
+            String name = pkg.getName();
+            System.out.println(name);
+        }
+
+        try {
+            Thread.currentThread().getContextClassLoader().loadClass("java.util.ArrayList");
+            Class c = Class.forName("java.lang.Thread");
+            for (Method f : c.getMethods()) {
+                System.out.println(f.toGenericString());
+            }
+        } catch (ClassNotFoundException e) {}
+}
 }
 
 class Test {
@@ -54,4 +68,5 @@ class Test {
 
 class HerTest extends Test {
 }
+
 

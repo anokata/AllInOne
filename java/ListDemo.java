@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import java.util.*;
 
 public class ListDemo extends JPanel
             implements KeyListener {
@@ -15,7 +16,11 @@ public class ListDemo extends JPanel
         super(new BorderLayout());
 
         listModel = new DefaultListModel();
-        listModel.addElement("John");
+
+        for (Object s : Elements.getRoot()) {
+            listModel.addElement(s);
+        }
+
 
         list = new JList(listModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -82,7 +87,7 @@ public class ListDemo extends JPanel
         String tmpString = KeyEvent.getModifiersExText(modifiersEx);
         modString += " (" + tmpString + ")";
         System.out.println(keyString + " : " + modString);
-        listModel.addElement(keyString + modString);
+        //listModel.addElement(keyString + modString);
     }
 
     private static void createAndShowGUI() {
@@ -102,5 +107,38 @@ public class ListDemo extends JPanel
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI());
+    }
+}
+
+class Elements {
+
+    static ArrayList<String> path;
+
+    static String[] root = {
+        "packages",
+        "test",
+        "urls",
+    };
+
+    public static Collection getRoot() {
+        return Arrays.asList(root);
+    }
+
+    public static Collection getPackages() {
+        ArrayList list = new ArrayList();
+        int limit = 10;
+        final Package[] packages = Package.getPackages();
+        java.util.Arrays.sort(packages, (x, y) -> x.getName().compareTo(y.getName()));
+        for (Package pkg : packages) {
+            if (limit-- < 0) break;
+            list.add(pkg.getName());
+        }
+        return list;
+    }
+
+    public static Collection go(String name) {
+        ArrayList list = new ArrayList();
+
+        return list;
     }
 }
