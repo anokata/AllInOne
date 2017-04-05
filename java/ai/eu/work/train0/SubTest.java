@@ -1,4 +1,5 @@
 package ai.eu.work.train0;
+import java.util.stream.*;
 
 class UnaryObj {
     public long value;
@@ -24,5 +25,12 @@ public class SubTest {
         String[] as = new String[2];
         System.out.println(as[0]); // null
         //System.out.println(am.class);
+        pseudoRandomStream(13).limit(10).forEach(System.out::println);
     }
+
+    public static IntStream pseudoRandomStream(int seed) {
+        return IntStream.iterate(seed, 
+                x -> (((x*x/1000)%10)*100 + ((x*x/100)%10)*10 + ((x*x/10)%10)));
+    }
+
 }
