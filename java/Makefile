@@ -23,3 +23,7 @@ SubTest:
 java:
 	javac $(JavaSource) && \
 	java $(JavaClass)
+
+jdbcdemo:
+	javac -cp . jdbcdemo.java && \
+	java -cp .:postgresql-42.0.0.jar jdbcdemo
