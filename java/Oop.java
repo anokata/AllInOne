@@ -436,7 +436,26 @@ public class Oop {
         }
     }
 
+    public static <T, U> Function<T, U> ternaryOperator(
+            Predicate<? super T> condition,
+            Function<? super T, ? extends U> ifTrue,
+            Function<? super T, ? extends U> ifFalse) {
+
+        Function<T, U> f = (x) -> condition.test(x) ? ifTrue.apply(x) : ifFalse.apply(x);
+        return f;
+
+    }
+
+    public static void test_func() {
+        Predicate<Object> condition = Objects::isNull;
+        Function<Object, Integer> ifTrue = obj -> 0;
+        Function<CharSequence, Integer> ifFalse = CharSequence::length;
+        Function<String, Integer> safeStringLength = ternaryOperator(condition, ifTrue, ifFalse);
+        System.exit(0);
+    }
+
     public static void main(String[] args) throws IOException {
+        test_func();
         //test_collection();
         test_pair();
         test_mail();
