@@ -11,6 +11,12 @@ class CL {
         } catch (ClassNotFoundException ex) {
             return;
         }
+        /*
+        URL  jarFileURL = new URL("file://some.jar");
+        ClassLoader  classLoader = new  URLClassLoader(
+        new URL[] {jarFileURL });
+        Class c4 = classLoader.loadClass("SomeClass");
+        */
     }
 
     class Sub {

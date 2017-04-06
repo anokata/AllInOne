@@ -3,11 +3,35 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Member;
+import java.lang.reflect.*;
+import java.lang.annotation.*;
 
 enum En {Ae, Bu, Co}
 
+@interface Customanot {}
+
+@interface mystruct {
+    String name();
+}
+
+@Retention(value= RetentionPolicy.RUNTIME)
+@interface myanot { 
+    public int ver() default 1;
+    mystruct aname();
+}
+
+@Customanot
+@mystruct(name="other")
+@myanot(ver = 18, aname = @mystruct(name="hi"))
+class some_one {
+    @myanot(aname = @mystruct(name="met"))
+    public void method_one() {
+    }
+}
+
 class reflect {
-    public static void main(String[] args) {
+    public static void test_reflect_class() {
+        test_reflect_class();
         System.out.println("Reflect.");
         Test t1 = new Test();
         Class class1 = t1.getClass();
@@ -56,9 +80,28 @@ class reflect {
                 System.out.println(f.toGenericString());
             }
         } catch (ClassNotFoundException e) {}
+    }
+    public static void main(String[] args) {
+        //test_reflect_class();
+        // get anot class
+        some_one s = new some_one();
+        Annotation[] ans = s.getClass().getAnnotations();
+        for (Annotation a : ans) {
+            System.out.println(">"+a);
+        }
+        System.out.println(">"+Test.class.getName());
+        ans = Test.class.getAnnotations();
+        for (Annotation a : ans) {
+            System.out.println(">"+a);
+        }
+        myanot anot = s.getClass().getAnnotation(myanot.class);
+        // get anot values
+        //int version = anot.ver();
+        //String s = anot.aname();
 }
 }
 
+@Customanot
 class Test {
     private int f;
     public String s;
