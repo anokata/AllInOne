@@ -3,6 +3,251 @@ import java.math.*;
 import java.util.*;
 import java.util.function.*;
 import java.io.*;
+import java.util.logging.*;
+
+interface Sendable {
+    String getFrom();
+    String getTo();
+}
+
+abstract class AbstractSendable implements Sendable {
+
+    protected final String from;
+    protected final String to;
+
+    public AbstractSendable(String from, String to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    @Override
+    public String getFrom() {
+        return from;
+    }
+
+    @Override
+    public String getTo() {
+        return to;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractSendable that = (AbstractSendable) o;
+        if (!from.equals(that.from)) return false;
+        if (!to.equals(that.to)) return false;
+        return true;
+    }
+}
+
+class MailMessage extends AbstractSendable {
+
+    private final String message;
+
+    public MailMessage(String from, String to, String message) {
+        super(from, to);
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        MailMessage that = (MailMessage) o;
+
+        if (message != null ? !message.equals(that.message) : that.message != null) return false;
+
+        return true;
+    }
+}
+
+class MailPackage extends AbstractSendable {
+    private final Package content;
+
+    public MailPackage(String from, String to, Package content) {
+        super(from, to);
+        this.content = content;
+    }
+
+    public Package getContent() {
+        return content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        MailPackage that = (MailPackage) o;
+
+        if (!content.equals(that.content)) return false;
+
+        return true;
+    }
+}
+
+class Package {
+    private final String content;
+    private final int price;
+
+    public Package(String content, int price) {
+        this.content = content;
+        this.price = price;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Package aPackage = (Package) o;
+
+        if (price != aPackage.price) return false;
+        if (!content.equals(aPackage.content)) return false;
+
+        return true;
+    }
+}
+
+interface MailService {
+    Sendable processMail(Sendable mail);
+}
+
+class RealMailService implements MailService {
+
+    public static final Logger LOGGER = 
+        Logger.getLogger("mail");
+
+    @Override
+    public Sendable processMail(Sendable mail) {
+        if (mail instanceof MailPackage) {
+            MailPackage pkg = (MailPackage) mail;
+            LOGGER.info("real PACKAGE " + pkg.getContent().getContent() + " prc " + 
+                    pkg.getContent().getPrice());
+        }
+        LOGGER.info("real proc " + mail.getFrom());
+        return mail;
+    }
+}
+
+class UntrustworthyMailWorker implements MailService {
+
+    private MailService realService;
+    private MailService[] chain;
+
+    public MailService getRealMailService() {
+        return realService;
+    }
+
+    public UntrustworthyMailWorker(MailService[] chain) {
+        this.chain = chain;
+        this.realService = new RealMailService();
+    }
+    
+    @Override
+    public Sendable processMail(Sendable mail) {
+        for (MailService ms : chain) {
+            mail = ms.processMail(mail);
+        }
+        return realService.processMail(mail);
+    }
+}
+
+class Spy implements MailService {
+
+    public static final String AUSTIN_POWERS = "Austin Powers";
+
+    private Logger logger;
+
+    public Spy(Logger log) {
+        this.logger = log;
+    }
+
+    @Override
+    public Sendable processMail(Sendable mail) {
+        if (mail instanceof MailMessage) {
+            MailMessage msg = (MailMessage) mail;
+            if (mail.getFrom().equals(AUSTIN_POWERS) || mail.getTo().equals(AUSTIN_POWERS)) {
+                logger.log(Level.WARNING, 
+                        "Detected target mail correspondence: from " +
+                        mail.getFrom() + " to " + mail.getTo() + " \"" + msg.getMessage() + "\"");
+            } else {
+                logger.log(Level.INFO, 
+                        "Usual correspondence: from {0} to {1}", new Object[] {mail.getFrom(), mail.getTo()});
+            }
+        }
+        return mail;
+    }
+}
+
+class Thief implements MailService {
+    int min_price;
+    int sum;
+
+    public Thief(int min) {
+        min_price = min;
+        sum = 0;
+    }
+
+    public int getStolenValue() {
+        return sum;
+    }
+    
+    @Override
+    public Sendable processMail(Sendable mail) {
+        if (mail instanceof MailPackage) {
+            MailPackage pkg = (MailPackage) mail;
+            if (pkg.getContent().getPrice() < min_price) return mail;
+
+            MailPackage change = new MailPackage(pkg.getFrom(), pkg.getTo(), 
+                    new Package("stones instead of " + pkg.getContent().getContent(), 0));
+            sum += pkg.getContent().getPrice();
+            return change;
+        }
+        return mail;
+    }
+}
+
+class IllegalPackageException extends RuntimeException { }
+class StolenPackageException extends RuntimeException { }
+
+class Inspector implements MailService {
+
+    public static final String WEAPONS = "weapons";
+    public static final String BANNED_SUBSTANCE = "banned substance";
+
+    @Override
+    public Sendable processMail(Sendable mail) {
+        if (mail instanceof MailPackage) {
+            MailPackage pkg = (MailPackage) mail;
+            String content = pkg.getContent().getContent();
+            if (content.contains(WEAPONS) || 
+                    content.contains(BANNED_SUBSTANCE)) {
+                throw new IllegalPackageException();
+            }
+            if (content.contains("stones")) {
+                throw new StolenPackageException();
+            }
+        }
+        return mail;
+    }
+}
 
 class Animal implements Serializable {
     private final String name;
@@ -23,8 +268,32 @@ class Animal implements Serializable {
         return name;
     }
 }
+
  
 public class Oop {
+    public static final Logger LOGGER = 
+        Logger.getLogger("mail");
+
+    public static void test_mail() {
+        RealMailService r = new RealMailService();
+        Spy s = new Spy(LOGGER);
+        Thief t = new Thief(10);
+        Inspector i = new Inspector();
+        UntrustworthyMailWorker u = new UntrustworthyMailWorker(
+                new MailService[] {r, s, i, t, r});
+        MailMessage msg = new MailMessage("John", "Mary", "Hi M.");
+        MailMessage msg2 = new MailMessage("Austin Powers", "Mary", "Hi M.");
+        MailPackage p1 = new MailPackage("weapons", "b", new Package("neapons", 3));
+        MailPackage p2 = new MailPackage("a", "b", new Package("coin", 40));
+        u.processMail(msg);
+        u.processMail(msg2);
+        u.processMail(p1);
+        u.processMail(p2);
+        LOGGER.warning("package: " + p1.getContent().getContent());
+        LOGGER.warning("package: " + p2.getContent().getContent());
+        LOGGER.warning("thief: " + t.sum);
+    }
+
     public static Animal[] deserializeAnimalArray(byte[] data) { 
         try (ObjectInputStream ds = new ObjectInputStream(
                 new ByteArrayInputStream(data))) {
@@ -46,6 +315,7 @@ public class Oop {
     }
 
     public static void main(String[] args) throws IOException {
+        test_mail();
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         ObjectOutputStream bs = new ObjectOutputStream(buf);
         Animal afish = new Animal("Fish");
