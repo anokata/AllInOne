@@ -2,9 +2,65 @@ import java.lang.*;
 import java.math.*;
 import java.util.*;
 import java.util.function.*;
+import java.io.*;
 
+class Animal implements Serializable {
+    private final String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Animal) {
+            return Objects.equals(name, ((Animal) obj).name);
+        }
+        return false;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+ 
 public class Oop {
-    public static void main(String[] args) {
+    public static Animal[] deserializeAnimalArray(byte[] data) { 
+        try (ObjectInputStream ds = new ObjectInputStream(
+                new ByteArrayInputStream(data))) {
+            int n = ds.readInt();
+            Animal[] animals = new Animal[n];
+            for (int i = 0; i < n; i++) {
+                animals[i] = (Animal) ds.readObject();
+            }
+            return animals;
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+        catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException();
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        ObjectOutputStream bs = new ObjectOutputStream(buf);
+        Animal afish = new Animal("Fish");
+        Animal adog = new Animal("Dog");
+        bs.writeInt(2);
+        bs.writeObject(afish);
+        bs.writeObject(adog);
+        System.out.println("animal bytes: " + Arrays.toString(buf.toByteArray()));
+        Animal[] animals = deserializeAnimalArray(buf.toByteArray());
+        if (animals == null) return;
+        for (Animal a : animals) {
+            System.out.println("get animal: " + a.getName());
+        }
+        bs.close();
+
         System.out.println("Hi!\u03A9");
         System.out.println(integrate(x -> -x*x * Math.sin(x), 0, 10));
         AsciiCharSequence a = new AsciiCharSequence("some");
