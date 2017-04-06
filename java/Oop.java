@@ -341,6 +341,18 @@ public class Oop {
     }
 
     public static void test_collection(){
+        ArrayDeque<Integer> a = new ArrayDeque();
+        Scanner scn = new Scanner(System.in);
+        boolean even = false;
+        while (scn.hasNext()) {
+            int i = scn.nextInt();
+            if (even) 
+                a.addFirst(i);
+            even = !even;
+        }
+        a.forEach(x -> System.out.print(x + " "));
+        //System.exit(0);
+
         HashSet<String> s1 = new HashSet();
         HashSet<String> s2 = new HashSet();
         s1.add("a");
@@ -356,7 +368,6 @@ public class Oop {
             String s = i.next();
             System.out.println(s);
         }
-        System.exit(0);
     }
 
     public static void test_pair() {
@@ -426,7 +437,7 @@ public class Oop {
     }
 
     public static void main(String[] args) throws IOException {
-        test_collection();
+        //test_collection();
         test_pair();
         test_mail();
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
