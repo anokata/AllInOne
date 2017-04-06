@@ -269,10 +269,84 @@ class Animal implements Serializable {
     }
 }
 
+
+class Pair<F, S> {
+    F first;
+    S second;
+
+    private Pair(F fst, S snd) {
+        first = fst;
+        second = snd;
+    }
+
+    public F getFirst() {
+        return this.first;
+    }
+    
+    public S getSecond() {
+        return this.second;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof Pair)) return false;
+        Pair pair = (Pair) obj;
+
+        if (pair.first == null && first != null) return false;
+        if (pair.second == null && second != null) return false;
+        if (pair.first != null && first == null) return false;
+        if (pair.second != null && second == null) return false;
+        if (pair.first == null && pair.second == null &&
+                first == null && second == null) return true;
+
+        if (!pair.first.equals(first)) return false;
+        if (!pair.second.equals(second)) return false;
+        return true;
+    }
+
+    public int hashCode() {
+        if (first == null && second == null) return 0;
+        if (first == null && second != null) return second.hashCode();
+        if (first != null && second == null) return first.hashCode();
+        return first.hashCode() + second.hashCode();
+    }
+
+    public static <F, S> Pair<F, S> of (F fst, S snd) {
+        return new Pair(fst, snd);
+    }
+}
  
 public class Oop {
     public static final Logger LOGGER = 
         Logger.getLogger("mail");
+
+    public static void test_pair() {
+        Pair<Integer, String> pair = Pair.of(1, "hello");
+        Integer i = pair.getFirst(); // 1
+        String s = pair.getSecond(); // "hello"
+        LOGGER.info("i" +i);
+        LOGGER.info("i" +s);
+
+        Pair<Integer, String> pair2 = Pair.of(1, "hello");
+        boolean mustBeTrue = pair.equals(pair2); // true!
+        LOGGER.info("i" +mustBeTrue);
+        boolean mustAlsoBeTrue = pair.hashCode() == pair2.hashCode(); // true!
+        LOGGER.info("i" +mustAlsoBeTrue);
+
+        Pair<String, String> p = Pair.of(null, null);
+        Pair<String, String> pn = Pair.of(null, "x");
+        LOGGER.info("null " + p.getFirst());
+        LOGGER.info("null " + p.getSecond());
+        LOGGER.info("null " + p.equals(pair2));
+        LOGGER.info("null " + p.equals(pn));
+        LOGGER.info("null " + p.equals(p));
+        LOGGER.info("null " + p.equals(null));
+        LOGGER.info("null " + p.hashCode());
+        LOGGER.info("null " + pn.hashCode());
+
+        System.exit(0);
+    }
 
     public static void test_mail() {
         RealMailService r = new RealMailService();
@@ -315,6 +389,7 @@ public class Oop {
     }
 
     public static void main(String[] args) throws IOException {
+        test_pair();
         test_mail();
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         ObjectOutputStream bs = new ObjectOutputStream(buf);
