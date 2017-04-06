@@ -321,6 +321,44 @@ public class Oop {
     public static final Logger LOGGER = 
         Logger.getLogger("mail");
 
+    public static <T> Set<T> symmetricDifference(Set<? extends T> set1, Set<? extends T> set2) {
+        Set<T> result = new HashSet();
+        Iterator<? extends T> i = set1.iterator();
+        while (i.hasNext()) {
+            T var = i.next();
+            if (!set2.contains(var)) {
+                result.add(var);
+            }
+        }
+        i = set2.iterator();
+        while (i.hasNext()) {
+            T var = i.next();
+            if (!set1.contains(var)) {
+                result.add(var);
+            }
+        }
+        return result;
+    }
+
+    public static void test_collection(){
+        HashSet<String> s1 = new HashSet();
+        HashSet<String> s2 = new HashSet();
+        s1.add("a");
+        s1.add("b");
+        s1.add("c");
+        s2.add("a");
+        s2.add("b");
+        s2.add("d");
+        Set<String> s3 = 
+            symmetricDifference(s1, s2);
+        Iterator<String> i = s3.iterator();
+        while (i.hasNext()) {
+            String s = i.next();
+            System.out.println(s);
+        }
+        System.exit(0);
+    }
+
     public static void test_pair() {
         Pair<Integer, String> pair = Pair.of(1, "hello");
         Integer i = pair.getFirst(); // 1
@@ -345,7 +383,6 @@ public class Oop {
         LOGGER.info("null " + p.hashCode());
         LOGGER.info("null " + pn.hashCode());
 
-        System.exit(0);
     }
 
     public static void test_mail() {
@@ -389,6 +426,7 @@ public class Oop {
     }
 
     public static void main(String[] args) throws IOException {
+        test_collection();
         test_pair();
         test_mail();
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
