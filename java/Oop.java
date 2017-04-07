@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.*;
 import java.io.*;
 import java.util.logging.*;
+import java.util.stream.*;
 
 interface Sendable {
     String getFrom();
@@ -454,7 +455,51 @@ public class Oop {
         System.exit(0);
     }
 
+    public static <T> void findMinMax(
+            Stream<? extends T> stream,
+            Comparator<? super T> order,
+            BiConsumer<? super T, ? super T> minMaxConsumer) {
+
+        final Object[] a = new Object[2];
+        stream.forEach(x -> {
+            if (a[0] == null) a[0] = x;
+            if (a[1] == null) a[1] = x;
+                if (order.compare((T)a[0], x) > 0) { 
+                    a[0] = x;
+                } 
+                if (order.compare((T)a[1], x) < 0) { 
+                    a[1] = x;
+                }});
+        minMaxConsumer.accept((T)a[0], (T)a[1]);
+
+    }
+
+    public static void test_stream() {
+        final int[] a = new int[2];
+        a[0] = Integer.MAX_VALUE;
+        a[1] = Integer.MIN_VALUE;
+        //IntStream is = IntStream.iterate(2, x -> x + 2)
+        IntStream is = IntStream.of(2,3,8,1,9,2,4)
+            .map(x -> {
+                if (a[0] > x) { 
+                    a[0] = x;
+                } 
+                if (a[1] < x) { 
+                    a[1] = x;
+                } 
+                return x;} );
+        int is1 = is.max().orElse(0);
+        System.out.println(Arrays.toString(a));
+        System.out.println(is1);
+        Stream i = Stream.of(3,3,8,3,11,3,4);
+        findMinMax(i, Integer::compare, (x, y) -> 
+                System.out.println("consume " + x + " " + y));
+
+        System.exit(0);
+    }
+
     public static void main(String[] args) throws IOException {
+        test_stream();
         test_func();
         //test_collection();
         test_pair();
