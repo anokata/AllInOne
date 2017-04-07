@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "babel": "*",
+    "babel-preset-es2015": "*"
+  },
+  "dependencies": {
+    "webpack": "^1.14.0"
+  }
+}
