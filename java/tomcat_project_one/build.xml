@@ -155,7 +155,24 @@
       <include name="*.jar"/>
     </fileset>
 
+    <fileset dir="${catalina.home}/lib">
+        <include name="catalina-ant.jar"/>
+        <include name="tomcat-util.jar"/>
+    </fileset>
   </path>
+
+<path id="catalina-ant-classpath">
+    <!-- We need the Catalina jars for Tomcat -->
+    <!--  * for other app servers - check the docs -->
+    <fileset dir="${catalina.home}/lib">
+        <include name="catalina-ant.jar"/>
+        <include name="tomcat-util.jar"/>
+    </fileset>
+</path>
+
+<taskdef name="install" classname="org.apache.catalina.ant.DeployTask">
+    <classpath refid="catalina-ant-classpath"/>
+</taskdef>
 
 <!-- ================== Custom Ant Task Definitions ======================= -->
 <!--
@@ -324,7 +341,8 @@
        username="${manager.username}"
        password="${manager.password}"
            path="${app.path}"
-       localWar="file://${build.home}"/>
+       war="${dist.home}/${app.name}-${app.version}.war"
+       />
 
   </target>
 
