@@ -1,0 +1,39 @@
+\comment
+true num;
+true = 1;
+false num;
+false = 0;
+i num
+j num
+b num
+s0 str
+fl float
+
+
+i = 0;
+
+j = 0a;
+
+if i<j;{
+b=true;
+i=0;
+
+ if 0;{;}else{ out i;};
+
+} else {b= false;};\обязательны {}
+
+s0 = "stroka!";
+
+i = j-4 ; \rez - 6
+
+out i*j;
+
+for i<4\;i=i+1
+{
+   j=0?i>2;
+};
+
+for i>13 {	  \встречаем forr кладём в стек
+ ;
+} ; \закр.скобк.(опять forr) по усл. возвращаемся в forr на верху стека
+\нет инициализации

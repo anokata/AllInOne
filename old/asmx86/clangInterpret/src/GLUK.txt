@@ -1,0 +1,7 @@
+dd num;
+i num;
+dd=0;
+
+ for dd != 3 ;{};
+
+out i;

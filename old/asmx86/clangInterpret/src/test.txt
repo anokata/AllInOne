@@ -1,0 +1,14 @@
+a float; b float; c float;
+x1 float; x2 float; D float;
+out "Hello World";
+a = 1.0;
+b = 0-0D.0;
+c = 28.0;
+D = b*b - 4*a*c;
+if D<0; {out "KopHei HET";} else 
+	{x1 = (0-b + (sqrt D))/(2*a);
+	x2 = (0-b - (sqrt D))/(2*a);
+	out "KopeH x1= "; out x1;
+	out "KopeH x2= "; out x2;
+	}
+\\ (x-5)(x-8)=x*x-13x+41 in hex 13 = D 40=28

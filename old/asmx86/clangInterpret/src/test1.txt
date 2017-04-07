@@ -1,0 +1,10 @@
+dd num ;dd=0;
+i num; i=0;
+r num;
+
+for dd<2 {
+dd=dd+1; \out dd;
+ i=0;
+for i<3 {i=i+1;r=r+1;  if i>2;{ out r;}else{out 0;}; }; 
+
+ }; \out dd;

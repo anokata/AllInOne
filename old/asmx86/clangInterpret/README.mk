@@ -1,0 +1,1 @@
+This is simple some C-like language interpretator written in asm

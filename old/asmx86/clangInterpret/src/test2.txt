@@ -1,0 +1,26 @@
+a float
+b float
+c float
+d float
+x1 float
+x2 float
+
+a = 1.0;
+b = 3.0;
+c = 2.0;
+
+d = b*b - (4*a*c);
+
+if d?=0.0; {out ((0-1)*b)/c;} else {
+   if d<0.0; {out "корни комплекные" ;} else{
+   x1 = (((0.0-1)*b)+sqrt d)/(2*a);
+   out x1;
+\out (((0.0-1)*b)-sqrt d)/(2*a);
+\out (((0.0-1.0)*1.0)+sqrt 9.0)/(2*1.0);
+\out ((0.0-1.0)*1.0)+sqrt 9.0;
+\out !(!0);
+\out (1.0+sqrt 9.0)/(2.0);
+   out	(((0.0-1)*b)-sqrt d)/(2*a);
+
+};  };
+
