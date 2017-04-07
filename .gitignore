@@ -3,3 +3,5 @@ node_modules
 ftp.sh
 settings.php
 setting
+build
+dist
