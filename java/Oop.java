@@ -498,7 +498,23 @@ public class Oop {
         System.exit(0);
     }
 
+    static class Add {
+        public void add(int ...args) {
+            int sum = 0;
+            StringBuilder sb = new StringBuilder();
+            for (int x : args) {
+                sb.append(x + "+");
+                sum += x;
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            sb.append("=" + sum + "\n");
+            System.out.print(sb.toString());
+        }
+    }
+
     public static void main(String[] args) throws IOException {
+        Add addObj = new Add();
+        addObj.add(1,2,3);
         test_stream();
         test_func();
         //test_collection();
