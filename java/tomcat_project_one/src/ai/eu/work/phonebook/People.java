@@ -7,9 +7,7 @@ import ai.eu.work.phonebook.App;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.*;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.ResultSet;
+import java.sql.*;
 
 class PeopleModel extends DBModel {
 
@@ -25,6 +23,17 @@ class PeopleModel extends DBModel {
             return rs;
         } catch (SQLException e) {
             throw new ModelException("failed execute query");
+        }
+    }
+
+    public void addPeople(String name) throws ModelException {
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "insert into people (name) values (?)");
+            ps.setString(1, name);
+            ps.execute();
+        } catch (SQLException e) {
+            throw new ModelException("failed insert name");
         }
     }
 }
@@ -55,8 +64,8 @@ public class People extends App {
             throws ServletException, IOException {
 
         PrintWriter out = response.getWriter();
-        accept(out);
         request.getRequestDispatcher("/WEB-INF/nameInputForm.jsp").include(request, response);
+        accept(out);
     }
 
     public void doPost(HttpServletRequest request,
@@ -66,6 +75,18 @@ public class People extends App {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("hi post name is: " + request.getParameter("name"));
+        String name = request.getParameter("name");
+        if (name != null) {
+            PeopleModel pmodel = (PeopleModel) model;
+            try {
+                pmodel.addPeople(name);
+            } catch (ModelException e) {
+                out.println("not add " + e.getMessage());
+                throw new ServletException(e);
+            }
+        }
+        out.println("bye add");
+        response.sendRedirect("people");
         out.close();
     }
 

@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 
 public class DBModel implements Model {
 
-    Connection connection;
+    protected Connection connection;
     protected Statement statment;
 
     public DBModel(Connection connection) {
