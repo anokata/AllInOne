@@ -13,10 +13,92 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 
+interface Model {
+    ResultSet getData() throws ModelException;
+}
+
+class ModelException extends RuntimeException {}
+
+class PhoneBookModel implements Model {
+
+    Connection connection;
+
+    public PhoneBookModel(Connection connection) {
+        this.connection = connection;
+    }
+
+    public ResultSet getData() throws ModelException {
+        if (connection == null) {
+            return null;
+        }
+        try {
+            Statement stmt = connection.createStatement(
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = stmt.executeQuery("select * from phones");
+            //stmt.close(); // TODO need close? who?
+            return rs;
+        } catch (SQLException e) {
+            throw new ModelException();
+        }
+    }
+}
+
+interface View {
+    void view(PrintWriter out, Model model) throws ViewException;
+}
+
+class ViewException extends RuntimeException {}
+
+class PhoneBookView implements View {
+
+    public void view(PrintWriter out, Model model) throws ViewException {
+        try {
+            out.print("<table>");
+            ResultSet rs = model.getData();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int numberOfColumns = rsmd.getColumnCount();
+            rs.first();
+            while (rs.next()) {
+               out.print("<tr>");
+               for (int i = 1; i <= numberOfColumns; i++) {
+                   out.print("<td>");
+                   out.println(rs.getObject(i));
+                   out.print("</td>");
+               }
+               out.print("</tr>");
+            }
+            out.print("</table>");
+            rs.close();
+        } catch (SQLException e) {
+            throw new ViewException();
+        }
+    }
+}
+
 public class hello extends HttpServlet {
 
-    public void init() throws ServletException { }
-    public void destroy() { }
+    final String url = "jdbc:postgresql://localhost/phonebook?user=test&password=test&ssl=false";
+    Connection conn;
+
+    public void init() throws ServletException { 
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new ServletException("can not found pgsql driver class");
+        }
+        try {
+            conn = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            throw new ServletException("can not connect");
+        }
+    }
+        
+    public void destroy() { 
+        try {
+            conn.close();
+        } catch (SQLException e) {
+        }
+    }
 
     public void doGet(HttpServletRequest request,
                     HttpServletResponse response)
@@ -24,42 +106,16 @@ public class hello extends HttpServlet {
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        out.println("<html><body>");
-        out.println("Hi from code");
-        doDB(out);
+        request.getRequestDispatcher("/WEB-INF/head.jsp").include(request, response);
 
+        //controller
+        Model model = new PhoneBookModel(conn);
+        View v = new PhoneBookView();
+        v.view(out, model);
+
+        out.println("<hr>");
         out.println("</body></html>");
         out.close();
-        throw new IOException("hi");
     }
 
-    private void doDB(PrintWriter out) {
-        try {
-            // TODO connect and load in init
-            try {
-                Class.forName("org.postgresql.Driver");
-            } catch (ClassNotFoundException e) {
-                out.println("can not found pgsql driver class");
-            }
-            String url = "jdbc:postgresql://localhost/phonebook?user=test&password=test&ssl=false";
-            Connection conn = DriverManager.getConnection(url);
-            Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select * from phones");
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int numberOfColumns = rsmd.getColumnCount();
-            rs.first();
-            while (rs.next()) {
-               for (int i = 1; i <= numberOfColumns; i++) {
-                   out.println(rs.getObject(i));
-                   out.println(" | ");
-               }
-               out.println("<br>");
-            }
-            rs.close();
-            stmt.close();
-            conn.close();
-        } catch (SQLException e) {
-            out.print("SQLException" + e.getMessage());
-        }
-    }
 }
