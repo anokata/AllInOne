@@ -163,4 +163,25 @@
     </session-config>
 
 
+    <servlet>
+        <servlet-name>HelloServlet</servlet-name>
+        <servlet-class>hello.hello</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HelloServlet</servlet-name>
+        <url-pattern>/hello</url-pattern>
+    </servlet-mapping>
+
+
+<servlet>
+   <servlet-name>HelloWorld_</servlet-name>
+   <servlet-class>hello.HelloWorld</servlet-class>
+</servlet>
+
+<servlet-mapping>
+   <servlet-name>HelloWorld_</servlet-name>
+   <url-pattern>/HelloWorld</url-pattern>
+</servlet-mapping>
+
 </web-app>
