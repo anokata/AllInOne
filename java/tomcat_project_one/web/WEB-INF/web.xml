@@ -164,13 +164,13 @@
 
 
     <servlet>
-        <servlet-name>HelloServlet</servlet-name>
-        <servlet-class>hello.hello</servlet-class>
+        <servlet-name>PhoneBookServlet</servlet-name>
+        <servlet-class>ai.eu.work.phonebook.Phonebook</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>HelloServlet</servlet-name>
-        <url-pattern>/hello</url-pattern>
+        <servlet-name>PhoneBookServlet</servlet-name>
+        <url-pattern>/phonebook</url-pattern>
     </servlet-mapping>
 
 
