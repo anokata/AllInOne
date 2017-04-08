@@ -21,7 +21,7 @@ class PeopleModel extends DBModel {
         super.getData();
         try {
             ResultSet rs = statment.executeQuery(
-                    "select * from people, phones");
+                    "select name from people");
             return rs;
         } catch (SQLException e) {
             throw new ModelException("failed execute query");

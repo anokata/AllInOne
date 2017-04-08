@@ -26,9 +26,8 @@ public abstract class TableView implements View {
 
     public void printTableRows(PrintWriter out, ResultSet rs, int columns)
     throws SQLException {
-        //out.print("COUNT:" + rs.getFetchSize());
-        rs.first();
-        while (rs.next()) {
+        if (!rs.first()) return;
+        do {
            out.print("<tr>");
            for (int i = 1; i <= columns; i++) {
                out.print("<td>");
@@ -36,7 +35,7 @@ public abstract class TableView implements View {
                out.print("</td>");
            }
            out.print("</tr>");
-        }
+        } while (rs.next());
         rs.close();
     }
 
