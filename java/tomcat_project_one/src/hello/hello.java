@@ -13,62 +13,122 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 
-interface Model {
+interface Model extends AutoCloseable {
     ResultSet getData() throws ModelException;
 }
 
-class ModelException extends RuntimeException {}
+class ModelException extends Exception {
 
-class PhoneBookModel implements Model {
+    public ModelException(Throwable e) { 
+        initCause(e); 
+    } 
+
+    public ModelException(String message) { 
+        super(message);
+    } 
+}
+
+class DBModel implements Model {
 
     Connection connection;
+    Statement statment;
 
-    public PhoneBookModel(Connection connection) {
+    public DBModel(Connection connection) {
         this.connection = connection;
+    }
+
+    public void close() throws Exception {
+        try {
+            statment.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new Exception(e);
+        }
     }
 
     public ResultSet getData() throws ModelException {
         if (connection == null) {
-            return null;
+            throw new ModelException("no connection while getData");
         }
         try {
-            Statement stmt = connection.createStatement(
+            this.statment = connection.createStatement(
                     ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ResultSet rs = stmt.executeQuery("select * from phones");
-            //stmt.close(); // TODO need close? who?
+        } catch (SQLException e) {
+            throw new ModelException("fail create statement");
+        }
+        return null;
+    }
+}
+
+class PhoneBookModel extends DBModel {
+
+    public PhoneBookModel(Connection connection) {
+        super(connection);
+    }
+
+    public ResultSet getData() throws ModelException {
+        super.getData();
+        try {
+            ResultSet rs = statment.executeQuery(
+                    "select name, phone from phones inner join people on phones.people_id = people.id");
             return rs;
         } catch (SQLException e) {
-            throw new ModelException();
+            throw new ModelException("failed execute query");
         }
     }
 }
 
 interface View {
-    void view(PrintWriter out, Model model) throws ViewException;
+    void view(PrintWriter out, Model model) throws ViewException, ModelException;
+}
+
+abstract class TableView implements View {
+
+    public void printTableHead(PrintWriter out, ResultSetMetaData rsmd)
+    throws SQLException {
+        out.print("<thead><tr>");
+        int numberOfColumns = rsmd.getColumnCount();
+        for (int i = 1; i <= numberOfColumns; i++) {
+            out.print("<th>");
+            out.print(rsmd.getColumnName(i)); 
+            out.print("</th>");
+        }
+        out.print("</tr></thead>");
+    }
+
+    public void printTableRows(PrintWriter out, ResultSet rs, int columns)
+    throws SQLException {
+        rs.first();
+        while (rs.next()) {
+           out.print("<tr>");
+           for (int i = 1; i <= columns; i++) {
+               out.print("<td>");
+               out.println(rs.getObject(i));
+               out.print("</td>");
+           }
+           out.print("</tr>");
+        }
+        rs.close();
+    }
+
+    public void printTable(PrintWriter out, Model model)
+    throws SQLException, ModelException {
+        out.print("<table>");
+        ResultSet rs = model.getData();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        printTableHead(out, rsmd);
+        printTableRows(out, rs, rsmd.getColumnCount());
+        out.print("</table>");
+    }
 }
 
 class ViewException extends RuntimeException {}
 
-class PhoneBookView implements View {
+class PhoneBookView extends TableView {
 
-    public void view(PrintWriter out, Model model) throws ViewException {
+    public void view(PrintWriter out, Model model) throws ViewException, ModelException {
         try {
-            out.print("<table>");
-            ResultSet rs = model.getData();
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int numberOfColumns = rsmd.getColumnCount();
-            rs.first();
-            while (rs.next()) {
-               out.print("<tr>");
-               for (int i = 1; i <= numberOfColumns; i++) {
-                   out.print("<td>");
-                   out.println(rs.getObject(i));
-                   out.print("</td>");
-               }
-               out.print("</tr>");
-            }
-            out.print("</table>");
-            rs.close();
+            printTable(out, model);
         } catch (SQLException e) {
             throw new ViewException();
         }
@@ -81,6 +141,7 @@ public class hello extends HttpServlet {
     Connection conn;
 
     public void init() throws ServletException { 
+        // TODO DB abstraction
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
@@ -109,11 +170,18 @@ public class hello extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/head.jsp").include(request, response);
 
         //controller
-        Model model = new PhoneBookModel(conn);
-        View v = new PhoneBookView();
-        v.view(out, model);
+        try (Model model = new PhoneBookModel(conn)) {
+            View v = new PhoneBookView();
+            v.view(out, model);
+        } catch (ViewException | ModelException e) {
+            out.print(e.getMessage());
+            throw new ServletException(e);
+        } catch (Exception e) {
+            out.print("serious exception");
+            throw new ServletException(e);
+        }
 
-        out.println("<hr>");
+
         out.println("</body></html>");
         out.close();
     }
