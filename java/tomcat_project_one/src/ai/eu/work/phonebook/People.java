@@ -11,9 +11,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
-class PhoneBookModel extends DBModel {
+class PeopleModel extends DBModel {
 
-    public PhoneBookModel(Connection connection) {
+    public PeopleModel(Connection connection) {
         super(connection);
     }
 
@@ -21,7 +21,7 @@ class PhoneBookModel extends DBModel {
         super.getData();
         try {
             ResultSet rs = statment.executeQuery(
-                    "select name, phone from phones inner join people on phones.people_id = people.id");
+                    "select * from people, phones");
             return rs;
         } catch (SQLException e) {
             throw new ModelException("failed execute query");
@@ -29,36 +29,27 @@ class PhoneBookModel extends DBModel {
     }
 }
 
-class PhoneBookView extends TableView {
+class PeopleView extends TableView {
+
+    public PeopleView() { }
 
     public void view(PrintWriter out, Model model) throws ViewException, ModelException {
         try {
             printTable(out, model);
         } catch (SQLException e) {
-            throw new ViewException("Phone table view fail");
+            throw new ViewException("Table view fail print");
         }
     }
 }
 
-public class Phonebook extends App {
+public class People extends App {
         
     public void appDoGet(HttpServletRequest request,
                     HttpServletResponse response)
             throws ServletException, IOException {
 
         PrintWriter out = response.getWriter();
-
-        //controller
-        try (Model model = new PhoneBookModel(conn)) {
-            View v = new PhoneBookView();
-            v.view(out, model);
-        } catch (ViewException | ModelException e) {
-            out.print(e.getMessage());
-            throw new ServletException(e);
-        } catch (Exception e) {
-            out.print("serious exception");
-            throw new ServletException(e);
-        }
+        accept(PeopleModel.class, PeopleView.class, out);
     }
 
 }

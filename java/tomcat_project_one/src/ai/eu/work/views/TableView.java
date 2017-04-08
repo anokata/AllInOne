@@ -9,6 +9,9 @@ import java.sql.SQLException;
 
 public abstract class TableView implements View {
 
+    public TableView() {
+    }
+
     public void printTableHead(PrintWriter out, ResultSetMetaData rsmd)
     throws SQLException {
         out.print("<thead><tr>");
@@ -23,6 +26,7 @@ public abstract class TableView implements View {
 
     public void printTableRows(PrintWriter out, ResultSet rs, int columns)
     throws SQLException {
+        //out.print("COUNT:" + rs.getFetchSize());
         rs.first();
         while (rs.next()) {
            out.print("<tr>");

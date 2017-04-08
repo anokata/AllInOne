@@ -17,7 +17,9 @@ public class DBModel implements Model {
 
     public void close() throws Exception {
         try {
-            statment.close();
+            if (statment != null) {
+                statment.close();
+            }
             //connection.close();
         } catch (SQLException e) {
             throw new Exception(e);

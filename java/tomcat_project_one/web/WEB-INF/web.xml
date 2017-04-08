@@ -167,12 +167,19 @@
         <servlet-name>PhoneBookServlet</servlet-name>
         <servlet-class>ai.eu.work.phonebook.Phonebook</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>PhoneBookServlet</servlet-name>
         <url-pattern>/phonebook</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>PeopleServlet</servlet-name>
+        <servlet-class>ai.eu.work.phonebook.People</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PeopleServlet</servlet-name>
+        <url-pattern>/people</url-pattern>
+    </servlet-mapping>
 
 <servlet>
    <servlet-name>HelloWorld_</servlet-name>

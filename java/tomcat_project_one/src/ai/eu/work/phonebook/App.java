@@ -1,4 +1,6 @@
 package ai.eu.work.phonebook;
+import ai.eu.work.models.*;
+import ai.eu.work.views.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -8,6 +10,7 @@ import java.util.Enumeration;
 import java.sql.Driver;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.lang.reflect.Constructor;
 
 public class App extends HttpServlet {
     final String url = "jdbc:postgresql://localhost/phonebook?user=test&password=test&ssl=false";
@@ -51,5 +54,35 @@ public class App extends HttpServlet {
     
         PrintWriter out = response.getWriter();
         out.print("Main App");
+    }
+
+    public void accept(Class modelClass, Class viewClass, PrintWriter out) 
+            throws ServletException, IOException {
+        Model model = null;
+        try {
+            Constructor<?> ctor = modelClass.getConstructor(Connection.class);
+            model = (Model) ctor.newInstance(conn);
+            ctor = viewClass.getConstructor();
+            View view = (View) ctor.newInstance();
+            view.view(out, model);
+        } catch (ViewException | ModelException e) {
+            out.println(e.getMessage());
+            throw new ServletException(e);
+        } catch (Exception e) {
+            out.println("serious exception" + e.getMessage());
+            throw new ServletException(e);
+        } finally {
+            try {
+                if (model == null) {
+                    out.println("empty model");
+                    return;
+                }
+                model.close();
+            } catch (Exception e) {
+                out.println("very serious exception at close model" + e.getMessage() + "<BR>");
+                e.printStackTrace(out);
+                throw new ServletException(e);
+            }
+        }
     }
 }
