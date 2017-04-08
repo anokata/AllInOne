@@ -1,19 +1,15 @@
 package ai.eu.work.phonebook;
+
 import ai.eu.work.models.*;
 import ai.eu.work.views.*;
+import ai.eu.work.phonebook.App;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.*;
-
-import java.sql.DriverManager;
-import java.util.Enumeration;
-import java.sql.Driver;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 
 class PhoneBookModel extends DBModel {
 
@@ -44,39 +40,13 @@ class PhoneBookView extends TableView {
     }
 }
 
-public class Phonebook extends HttpServlet {
-
-    final String url = "jdbc:postgresql://localhost/phonebook?user=test&password=test&ssl=false";
-    Connection conn;
-
-    public void init() throws ServletException { 
-        // TODO DB abstraction
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new ServletException("can not found pgsql driver class");
-        }
-        try {
-            conn = DriverManager.getConnection(url);
-        } catch (SQLException e) {
-            throw new ServletException("can not connect");
-        }
-    }
+public class Phonebook extends App {
         
-    public void destroy() { 
-        try {
-            conn.close();
-        } catch (SQLException e) {
-        }
-    }
-
-    public void doGet(HttpServletRequest request,
+    public void appDoGet(HttpServletRequest request,
                     HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        request.getRequestDispatcher("/WEB-INF/head.jsp").include(request, response);
 
         //controller
         try (Model model = new PhoneBookModel(conn)) {
@@ -89,10 +59,6 @@ public class Phonebook extends HttpServlet {
             out.print("serious exception");
             throw new ServletException(e);
         }
-
-
-        out.println("</body></html>");
-        out.close();
     }
 
 }

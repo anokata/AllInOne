@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>PHB </title>
+        <title>PHBk</title>
 <style>
 td { 
     border: solid 2px #888;
@@ -12,9 +12,16 @@ table {
 #title {
     background-color: #FCF0F0;
 }
+#footer {
+    background-color: #FCF0F0;
+}
 </style>
 </head>
     <body>
         <div id='title'>
             <h4>Phone Book</h4>
+        </div>
+        <div id='menu'>
+            <a href='/oneapp/phonebook'>phonebook</a>
+            <a href='/oneapp/people'>people</a>
         </div>
