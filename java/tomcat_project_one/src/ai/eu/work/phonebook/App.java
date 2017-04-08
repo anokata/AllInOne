@@ -10,11 +10,13 @@ import java.util.Enumeration;
 import java.sql.Driver;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.lang.reflect.Constructor;
 
 public class App extends HttpServlet {
     final String url = "jdbc:postgresql://localhost/phonebook?user=test&password=test&ssl=false";
     protected Connection conn;
+
+    protected Model model;
+    protected View view;
 
     public void init() throws ServletException { 
         // TODO DB abstraction
@@ -56,14 +58,9 @@ public class App extends HttpServlet {
         out.print("Main App");
     }
 
-    public void accept(Class modelClass, Class viewClass, PrintWriter out) 
+    public void accept(PrintWriter out) 
             throws ServletException, IOException {
-        Model model = null;
         try {
-            Constructor<?> ctor = modelClass.getConstructor(Connection.class);
-            model = (Model) ctor.newInstance(conn);
-            ctor = viewClass.getConstructor();
-            View view = (View) ctor.newInstance();
             view.view(out, model);
         } catch (ViewException | ModelException e) {
             out.println(e.getMessage());

@@ -43,13 +43,30 @@ class PeopleView extends TableView {
 }
 
 public class People extends App {
-        
+
+    public void init() throws ServletException { 
+        super.init();
+        model = new PeopleModel(conn);
+        view = new PeopleView();
+    }
+
     public void appDoGet(HttpServletRequest request,
                     HttpServletResponse response)
             throws ServletException, IOException {
 
         PrintWriter out = response.getWriter();
-        accept(PeopleModel.class, PeopleView.class, out);
+        accept(out);
+        request.getRequestDispatcher("/WEB-INF/nameInputForm.jsp").include(request, response);
+    }
+
+    public void doPost(HttpServletRequest request,
+                    HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("hi post name is: " + request.getParameter("name"));
+        out.close();
     }
 
 }

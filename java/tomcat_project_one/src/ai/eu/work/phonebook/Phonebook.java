@@ -31,6 +31,8 @@ class PhoneBookModel extends DBModel {
 
 class PhoneBookView extends TableView {
 
+    public PhoneBookView() {}
+
     public void view(PrintWriter out, Model model) throws ViewException, ModelException {
         try {
             printTable(out, model);
@@ -42,23 +44,17 @@ class PhoneBookView extends TableView {
 
 public class Phonebook extends App {
         
+    public void init() throws ServletException { 
+        super.init();
+        model = new PhoneBookModel(conn);
+        view = new PhoneBookView();
+    }
+
     public void appDoGet(HttpServletRequest request,
                     HttpServletResponse response)
             throws ServletException, IOException {
 
-        PrintWriter out = response.getWriter();
-
-        //controller
-        try (Model model = new PhoneBookModel(conn)) {
-            View v = new PhoneBookView();
-            v.view(out, model);
-        } catch (ViewException | ModelException e) {
-            out.print(e.getMessage());
-            throw new ServletException(e);
-        } catch (Exception e) {
-            out.print("serious exception");
-            throw new ServletException(e);
-        }
+        accept(response.getWriter());
     }
 
 }
