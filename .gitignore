@@ -1,6 +1,8 @@
 node_modules
 *.class
 *.jar
+*.lst
+target
 ftp.sh
 settings.php
 setting
