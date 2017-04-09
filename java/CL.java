@@ -1,9 +1,37 @@
 import java.io.*;
 
+class InitTest {
+    static int a = init("a");
+    static int b;
+    static {
+        b = init("b");
+        c = init("c in static block");
+    }
+    static int c = init("c after static block");
+    int d = init("field d init");
+    {
+        d = init("field d init in block");
+        e = init("field e init in block");
+    }
+    int e = init("field e init");
+
+    static int init(String msg) {
+        System.out.println(msg);
+        return 1;
+    }
+
+    public InitTest() {
+        init("construct");
+    }
+}
+
 class CL {
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+        throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        Class.forName(InitTest.class.getName()).newInstance();
         System.out.println(CL.class.getClassLoader());
         System.out.println(Sub.class.getClassLoader());
+        System.out.println(String.class.getClassLoader() == null ? "bootstrap" : "_");
         MyLoader m = new MyLoader();
         Class <?> h;
         try {

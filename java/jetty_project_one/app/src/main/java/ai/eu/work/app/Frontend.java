@@ -11,6 +11,8 @@ public class Frontend extends HttpServlet {
         throws ServletException, IOException {
 
         PrintWriter out = response.getWriter();
-        out.println("hi");
+        String s = request.getParameter("key");
+        out.println(s);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

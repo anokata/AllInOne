@@ -10,14 +10,15 @@ public class App
 {
     public static void main( String[] args ) throws Exception
     {
-        System.out.println( "Hello World!" );
         Frontend frontend = new Frontend();
-        Server server = new Server(8081);
+        Server server = new Server(8080);
         ServletContextHandler context = 
             new ServletContextHandler(ServletContextHandler.SESSIONS);
         server.setHandler(context);
-        context.addServlet(new ServletHolder(frontend), "/authform");
+        context.addServlet(new ServletHolder(frontend), "/mirror");
         server.start();
+        //System.out.println("Server started");
+        java.util.logging.Logger.getGlobal().info("Server started");
         server.join();
     }
 }
