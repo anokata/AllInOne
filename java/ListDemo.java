@@ -71,16 +71,20 @@ public class ListDemo extends JPanel
         int id = e.getID();
         String keyString;
         if (id != KeyEvent.KEY_PRESSED) return;
+        char c = '0';
+        int keyCode = 0;
         if (id == KeyEvent.KEY_TYPED) {
-            char c = e.getKeyChar();
+            c = e.getKeyChar();
             keyString = "char= '" + c + "'";
         } else {
-            int keyCode = e.getKeyCode();
+            keyCode = e.getKeyCode();
             keyString = "code= " + keyCode
                     + " ("
                     + KeyEvent.getKeyText(keyCode)
                     + ")";
         }
+
+        if (keyCode == 81) System.exit(0);
         
         int modifiersEx = e.getModifiersEx();
         String modString = " " + modifiersEx;
@@ -142,3 +146,36 @@ class Elements {
         return list;
     }
 }
+
+class Element {
+    public String title;
+
+    public Element(String title) {
+        this.title = title;
+    }
+}
+
+class ElementDir {
+
+}
+
+class JavaPackagesDir extends ElementDir {
+
+    public static Collection<Element> getElements() {
+        ArrayList<Element> list = new ArrayList<Element>();
+        int limit = 10;
+        final Package[] packages = Package.getPackages();
+        java.util.Arrays.sort(packages, (x, y) -> x.getName().compareTo(y.getName()));
+        for (Package pkg : packages) {
+            if (limit-- < 0) break;
+            list.add(new Element(pkg.getName()));
+        }
+        return list;
+    }
+}
+
+class FixedDir extends ElementDir {
+
+}
+
+// read from file structure
