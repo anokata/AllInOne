@@ -7,18 +7,20 @@
  *
  */
 package ai.eu.work.views;
+
 import java.io.*;
-import ai.eu.work.models.*;
-import ai.eu.work.views.ViewException;
-import ai.eu.work.views.View;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import ai.eu.work.models.*;
+import ai.eu.work.views.ViewException;
+import ai.eu.work.views.View;
+
+
 public abstract class TableView implements View {
 
-    public TableView() {
-    }
+    public TableView() { }
 
     int idColumn;
 
