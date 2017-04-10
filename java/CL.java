@@ -28,6 +28,10 @@ class InitTest {
 class CL {
     public static void main(String[] args) 
         throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        String s = "s";
+        Object o = s;
+        System.out.println(o.getClass().getName());
+
         Class.forName(InitTest.class.getName()).newInstance();
         System.out.println(CL.class.getClassLoader());
         System.out.println(Sub.class.getClassLoader());
