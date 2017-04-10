@@ -21,7 +21,7 @@ class PhoneBookModel extends DBModel {
         super.getData();
         try {
             ResultSet rs = statment.executeQuery(
-                    "select name, phone from phones inner join people on phones.people_id = people.id");
+                    "select name, phones.id, phone from phones inner join people on phones.people_id = people.id");
             return rs;
         } catch (SQLException e) {
             throw new ModelException("failed execute query");

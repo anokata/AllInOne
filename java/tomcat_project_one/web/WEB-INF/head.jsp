@@ -15,6 +15,9 @@ table {
 #footer {
     background-color: #FCF0F0;
 }
+form {
+    display:inline;
+}
 </style>
 </head>
     <body>

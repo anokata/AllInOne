@@ -19,7 +19,7 @@ class PeopleModel extends DBModel {
         super.getData();
         try {
             ResultSet rs = statment.executeQuery(
-                    "select name from people");
+                    "select id, name from people");
             return rs;
         } catch (SQLException e) {
             throw new ModelException("failed execute query");
@@ -34,6 +34,17 @@ class PeopleModel extends DBModel {
             ps.execute();
         } catch (SQLException e) {
             throw new ModelException("failed insert name");
+        }
+    }
+
+    public void deletePeople(int id) throws ModelException {
+        try { // TODO delete first all phones or cascade?
+            PreparedStatement ps = connection.prepareStatement(
+                    "delete from people where id = ? ");
+            ps.setInt(1, id);
+            ps.execute();
+        } catch (SQLException e) {
+            throw new ModelException("failed delete");
         }
     }
 }
@@ -75,13 +86,27 @@ public class People extends App {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("hi post name is: " + request.getParameter("name"));
+        PeopleModel pmodel = (PeopleModel) model;
         String name = request.getParameter("name");
         if (name != null) {
-            PeopleModel pmodel = (PeopleModel) model;
             try {
                 pmodel.addPeople(name);
             } catch (ModelException e) {
                 out.println("not add " + e.getMessage());
+                throw new ServletException(e);
+            }
+        }
+
+        String action = request.getParameter("action");
+        String id = request.getParameter("id");
+        if (id != null && action.equals("delete")) {
+            out.println("try delete ");
+            int ID = Integer.parseInt(id);
+            out.println(ID + "!");
+            try {
+                pmodel.deletePeople(ID);
+            } catch (ModelException e) {
+                out.println("not del " + e.getMessage());
                 throw new ServletException(e);
             }
         }
