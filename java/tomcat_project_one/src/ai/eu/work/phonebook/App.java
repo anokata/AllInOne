@@ -1,15 +1,17 @@
 package ai.eu.work.phonebook;
+
+import java.io.*;
+import java.util.Enumeration;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
 import ai.eu.work.models.*;
 import ai.eu.work.views.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-import java.sql.DriverManager;
-import java.util.Enumeration;
-import java.sql.Driver;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public class App extends HttpServlet {
     final String url = "jdbc:postgresql://localhost/phonebook?user=test&password=test&ssl=false";

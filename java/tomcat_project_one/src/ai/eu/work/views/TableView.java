@@ -76,4 +76,13 @@ public abstract class TableView implements View {
         printTableRows(out, rs, rsmd.getColumnCount());
         out.print("</table>");
     }
+
+    /* not yet */
+    public void printTableA(PrintWriter out, Model model)
+    throws ModelException {
+        out.print("<table>");
+        //printTableHeadA(out, model.getNames());
+        //printTableRows(out, model.getRowsForTable();
+        out.print("</table>");
+    }
 }
