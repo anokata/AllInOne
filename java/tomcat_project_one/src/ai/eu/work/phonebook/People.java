@@ -1,6 +1,7 @@
 package ai.eu.work.phonebook;
 
 import java.io.*;
+import java.util.*;
 import java.sql.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -66,6 +67,21 @@ public class People extends App {
 }
 
 class Person {
+    private String name;
+    private long id;
+
+    public Person(String name, long id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public long getId() {
+        return this.id;
+    }
 
 }
 
@@ -107,6 +123,27 @@ class PeopleModel extends DBModel {
             throw new ModelException("failed delete");
         }
     }
+
+    public List<Person> getRowsForTable() {
+        LinkedList list<Person> = new LinkedList<>();
+        ResultSet rs = getData();
+        ResultSetMetaData rsmd = rs.getMetaData();
+
+        int numberOfColumns = rsmd.getColumnCount();
+        /*for (int i = 1; i <= numberOfColumns; i++) {
+            (rsmd.getColumnName(i)); 
+        }*/
+        if (!rs.first()) return;
+        do {
+            for (int i = 1; i <= columns; i++) {
+                //(rs.getObject()); 
+            }
+            //list.add(new Person());
+
+        } while (rs.next());
+        rs.close();
+        return list;
+    }
 }
 
 class PeopleView extends TableView {
@@ -119,6 +156,19 @@ class PeopleView extends TableView {
         } catch (SQLException e) {
             throw new ViewException("Table view fail print");
         }
+    }
+
+    public String getRow(Person p) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<tr>");
+        sb.append("<td>");
+        sb.append("_form_");
+        sb.append("</td>");
+        sb.append("<td>");
+        sb.append(p.getName());
+        sb.append("</td>");
+        sb.append("</tr>");
+        return sb.toString();
     }
 }
 

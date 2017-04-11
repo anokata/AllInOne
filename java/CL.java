@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 
 class InitTest {
     static int a = init("a");
@@ -31,6 +32,11 @@ class CL {
         String s = "s";
         Object o = s;
         System.out.println(o.getClass().getName());
+        List<Integer> l = new ArrayList<>();
+        l.add(8);
+        List<? extends Object> lo = l;
+        //lo.add(new Integer(8)); //err
+
 
         Class.forName(InitTest.class.getName()).newInstance();
         System.out.println(CL.class.getClassLoader());
