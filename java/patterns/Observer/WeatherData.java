@@ -56,15 +56,12 @@ public class WeatherData implements Subject {
 
     private void tick() {
         temperature++;
-        System.out.println("changed>" 
-                + " temp: " + getTemperature()
-                + " humi: " + getHumidity()
-                + " pres: " + getPressure());
         mesurementChanged();
     }
 
     public static void main(String[] args) {
         WeatherData wd = new WeatherData();
+        Observer ccd = new CurrentConditionsDisplay(wd);
         System.out.println("started.");
         wd.setMeasurments();
     }
@@ -87,3 +84,28 @@ interface Subject {
 interface DisplayElement {
     void display();
 }
+
+class CurrentConditionsDisplay implements Observer, DisplayElement {
+    private float temperature;
+    private float humidity;
+    private Subject weatherData;
+
+    public CurrentConditionsDisplay(Subject weatherData) {
+        this.weatherData = weatherData;
+        weatherData.registerObserver(this);
+    }
+    
+    public void update(float temp, float humidity, float pressure) {
+        temperature = temp;
+        this.humidity = humidity;
+        display();
+    }
+
+    public void display() {
+        System.out.println("changed>" 
+                + " temp: " + temperature
+                + " humi: " + humidity);
+    }
+
+}
+
