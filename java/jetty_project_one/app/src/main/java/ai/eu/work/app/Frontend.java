@@ -6,6 +6,8 @@ import java.io.*;
 
 public class Frontend extends HttpServlet {
 
+    private int counter = 0;
+
     public void doGet(HttpServletRequest request,
             HttpServletResponse response)
         throws ServletException, IOException {
@@ -17,13 +19,14 @@ public class Frontend extends HttpServlet {
         /* auth */
         HttpSession session = request.getSession();
         //Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
+        //if (userId == null) {
             //userId = userIdGenerator.getAndIncrement();
-            session.setAttribute("userId", userId);
-        }
+            //session.setAttribute("userId", userId);
+        //}
         String key = session.toString();
         out.println(key);
 
+        out.println("requested: " + counter++);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
