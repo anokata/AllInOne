@@ -13,6 +13,17 @@ public class Frontend extends HttpServlet {
         PrintWriter out = response.getWriter();
         String s = request.getParameter("key");
         out.println(s);
+
+        /* auth */
+        HttpSession session = request.getSession();
+        //Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            //userId = userIdGenerator.getAndIncrement();
+            session.setAttribute("userId", userId);
+        }
+        String key = session.toString();
+        out.println(key);
+
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }

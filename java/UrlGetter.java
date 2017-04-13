@@ -71,11 +71,11 @@ class UrlGetter {
     //TODO: make method current weather in words 
     //and how it change in near time(up or down
     //temp, rain? wind raise?)
-    public static List<HashMap<String, String>> getForecast(Document doc)
+    public static List<? extends Map<String, String>> getForecast(Document doc)
             throws XPathExpressionException {
         //TODO: extract
         //TODO: make get one and use it for now weather and this loop simplification
-        HashMap<String, String> forecastDict = new HashMap<String, String>();
+        Map<String, String> forecastDict = new HashMap<String, String>();
         forecastDict.put("windSpeed", "mps");
         forecastDict.put("temperature", "value");
         forecastDict.put("pressure", "value");
