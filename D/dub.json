@@ -1,0 +1,8 @@
+{
+    "name": "xox",
+    "targetPath": "bin",
+    "targetType": "executable",
+    "dependencies": {
+        "gtk-d": "~>3.1.3"
+    }
+}

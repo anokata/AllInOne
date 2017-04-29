@@ -1,0 +1,8 @@
+{
+	"dub": {
+		"lastUpgrade": "2017-04-29T21:59:19.3248683",
+		"cachedUpgrades": {
+			"gtk-d": "3.1.5"
+		}
+	}
+}
