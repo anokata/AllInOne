@@ -22,7 +22,7 @@ void main() {
     }
     writeln();
     // dict
-    int [string] dic;
+    ulong [string] dic;
     // file
     auto file = File("hi.d", "r"); 
     foreach (line; file.byLine) {
@@ -32,5 +32,16 @@ void main() {
     }
     dic["a"] = 2;
     dic["ab"] = 12;
+
+    file = File("hi.d", "r");
+    foreach (line; file.byLine) {
+        foreach (word; split(strip(line))) {
+            if (word in dic) continue;
+            ulong id = dic.length;
+            dic[line.idup] = id;
+        }
+    }
+
+
     writeln(dic);
 }
