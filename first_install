@@ -17,3 +17,22 @@ cp dotfiles/.tmux.conf ~/
 source .bashrc 
 xbindkeys
 tmux
+
+## new
+sudo apt install tint2
+#sudo apt install postgresql
+sudo apt install tree
+#sudo apt install gdc
+#sudo apt install chromium-browser
+#sudo apt install skype
+#sudo apt install python-pip
+#sudo apt install virtualenv
+#sudo apt install texlive texlive-lang-cyrillic 
+#sudo apt install geany
+sudo apt install sdcv
+#sudo apt install hping3 
+sudo apt install gnumeric
+sudo apt install feh 
+sudo apt install cpuid
+sudo apt install gtypist 
+sudo apt install vim-gnome
