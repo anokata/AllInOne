@@ -7,13 +7,16 @@ OUTDIR=/tmp/tomcatbuild
 SOURCEDIR=src/hello
 WEBINF=web/WEB-INF/web.xml
 
-default: prepare compile deploy
+default: prepare compile deploy tomcat_reload_app
 	@echo OK
 
 tomcat_restart:
 	export JAVA_HOME=$(dirname $(dirname $(dirname $(readlink -f $(which java)))))
 	$(CATALINA_HOME)/bin/daemon.sh stop
 	$(CATALINA_HOME)/bin/daemon.sh --tomcat-user $(whoami) start
+
+tomcat_reload_app:
+	curl --user tomcat:wa8va128 http://localhost:8080/manager/text/reload?path=/$(APP) > /dev/null 2>/dev/null
 
 makejar:
 	@echo TODO
