@@ -1,0 +1,171 @@
+<project name="Tomcat one project" default="compile" basedir=".">
+  <property file="build.properties"/>
+  <property file="${user.home}/build.properties"/>
+  <property name="app.name"      value="myapp"/>
+  <property name="app.path"      value="/${app.name}"/>
+  <property name="app.version"   value="0.1-dev"/>
+  <property name="build.home"    value="${basedir}/build"/>
+  <property name="catalina.home" value="/home/ksi/tomcat/tomcat8"/> <!-- UPDATE THIS! -->
+  <property name="dist.home"     value="${basedir}/dist"/>
+  <property name="docs.home"     value="${basedir}/docs"/>
+  <property name="manager.url"   value="http://localhost:8080/manager/text"/>
+  <property name="src.home"      value="${basedir}/src"/>
+  <property name="web.home"      value="${basedir}/web"/>
+
+  <path id="compile.classpath">
+      <fileset dir="${catalina.home}/bin">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${catalina.home}/lib"/>
+        <fileset dir="${catalina.home}/lib">
+          <include name="*.jar"/>
+      </fileset>
+
+      <fileset dir="${catalina.home}/lib">
+            <include name="catalina-ant.jar"/>
+            <include name="tomcat-util.jar"/>
+      </fileset>
+  </path>
+
+    <path id="catalina-ant-classpath">
+        <fileset dir="${catalina.home}/lib">
+            <include name="catalina-ant.jar"/>
+            <include name="tomcat-util.jar"/>
+        </fileset>
+    </path>
+
+<taskdef name="install" classname="org.apache.catalina.ant.DeployTask">
+    <classpath refid="catalina-ant-classpath"/>
+</taskdef>
+
+<taskdef resource="org/apache/catalina/ant/catalina.tasks"
+       classpathref="compile.classpath"/>
+
+  <property name="compile.debug"       value="true"/>
+  <property name="compile.deprecation" value="false"/>
+
+  <target name="all" depends="clean,compile"
+   description="Clean build and dist directories, then compile"/>
+
+  <target name="clean"
+   description="Delete old build and dist directories">
+    <delete dir="${build.home}"/>
+    <delete dir="${dist.home}"/>
+  </target>
+
+  <target name="compile" depends="prepare"
+   description="Compile Java sources">
+
+    <!-- Compile Java classes as necessary -->
+    <mkdir    dir="${build.home}/WEB-INF/classes"/>
+    <javac srcdir="${src.home}"
+          destdir="${build.home}/WEB-INF/classes"
+            debug="${compile.debug}"
+      deprecation="${compile.deprecation}">
+        <classpath refid="compile.classpath"/>
+    </javac>
+
+    <!-- Copy application resources -->
+    <copy  todir="${build.home}/WEB-INF/classes">
+      <fileset dir="${src.home}" excludes="**/*.java"/>
+    </copy>
+
+  </target>
+
+
+  <target name="dist" depends="compile,javadoc"
+   description="Create binary distribution">
+
+
+    <!-- Create application JAR file -->
+    <jar jarfile="${dist.home}/${app.name}-${app.version}.war"
+         basedir="${build.home}"/>
+
+    <!-- Copy additional files to ${dist.home} as necessary -->
+
+  </target>
+
+
+  <target name="install" depends="compile"
+   description="Install application to servlet container">
+
+    <deploy url="${manager.url}"
+       username="${manager.username}"
+       password="${manager.password}"
+           path="${app.path}"
+       war="${dist.home}/${app.name}-${app.version}.war"
+       />
+
+  </target>
+
+  <target name="javadoc" depends="compile"
+   description="Create Javadoc API documentation">
+
+    <mkdir          dir="${dist.home}/docs/api"/>
+    <javadoc sourcepath="${src.home}"
+                destdir="${dist.home}/docs/api"
+           packagenames="*">
+      <classpath refid="compile.classpath"/>
+    </javadoc>
+
+  </target>
+
+
+  <target name="list"
+   description="List installed applications on servlet container">
+
+    <list    url="${manager.url}"
+        username="${manager.username}"
+        password="${manager.password}"/>
+
+  </target>
+
+
+  <target name="prepare">
+
+    <!-- Create build directories as needed -->
+    <mkdir  dir="${build.home}"/>
+    <mkdir  dir="${build.home}/WEB-INF"/>
+    <mkdir  dir="${build.home}/WEB-INF/classes"/>
+
+
+    <!-- Copy static content of this web application -->
+    <copy todir="${build.home}">
+      <fileset dir="${web.home}"/>
+    </copy>
+
+    <!-- Copy external dependencies as required -->
+    <!-- *** CUSTOMIZE HERE AS REQUIRED BY YOUR APPLICATION *** -->
+    <mkdir  dir="${build.home}/WEB-INF/lib"/>
+<!--
+    <copy todir="${build.home}/WEB-INF/lib" file="${foo.jar}"/>
+-->
+
+    <!-- Copy static files from external dependencies as needed -->
+    <!-- *** CUSTOMIZE HERE AS REQUIRED BY YOUR APPLICATION *** -->
+
+  </target>
+
+
+  <target name="reload" depends="compile"
+   description="Reload application on servlet container">
+
+    <reload url="${manager.url}"
+       username="${manager.username}"
+       password="${manager.password}"
+           path="${app.path}"/>
+
+  </target>
+
+  <target name="remove"
+   description="Remove application on servlet container">
+
+    <undeploy url="${manager.url}"
+         username="${manager.username}"
+         password="${manager.password}"
+             path="${app.path}"/>
+
+  </target>
+
+
+</project>
