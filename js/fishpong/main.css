@@ -1,0 +1,20 @@
+div.cat {
+    height: 5rem;
+    width: 5rem;
+    background-image: url(../cat.jpg);
+    background-size: contain;
+}
+
+tr {
+    height: 5rem;
+}
+
+td {
+    background-color: #eee;
+    width: 5rem;
+    border: 1px solid #ddd;
+}
+
+table {
+    border-collapse: collapse;
+}
