@@ -5,6 +5,13 @@ div.cat {
     background-size: contain;
 }
 
+div.fish {
+    height: 3rem;
+    width: 3rem;
+    background-image: url(../fish.png);
+    background-size: contain;
+}
+
 tr {
     height: 5rem;
 }
