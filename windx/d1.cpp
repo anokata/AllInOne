@@ -1,25 +1,25 @@
-// include the basic windows header files and the Direct3D header file
+/* Подключение заголовочных файлов с описанимями базовых функций windows и Direct3D */
 #include <windows.h>
 #include <windowsx.h>
 #include <d3d9.h>
 
-// include the Direct3D Library file
+/* Подключение библиотеки Direct3D */
 #pragma comment (lib, "d3d9.lib")
 
-// global declarations
-LPDIRECT3D9 d3d;    // the pointer to our Direct3D interface
-LPDIRECT3DDEVICE9 d3ddev;    // the pointer to the device class
+/* Глобальные объявления */
+LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
+LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устройства
 
-// function prototypes
-void initD3D(HWND hWnd);    // sets up and initializes Direct3D
-void render_frame(void);    // renders a single frame
-void cleanD3D(void);    // closes Direct3D and releases memory
+/* Прототипы функций */
+void initD3D(HWND hWnd);    // Функция настроийки и инициализации Direct3D
+void render_frame(void);    // Функция отображения одного кадра
+void cleanD3D(void);    // Функция закрытия Direct3D и освобождения памяти
 
-// the WindowProc function prototype
+/* the WindowProc function prototype */
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
-// the entry point for any Windows program
+/* Входная точка для программ Windows */
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine,
@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     RegisterClassEx(&wc);
 
-    hWnd = CreateWindowEx(NULL,
+    hWnd = CreateWindowEx(0,
                           "WindowClass",
                           "Our First Direct3D Program",
                           WS_OVERLAPPEDWINDOW,
