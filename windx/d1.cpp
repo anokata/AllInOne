@@ -25,7 +25,7 @@ void initD3D(HWND hWnd);    // Функция настроийки и иници
 void render_frame(void);    // Функция отображения одного кадра
 void cleanD3D(void);    // Функция закрытия Direct3D и освобождения памяти
 
-/* the WindowProc function prototype */
+/* Прототип функции обработчика оконных сообщений */
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
@@ -48,7 +48,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wc.lpszClassName = "WindowClass";
 
     RegisterClassEx(&wc);
-
     hWnd = CreateWindowEx(0, "WindowClass", "Our First Direct3D Program",
                           WS_OVERLAPPEDWINDOW,
                           300, 300,
@@ -56,11 +55,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           NULL, NULL, hInstance, NULL);
 
     ShowWindow(hWnd, nCmdShow);
-
     initD3D(hWnd);
 
     MSG msg;
-    // enter the main loop:
+    // Главный цикл обработки сообщений и отрисовки
     while(TRUE) {
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
@@ -73,7 +71,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
         render_frame();
     }
 
-    // clean up DirectX and COM
     cleanD3D();
     return msg.wParam;
 }
@@ -92,22 +89,21 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 }
 
 
-/* this function initializes and prepares Direct3D for use */
+/* Функция настроийки и инициализации Direct3D */
 void initD3D(HWND hWnd) {
-    d3d = Direct3DCreate9(D3D_SDK_VERSION);    // create the Direct3D interface
+    d3d = Direct3DCreate9(D3D_SDK_VERSION);    // создание интерфейса D3D
 
-    D3DPRESENT_PARAMETERS d3dpp;    // create a struct to hold various device information
+    D3DPRESENT_PARAMETERS d3dpp;    // Создание структуры информции устройства
 
-    ZeroMemory(&d3dpp, sizeof(d3dpp));    // clear out the struct for use
-    d3dpp.Windowed = TRUE;    // program windowed, not fullscreen
-    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;    // discard old frames
-    d3dpp.hDeviceWindow = hWnd;    // set the window to be used by Direct3D
+    ZeroMemory(&d3dpp, sizeof(d3dpp));    // Очистка структуры перед использованием
+    d3dpp.Windowed = TRUE;    // Включение оконного режима
+    d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;    // Включение отбрасывания старых кадров
+    d3dpp.hDeviceWindow = hWnd;    // Установка окна которое будет использовано для Direct3D
 
     d3dpp.EnableAutoDepthStencil = TRUE;
     d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 
-
-    // create a device class using this information and the info from the d3dpp stuct
+    // Создать класс устройства используя информацию из структуры d3dpp
     d3d->CreateDevice(D3DADAPTER_DEFAULT,
                       D3DDEVTYPE_HAL,
                       hWnd,
@@ -115,26 +111,24 @@ void initD3D(HWND hWnd) {
                       &d3dpp,
                       &d3ddev);
 
-    d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // turn on the z-buffer
+    d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включить z-буффер
 }
 
 
-/* this is the function used to render a single frame */
+/* Функция отображения одного кадра */
 void render_frame(void) {
-    // clear the window to a deep blue
+    // Очистка экрана
     d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
     d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
-    d3ddev->BeginScene();    // begins the 3D scene
-    // do 3D rendering on the back buffer here
-    // 	
+    d3ddev->BeginScene();    // Начало 3D сцены
 
     LPD3DXMESH sphere;
     D3DXCreateSphere(d3ddev, 1.0f, 16, 16, &sphere, NULL);
     sphere->DrawSubset(0);
 
-    d3ddev->EndScene();    // ends the 3D scene
-    d3ddev->Present(NULL, NULL, NULL, NULL);   // displays the created frame on the screen
+    d3ddev->EndScene();    // Окончание 3D сцены 
+    d3ddev->Present(NULL, NULL, NULL, NULL);   // Отобразить созданный кадр на экране
 }
 
 
