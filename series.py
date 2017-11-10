@@ -1,7 +1,16 @@
 import math
 
+def a(n):
+    return 2*n - 1
+
+def b(n):
+    return 3*n*n*n + 2
+
 def s(n):
     return 1
+
+def l(n):
+    return math.log(n+1, 2)
 
 def sM2(n):
     return n
@@ -40,3 +49,19 @@ print(sum(xn,ss,1020))
 print(sum(xn,ss,10020))
 print(sum(xn,ss,100020))
 print(sum(xn,ss,1000020))
+
+print()
+print(sum(l,ss,100))
+print(sum(l,ss,1000))
+print(sum(l,ss,10000))
+print(sum(l,ss,100000))
+print()
+print(sum(l,fac,10))
+print(sum(l,fac,100))
+
+print()
+print(sum(a,b,100))
+print(sum(a,b,1000))
+print(sum(a,b,10000))
+print(sum(a,b,100000))
+print(sum(a,b,1000000))
