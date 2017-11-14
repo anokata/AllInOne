@@ -35,3 +35,17 @@ def d():
 #print(b())
 #print(c())
 print(d())
+
+def e():
+    a = (13.75 + 9 + 1/6) * 1.2
+    b = (10.3 - 8.5) * 5/9
+    x = a/b
+    print(a, b, x)
+    c = (6.8 - 3.6) * (5 + 5/6)
+    d = (3 + 2/3 - 3 - 1/6) * 56
+    y = c/d
+    print(c, d, y)
+    z = x + y - 27 - 1/6
+    return z
+
+print(e())
