@@ -4,21 +4,15 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <d3dx9shape.h>
-#include <dinput.h>
 /*
-http://www.cplusplus.com/forum/windows/108166/
+ *http://www.cplusplus.com/forum/windows/108166/
 http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
 https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
-   +sphere
-   +texture
-   +animation rotate
-   lightning
-   material
+ * sphere
+   texture
+   animation rotate
    input move
    sattelite
-   rings
-   starts box
-https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 */
 
 #define SCREEN_WIDTH 800
@@ -26,14 +20,12 @@ https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 /* Подключение библиотеки Direct3D */
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
-#pragma comment (lib, "dinput.lib")
 
 /* Глобальные объявления */
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
 LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устройства
 LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
 LPDIRECT3DTEXTURE9 t;
-LPDIRECTINPUT dinput;
 
 /* Прототипы функций */
 void initD3D(HWND hWnd);    // Функция настроийки и инициализации Direct3D
@@ -76,7 +68,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     ShowWindow(hWnd, nCmdShow);
     initD3D(hWnd);
-    //DirectInputCreate(hInstance, DIRECTINPUT_VERSION, &dinput, NULL);
 
     MSG msg;
     // Главный цикл обработки сообщений и отрисовки
@@ -174,7 +165,7 @@ void init_graphics(void)
 /* Функция отображения одного кадра */
 void render_frame(void) {
     // Очистка экрана
-    d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+    d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
     d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
     d3ddev->BeginScene();    // Начало 3D сцены
@@ -184,7 +175,7 @@ void render_frame(void) {
         
         // SET UP THE PIPELINE
         D3DXMATRIX matRotateY;    // a matrix to store the rotation information
-        static float index = 0.0f; index+=0.02f;    // an ever-increasing float value
+        static float index = 0.0f; index+=0.05f;    // an ever-increasing float value
         // build a matrix to rotate the model based on the increasing float value
         D3DXMatrixRotationY(&matRotateY, index);
         // tell Direct3D about our matrix
