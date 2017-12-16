@@ -34,6 +34,7 @@ LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устрой�
 LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
 LPDIRECT3DTEXTURE9 saturnTexture;
 LPDIRECT3DTEXTURE9 titanTexture;
+LPDIRECT3DTEXTURE9 ringsTexture;
 LPDIRECTINPUT dinput;
 
 /* Прототипы функций */
@@ -43,8 +44,8 @@ void cleanD3D(void);    // Функция закрытия Direct3D и осво�
 void init_graphics(void);
 LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks);
 
-struct CUSTOMVERTEX {FLOAT X, Y, Z; DWORD COLOR;};
-#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE)
+struct CUSTOMVERTEX {FLOAT X, Y, Z; FLOAT nx, ny, nz; FLOAT tu, tv; DWORD COLOR; };
+#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1 | D3DFVF_DIFFUSE )
 
 /* Прототип функции обработчика оконных сообщений */
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -144,7 +145,7 @@ void initD3D(HWND hWnd) {
 void init_graphics(void)
 {
     // create a vertex buffer interface called v_buffer
-    d3ddev->CreateVertexBuffer(3*sizeof(CUSTOMVERTEX),
+    d3ddev->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX),
                                0,
                                CUSTOMFVF,
                                D3DPOOL_MANAGED,
@@ -152,25 +153,26 @@ void init_graphics(void)
                                NULL);
 
     // create the vertices using the CUSTOMVERTEX struct
-    /*
     CUSTOMVERTEX vertices[] = 
     {
-        { 3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(0, 0, 255), },
-        { 0.0f, 3.0f, 0.0f, D3DCOLOR_XRGB(0, 255, 0), },
-        { -3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), },
-    };
+        { -3.0f, 3.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, },
+        { 3.0f, 3.0f, 0.0f,   0.0f, 0.0f, -1.0f, 0.0f, 1.0f, },
+        { -3.0f, -3.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, },
+        { 3.0f, -3.0f, 0.0f,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, },
+    }; 
 
     VOID* pVoid;    // a void pointer
-
     // lock v_buffer and load the vertices into it
     v_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vertices, sizeof(vertices));
     v_buffer->Unlock();
-    */
 
     // texture
     D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &saturnTexture);
     D3DXCreateTextureFromFile(d3ddev, "./titan.jpg", &titanTexture);
+    D3DXCreateTextureFromFile(d3ddev, "./rings0.png", &ringsTexture);
+
+    d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
 
 /* Функция отображения одного кадра */
@@ -208,20 +210,24 @@ void render_frame(void) {
                                    100.0f);    // the far view-plane
         d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
 
-
-        // select the vertex buffer to display
-        //d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
-
         d3ddev->SetTexture(0, saturnTexture);
         d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
         d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 
-        // copy the vertex buffer to the back buffer
-        //d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
     LPD3DXMESH sphere;
     sphere = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
     sphere->DrawSubset(0);
+
+    // select the vertex buffer to display
+    d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+    // copy the vertex buffer to the back buffer
+    d3ddev->SetTexture(0, ringsTexture);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+    //d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+
 
     D3DXMATRIX matTranslate;
     D3DXMATRIX matRotateX;
