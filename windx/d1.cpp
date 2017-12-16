@@ -32,7 +32,8 @@ https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
 LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устройства
 LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
-LPDIRECT3DTEXTURE9 t;
+LPDIRECT3DTEXTURE9 saturnTexture;
+LPDIRECT3DTEXTURE9 titanTexture;
 LPDIRECTINPUT dinput;
 
 /* Прототипы функций */
@@ -168,7 +169,8 @@ void init_graphics(void)
     */
 
     // texture
-    D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &t);
+    D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &saturnTexture);
+    D3DXCreateTextureFromFile(d3ddev, "./titan.jpg", &titanTexture);
 }
 
 /* Функция отображения одного кадра */
@@ -208,9 +210,9 @@ void render_frame(void) {
 
 
         // select the vertex buffer to display
-        d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+        //d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
 
-        d3ddev->SetTexture(0, t);
+        d3ddev->SetTexture(0, saturnTexture);
         d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
         d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 
@@ -220,6 +222,23 @@ void render_frame(void) {
     LPD3DXMESH sphere;
     sphere = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
     sphere->DrawSubset(0);
+
+    D3DXMATRIX matTranslate;
+    D3DXMATRIX matRotateX;
+
+    D3DXMatrixTranslation(&matTranslate, 4.0f, 0.0f, 0.0f);
+    D3DXMatrixRotationY(&matRotateX, index * 2);
+
+    D3DXMATRIX xy = matRotateY * matTranslate * matRotateX;
+    d3ddev->SetTransform(D3DTS_WORLD, &xy);
+
+    d3ddev->SetTexture(0, titanTexture);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+
+    LPD3DXMESH titan;
+    titan = CreateMappedSphere(d3ddev, 0.3f, 32, 32);
+    titan->DrawSubset(0);
 
     d3ddev->EndScene();    // Окончание 3D сцены 
     d3ddev->Present(NULL, NULL, NULL, NULL);   // Отобразить созданный кадр на экране
