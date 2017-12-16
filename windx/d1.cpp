@@ -5,6 +5,7 @@
 #include <d3dx9.h>
 #include <d3dx9shape.h>
 #include <dinput.h>
+#include <dinputd.h>
 /*
 http://www.cplusplus.com/forum/windows/108166/
 http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
@@ -12,12 +13,12 @@ https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
    +sphere
    +texture
    +animation rotate
-   lightning
-   material
-   input move
    +sattelite
    +rings
-   starts box
+   ?starts box
+   lightning
+   material
+   !input move
 https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 */
 
@@ -27,6 +28,7 @@ https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
 #pragma comment (lib, "dinput.lib")
+#pragma comment (lib, "dxguid.lib")
 
 /* Глобальные объявления */
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
@@ -35,6 +37,7 @@ LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
 LPDIRECT3DTEXTURE9 saturnTexture;
 LPDIRECT3DTEXTURE9 titanTexture;
 LPDIRECT3DTEXTURE9 ringsTexture;
+LPDIRECT3DTEXTURE9 skyTexture;
 LPDIRECTINPUT dinput;
 
 D3DXMATRIX matRotateY;    // a matrix to store the rotation information
@@ -85,6 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     ShowWindow(hWnd, nCmdShow);
     initD3D(hWnd);
     //DirectInputCreate(hInstance, DIRECTINPUT_VERSION, &dinput, NULL);
+    //DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, NULL);
 
     MSG msg;
     // Главный цикл обработки сообщений и отрисовки
@@ -182,6 +186,7 @@ void init_graphics(void)
     D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &saturnTexture);
     D3DXCreateTextureFromFile(d3ddev, "./titan.jpg", &titanTexture);
     D3DXCreateTextureFromFile(d3ddev, "./rings1.png", &ringsTexture);
+    D3DXCreateTextureFromFile(d3ddev, "./skys.jpg", &skyTexture);
 
     d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
@@ -199,9 +204,23 @@ void drawRing() {
     d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 }
 
+void drawSky() {
+    D3DXMatrixTranslation(&matTranslate, 0.0f, 0.0f, 0.0f);
+    d3ddev->SetTransform(D3DTS_WORLD, &matTranslate);
+
+    d3ddev->SetTexture(0, skyTexture);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+
+    LPD3DXMESH sky;
+    sky = CreateMappedSphere(d3ddev, 80.0f, 32, 32);
+    sky->DrawSubset(0);
+}
+
+
 void drawTitan() {
     D3DXMatrixTranslation(&matTranslate, 4.0f, 0.0f, 0.0f);
-    D3DXMatrixRotationY(&matRotateX, rotation * 2);
+    D3DXMatrixRotationY(&matRotateX, rotation * 1.4f);
 
     D3DXMATRIX xy = matRotateY * matTranslate * matRotateX;
     d3ddev->SetTransform(D3DTS_WORLD, &xy);
@@ -215,11 +234,7 @@ void drawTitan() {
     titan->DrawSubset(0);
 }
 
-void drawSaturn() {
-    // build a matrix to rotate the model based on the increasing float value
-    D3DXMatrixRotationY(&matRotateY, rotation);
-    // tell Direct3D about our matrix
-    d3ddev->SetTransform(D3DTS_WORLD, &matRotateY);
+void viewTransform() {
     D3DXMATRIX matView;    // the view transform matrix
     D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // the camera position
     D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // the look-at position
@@ -229,13 +244,22 @@ void drawSaturn() {
                        &lookAt,
                        &upDir);
     d3ddev->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView
+
     D3DXMATRIX matProjection;     // the projection transform matrix
     D3DXMatrixPerspectiveFovLH(&matProjection,
                                D3DXToRadian(45),    // the horizontal field of view
                                (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // aspect ratio
                                1.0f,    // the near view-plane
                                100.0f);    // the far view-plane
+
     d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
+}
+
+void drawSaturn() {
+    // build a matrix to rotate the model based on the increasing float value
+    D3DXMatrixRotationY(&matRotateY, rotation);
+    // tell Direct3D about our matrix
+    d3ddev->SetTransform(D3DTS_WORLD, &matRotateY);
 
     d3ddev->SetTexture(0, saturnTexture);
     d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -259,6 +283,9 @@ void render_frame(void) {
     
     rotation+=0.02f;    // an ever-increasing float value
 
+    viewTransform();
+
+    drawSky();
     drawSaturn();
     drawTitan(); 
     drawRing();
