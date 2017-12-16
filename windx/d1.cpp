@@ -31,8 +31,8 @@ void render_frame(void);    // Функция отображения одног�
 void cleanD3D(void);    // Функция закрытия Direct3D и освобождения памяти
 void init_graphics(void);
 
-struct CUSTOMVERTEX {FLOAT X, Y, Z, RHW; DWORD COLOR;};
-#define CUSTOMFVF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
+struct CUSTOMVERTEX {FLOAT X, Y, Z; DWORD COLOR;};
+#define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE)
 
 /* Прототип функции обработчика оконных сообщений */
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -125,7 +125,7 @@ void initD3D(HWND hWnd) {
 
     //d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включить z-буффер
     init_graphics();
-    //d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);    // turn off the 3D lighting
+    d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);    // turn off the 3D lighting
 }
 
 void init_graphics(void)
@@ -133,9 +133,9 @@ void init_graphics(void)
     // create the vertices using the CUSTOMVERTEX struct
     CUSTOMVERTEX vertices[] = 
     {
-        { 400.0f, 62.5f, 0.5f, 1.0f, D3DCOLOR_XRGB(0, 0, 255), },
-        { 650.0f, 500.0f, 0.5f, 1.0f, D3DCOLOR_XRGB(0, 255, 0), },
-        { 150.0f, 500.0f, 0.5f, 1.0f, D3DCOLOR_XRGB(255, 0, 0), },
+        { 3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(0, 0, 255), },
+        { 0.0f, 3.0f, 0.0f, D3DCOLOR_XRGB(0, 255, 0), },
+        { -3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), },
     };
 
     // create a vertex buffer interface called v_buffer
@@ -165,14 +165,40 @@ void render_frame(void) {
 
         // select which vertex format we are using
         d3ddev->SetFVF(CUSTOMFVF);
+        
+        // SET UP THE PIPELINE
+        D3DXMATRIX matRotateY;    // a matrix to store the rotation information
+        static float index = 0.0f; index+=0.05f;    // an ever-increasing float value
+        // build a matrix to rotate the model based on the increasing float value
+        D3DXMatrixRotationY(&matRotateY, index);
+        // tell Direct3D about our matrix
+        d3ddev->SetTransform(D3DTS_WORLD, &matRotateY);
+        D3DXMATRIX matView;    // the view transform matrix
+        D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // the camera position
+        D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // the look-at position
+        D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // the up direction
+        D3DXMatrixLookAtLH(&matView,
+                           &camPos,
+                           &lookAt,
+                           &upDir);
+        d3ddev->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView
+        D3DXMATRIX matProjection;     // the projection transform matrix
+        D3DXMatrixPerspectiveFovLH(&matProjection,
+                                   D3DXToRadian(45),    // the horizontal field of view
+                                   (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // aspect ratio
+                                   1.0f,    // the near view-plane
+                                   100.0f);    // the far view-plane
+        d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
+
+
         // select the vertex buffer to display
         d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
         // copy the vertex buffer to the back buffer
         d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
-    //LPD3DXMESH sphere;
-    //D3DXCreateSphere(d3ddev, 1.0f, 16, 16, &sphere, NULL);
-    //sphere->DrawSubset(0);
+    LPD3DXMESH sphere;
+    D3DXCreateSphere(d3ddev, 1.0f, 16, 16, &sphere, NULL);
+    sphere->DrawSubset(0);
 
     d3ddev->EndScene();    // Окончание 3D сцены 
     d3ddev->Present(NULL, NULL, NULL, NULL);   // Отобразить созданный кадр на экране
