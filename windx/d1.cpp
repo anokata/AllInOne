@@ -15,8 +15,8 @@ https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
    lightning
    material
    input move
-   sattelite
-   rings
+   +sattelite
+   +rings
    starts box
 https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 */
@@ -36,6 +36,12 @@ LPDIRECT3DTEXTURE9 saturnTexture;
 LPDIRECT3DTEXTURE9 titanTexture;
 LPDIRECT3DTEXTURE9 ringsTexture;
 LPDIRECTINPUT dinput;
+
+D3DXMATRIX matRotateY;    // a matrix to store the rotation information
+D3DXMATRIX matTranslate;
+D3DXMATRIX matRotateX;
+float rotation = 0.0f; 
+
 
 /* Прототипы функций */
 void initD3D(HWND hWnd);    // Функция настроийки и инициализации Direct3D
@@ -140,6 +146,11 @@ void initD3D(HWND hWnd) {
     init_graphics();
     d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);    // turn off the 3D lighting
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включить z-буффер
+
+    d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    d3ddev->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+    d3ddev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    d3ddev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 void init_graphics(void)
@@ -170,70 +181,27 @@ void init_graphics(void)
     // texture
     D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &saturnTexture);
     D3DXCreateTextureFromFile(d3ddev, "./titan.jpg", &titanTexture);
-    D3DXCreateTextureFromFile(d3ddev, "./rings0.png", &ringsTexture);
+    D3DXCreateTextureFromFile(d3ddev, "./rings1.png", &ringsTexture);
 
     d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
 
-/* Функция отображения одного кадра */
-void render_frame(void) {
-    // Очистка экрана
-    d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-    d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-
-    d3ddev->BeginScene();    // Начало 3D сцены
-
-        // select which vertex format we are using
-        d3ddev->SetFVF(CUSTOMFVF);
-        
-        // SET UP THE PIPELINE
-        D3DXMATRIX matRotateY;    // a matrix to store the rotation information
-        static float index = 0.0f; index+=0.02f;    // an ever-increasing float value
-        // build a matrix to rotate the model based on the increasing float value
-        D3DXMatrixRotationY(&matRotateY, index);
-        // tell Direct3D about our matrix
-        d3ddev->SetTransform(D3DTS_WORLD, &matRotateY);
-        D3DXMATRIX matView;    // the view transform matrix
-        D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // the camera position
-        D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // the look-at position
-        D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // the up direction
-        D3DXMatrixLookAtLH(&matView,
-                           &camPos,
-                           &lookAt,
-                           &upDir);
-        d3ddev->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView
-        D3DXMATRIX matProjection;     // the projection transform matrix
-        D3DXMatrixPerspectiveFovLH(&matProjection,
-                                   D3DXToRadian(45),    // the horizontal field of view
-                                   (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // aspect ratio
-                                   1.0f,    // the near view-plane
-                                   100.0f);    // the far view-plane
-        d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
-
-        d3ddev->SetTexture(0, saturnTexture);
-        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-
-
-    LPD3DXMESH sphere;
-    sphere = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
-    sphere->DrawSubset(0);
-
+void drawRing() {
+    D3DXMatrixRotationX(&matRotateX, 3.14159265358f/2-0.1);
+    d3ddev->SetTransform(D3DTS_WORLD, &matRotateX);
     // select the vertex buffer to display
     d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+
     // copy the vertex buffer to the back buffer
     d3ddev->SetTexture(0, ringsTexture);
     d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
     d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-    //d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+}
 
-
-    D3DXMATRIX matTranslate;
-    D3DXMATRIX matRotateX;
-
+void drawTitan() {
     D3DXMatrixTranslation(&matTranslate, 4.0f, 0.0f, 0.0f);
-    D3DXMatrixRotationY(&matRotateX, index * 2);
+    D3DXMatrixRotationY(&matRotateX, rotation * 2);
 
     D3DXMATRIX xy = matRotateY * matTranslate * matRotateX;
     d3ddev->SetTransform(D3DTS_WORLD, &xy);
@@ -245,6 +213,55 @@ void render_frame(void) {
     LPD3DXMESH titan;
     titan = CreateMappedSphere(d3ddev, 0.3f, 32, 32);
     titan->DrawSubset(0);
+}
+
+void drawSaturn() {
+    // build a matrix to rotate the model based on the increasing float value
+    D3DXMatrixRotationY(&matRotateY, rotation);
+    // tell Direct3D about our matrix
+    d3ddev->SetTransform(D3DTS_WORLD, &matRotateY);
+    D3DXMATRIX matView;    // the view transform matrix
+    D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // the camera position
+    D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // the look-at position
+    D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // the up direction
+    D3DXMatrixLookAtLH(&matView,
+                       &camPos,
+                       &lookAt,
+                       &upDir);
+    d3ddev->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView
+    D3DXMATRIX matProjection;     // the projection transform matrix
+    D3DXMatrixPerspectiveFovLH(&matProjection,
+                               D3DXToRadian(45),    // the horizontal field of view
+                               (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // aspect ratio
+                               1.0f,    // the near view-plane
+                               100.0f);    // the far view-plane
+    d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
+
+    d3ddev->SetTexture(0, saturnTexture);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+
+    LPD3DXMESH sphere;
+    sphere = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
+    sphere->DrawSubset(0);
+}
+
+/* Функция отображения одного кадра */
+void render_frame(void) {
+    // Очистка экрана
+    d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+    d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+
+    d3ddev->BeginScene();    // Начало 3D сцены
+
+    // select which vertex format we are using
+    d3ddev->SetFVF(CUSTOMFVF);
+    
+    rotation+=0.02f;    // an ever-increasing float value
+
+    drawSaturn();
+    drawTitan(); 
+    drawRing();
 
     d3ddev->EndScene();    // Окончание 3D сцены 
     d3ddev->Present(NULL, NULL, NULL, NULL);   // Отобразить созданный кадр на экране
