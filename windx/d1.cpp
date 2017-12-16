@@ -15,8 +15,8 @@ https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
    sattelite
 */
 
-#define SCREEN_WIDTH 400
-#define SCREEN_HEIGHT 300
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 /* Подключение библиотеки Direct3D */
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
@@ -32,6 +32,7 @@ void initD3D(HWND hWnd);    // Функция настроийки и иници
 void render_frame(void);    // Функция отображения одного кадра
 void cleanD3D(void);    // Функция закрытия Direct3D и освобождения памяти
 void init_graphics(void);
+LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks);
 
 struct CUSTOMVERTEX {FLOAT X, Y, Z; DWORD COLOR;};
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_DIFFUSE)
@@ -132,14 +133,6 @@ void initD3D(HWND hWnd) {
 
 void init_graphics(void)
 {
-    // create the vertices using the CUSTOMVERTEX struct
-    CUSTOMVERTEX vertices[] = 
-    {
-        { 3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(0, 0, 255), },
-        { 0.0f, 3.0f, 0.0f, D3DCOLOR_XRGB(0, 255, 0), },
-        { -3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), },
-    };
-
     // create a vertex buffer interface called v_buffer
     d3ddev->CreateVertexBuffer(3*sizeof(CUSTOMVERTEX),
                                0,
@@ -148,12 +141,22 @@ void init_graphics(void)
                                &v_buffer,
                                NULL);
 
+    // create the vertices using the CUSTOMVERTEX struct
+    /*
+    CUSTOMVERTEX vertices[] = 
+    {
+        { 3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(0, 0, 255), },
+        { 0.0f, 3.0f, 0.0f, D3DCOLOR_XRGB(0, 255, 0), },
+        { -3.0f, -3.0f, 0.0f, D3DCOLOR_XRGB(255, 0, 0), },
+    };
+
     VOID* pVoid;    // a void pointer
 
     // lock v_buffer and load the vertices into it
     v_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vertices, sizeof(vertices));
     v_buffer->Unlock();
+    */
 
     // texture
     D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &t);
@@ -203,10 +206,10 @@ void render_frame(void) {
         d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 
         // copy the vertex buffer to the back buffer
-        d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+        //d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
     LPD3DXMESH sphere;
-    D3DXCreateSphere(d3ddev, 1.0f, 16, 16, &sphere, NULL);
+    sphere = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
     sphere->DrawSubset(0);
 
     d3ddev->EndScene();    // Окончание 3D сцены 
@@ -219,4 +222,48 @@ void cleanD3D(void) {
     v_buffer->Release();    // close and release the vertex buffer
     d3ddev->Release();    // Закрыть 3D устройство
     d3d->Release();    // Закрыть Direct3D
+}
+
+typedef struct {
+    D3DXVECTOR3 pos;     // vertex position
+    D3DXVECTOR3 norm;    // vertex normal
+    float tu;            // texture coordinates
+    float tv;
+} *LPVERTEX;
+
+#define FVF_VERTEX    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1
+
+LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks) {
+    // create the sphere
+    LPD3DXMESH mesh;
+    if (FAILED(D3DXCreateSphere(pDev,fRad,slices,stacks,&mesh,NULL))) return NULL;
+    // create a copy of the mesh with texture coordinates,
+    // since the D3DX function doesn't include them
+    LPD3DXMESH texMesh;
+    if (FAILED(mesh->CloneMeshFVF(D3DXMESH_SYSTEMMEM,FVF_VERTEX,pDev,&texMesh))) return mesh;
+    // finished with the original mesh, release it
+    mesh->Release();
+
+    // lock the vertex buffer
+    LPVERTEX pVerts;
+    if (SUCCEEDED(texMesh->LockVertexBuffer(0,(void **) &pVerts))) {
+
+        // get vertex count
+        int numVerts=texMesh->GetNumVertices();
+
+        // loop through the vertices
+        for (int i=0;i<numVerts;i++) {
+            // calculate texture coordinates
+            pVerts->tu=asinf(pVerts->norm.x)/D3DX_PI+0.5f;
+            pVerts->tv=asinf(pVerts->norm.y)/D3DX_PI+0.5f;
+            // go to next vertex
+            pVerts++;
+        }
+
+        // unlock the vertex buffer
+        texMesh->UnlockVertexBuffer();
+    }
+    
+    // return pointer to caller
+    return texMesh;
 }
