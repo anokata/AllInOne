@@ -112,8 +112,8 @@ void initD3D(HWND hWnd) {
     d3dpp.BackBufferWidth = SCREEN_WIDTH;
     d3dpp.BackBufferHeight = SCREEN_HEIGHT;
 
-    //d3dpp.EnableAutoDepthStencil = TRUE;
-    //d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+    d3dpp.EnableAutoDepthStencil = TRUE;
+    d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 
     // Создать класс устройства используя информацию из структуры d3dpp
     d3d->CreateDevice(D3DADAPTER_DEFAULT,
@@ -123,9 +123,9 @@ void initD3D(HWND hWnd) {
                       &d3dpp,
                       &d3ddev);
 
-    //d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включить z-буффер
     init_graphics();
     d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);    // turn off the 3D lighting
+    d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включить z-буффер
 }
 
 void init_graphics(void)
@@ -158,8 +158,7 @@ void init_graphics(void)
 void render_frame(void) {
     // Очистка экрана
     d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 40, 100), 1.0f, 0);
-    //d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-    //d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+    d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
     d3ddev->BeginScene();    // Начало 3D сцены
 
