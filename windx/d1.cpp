@@ -7,6 +7,7 @@
 /*
  *http://www.cplusplus.com/forum/windows/108166/
 http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
+https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
  * sphere
    texture
    animation rotate
@@ -24,6 +25,7 @@ http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
 LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устройства
 LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
+LPDIRECT3DTEXTURE9 t;
 
 /* Прототипы функций */
 void initD3D(HWND hWnd);    // Функция настроийки и инициализации Direct3D
@@ -152,6 +154,9 @@ void init_graphics(void)
     v_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vertices, sizeof(vertices));
     v_buffer->Unlock();
+
+    // texture
+    D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &t);
 }
 
 /* Функция отображения одного кадра */
@@ -192,6 +197,11 @@ void render_frame(void) {
 
         // select the vertex buffer to display
         d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+
+        d3ddev->SetTexture(0, t);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+
         // copy the vertex buffer to the back buffer
         d3ddev->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
