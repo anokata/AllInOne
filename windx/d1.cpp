@@ -7,6 +7,7 @@
 #include <dinput.h>
 #include <dinputd.h>
 /*
+ !https://www.ixbt.com/video/3dterms.html
 http://www.cplusplus.com/forum/windows/108166/
 http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
 https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
@@ -48,20 +49,20 @@ float rotation = 0.0f;    // Угол вращения планеты в рад�
 
 
 /* Прототипы функций */
-void initD3D(HWND hWnd);    // Функция настроийки и инициализации Direct3D
-void render_frame(void);    // Функция отображения одного кадра
-void cleanD3D(void);    // Функция закрытия Direct3D и освобождения памяти
-void init_graphics(void); // Функция инициализации графических объектов
-void viewTransform(); // Трансформация матрицы представления и проекции
-void drawSky(); // Функция отображения заднего фона
-void drawRing(); // Функция отображения колец
-void drawTitan(); // Функция отображения Титана
-void drawSaturn(); // Функция отображения Сатурна
+void initD3D(HWND hWnd);    /* Функция настроийки и инициализации Direct3D */
+void render_frame(void);    /* Функция отображения одного кадра */
+void cleanD3D(void);    /* Функция закрытия Direct3D и освобождения памяти */
+void init_graphics(void); /* Функция инициализации графических объектов */
+void viewTransform(); /* Трансформация матрицы представления и проекции */
+void drawSky(); /* Функция отображения заднего фона */
+void drawRing(); /* Функция отображения колец */
+void drawTitan(); /* Функция отображения Титана */
+void drawSaturn(); /* Функция отображения Сатурна */
 
-// Функция создания модели сферы с текстурными координатами 
+/* Функция создания модели сферы с текстурными координатами  */
 LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks);
 
-// Структура формата вершин
+/* Структура формата вершин */
 struct CUSTOMVERTEX {FLOAT X, Y, Z; FLOAT nx, ny, nz; FLOAT tu, tv; DWORD COLOR; };
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1 | D3DFVF_DIFFUSE )
 
@@ -82,11 +83,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine,
                    int nCmdShow) {
-    HWND hWnd;
-    WNDCLASSEX wc;
+    HWND hWnd; // Главное окно
+    WNDCLASSEX wc; // Структура класса окна
 
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+    ZeroMemory(&wc, sizeof(WNDCLASSEX)); // Инициализация структуры нулями
 
+    /* Установка параметров класса окна */
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = WindowProc;
@@ -95,32 +97,39 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wc.lpszClassName = "WindowClass";
 
-    RegisterClassEx(&wc);
+    RegisterClassEx(&wc); // Реристрация класса окна
+    /* Создание главного окна приложения по зарегестрированному классу */
     hWnd = CreateWindowEx(0, "WindowClass", "Our First Direct3D Program",
                           WS_OVERLAPPEDWINDOW,
                           300, 300,
                           800, 600,
                           NULL, NULL, hInstance, NULL);
 
+    // Отображение окна
     ShowWindow(hWnd, nCmdShow);
     initD3D(hWnd);
     //DirectInputCreate(hInstance, DIRECTINPUT_VERSION, &dinput, NULL);
     //DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, NULL);
 
-    MSG msg;
+    MSG msg; // Сообщение
     // Главный цикл обработки сообщений и отрисовки
     while(TRUE) {
+        /* Стандартный конвейр получения и обработки сообщений */
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
+        // Окончание обработки при получении сообщения завершения работы.
         if(msg.message == WM_QUIT)
             break;
+        // TODO win keys?
 
+        /* Отображение одного кадра */
         render_frame();
     }
 
+    // Освобождение ресурсов
     cleanD3D();
     return msg.wParam;
 }
@@ -151,6 +160,7 @@ void initD3D(HWND hWnd) {
     d3dpp.Windowed = TRUE;    // Включение оконного режима
     d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;    // Включение отбрасывания старых кадров
     d3dpp.hDeviceWindow = hWnd;    // Установка окна которое будет использовано для Direct3D
+    /* Настройка формата вторичного буфера */
     d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
     d3dpp.BackBufferWidth = SCREEN_WIDTH;
     d3dpp.BackBufferHeight = SCREEN_HEIGHT;
@@ -214,20 +224,24 @@ void init_graphics(void)
 }
 
 void drawRing() {
+    // Построение матрицы поворота по оси X
     D3DXMatrixRotationX(&matRotateX, 3.14159265358f/2-0.1);
+    /* Применение полученной матрицы */
     d3ddev->SetTransform(D3DTS_WORLD, &matRotateX);
-    // select the vertex buffer to display
+    // Выбор буфера вершин для отображения
     d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
 
-    // copy the vertex buffer to the back buffer
     d3ddev->SetTexture(0, ringsTexture);
     d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    // Копирование буфера вершин во вторичный буфер
     d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 }
 
 void drawSky() {
+    // Построение матрицы переноса в начало координат
     D3DXMatrixTranslation(&matTranslate, 0.0f, 0.0f, 0.0f);
+    /* Применение полученной матрицы */
     d3ddev->SetTransform(D3DTS_WORLD, &matTranslate);
 
     d3ddev->SetTexture(0, skyTexture);
@@ -241,12 +255,17 @@ void drawSky() {
 
 
 void drawTitan() {
+    // Построение матрицы переноса на 4 единицы по оси X
     D3DXMatrixTranslation(&matTranslate, 4.0f, 0.0f, 0.0f);
+    // Построение матрицы поворота основанное на текущем значении поворота
     D3DXMatrixRotationY(&matRotateX, rotation * 1.4f);
 
+    /* Перемножение матриц */
     D3DXMATRIX xy = matRotateY * matTranslate * matRotateX;
+    /* Применение полученной матрицы */
     d3ddev->SetTransform(D3DTS_WORLD, &xy);
 
+    /* Выбор и настройка текстуры */ // TODO refactor
     d3ddev->SetTexture(0, titanTexture);
     d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
@@ -257,36 +276,35 @@ void drawTitan() {
 }
 
 void viewTransform() {
-    D3DXMATRIX matView;    // the view transform matrix
-    D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // the camera position
-    D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // the look-at position
-    D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // the up direction
-    D3DXMatrixLookAtLH(&matView,
-                       &camPos,
-                       &lookAt,
-                       &upDir);
-    d3ddev->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView
+    D3DXMATRIX matView;    // Матрица транформации представления
+    D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // Позиция камеры
+    D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // Точка направления взгляда
+    D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // Направление "вверх"
+    D3DXMatrixLookAtLH(&matView, &camPos, &lookAt, &upDir);
+    d3ddev->SetTransform(D3DTS_VIEW, &matView);    // Применение матрицы трансформации представления
 
-    D3DXMATRIX matProjection;     // the projection transform matrix
+    D3DXMATRIX matProjection;     // Матрица трансформации проекции
     D3DXMatrixPerspectiveFovLH(&matProjection,
-                               D3DXToRadian(45),    // the horizontal field of view
-                               (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // aspect ratio
-                               1.0f,    // the near view-plane
-                               100.0f);    // the far view-plane
+                               D3DXToRadian(45),    // Угол поля обзора
+                               (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // Соотношение сторон экрана
+                               1.0f,    // Ближняя плоскость отсечения
+                               100.0f);    // Дальняя плоскость отсечения 
 
-    d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
+    d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // Применение трансформации проекции
 }
 
 void drawSaturn() {
-    // build a matrix to rotate the model based on the increasing float value
+    // Построение матрицы поворота основанное на текущем значении поворота
     D3DXMatrixRotationY(&matRotateY, rotation);
-    // tell Direct3D about our matrix
+    /* Применение полученной матрицы */
     d3ddev->SetTransform(D3DTS_WORLD, &matRotateY);
 
+    /* Выбор и настройка текстуры */
     d3ddev->SetTexture(0, saturnTexture);
     d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 
+    /* Создание сферы */
     LPD3DXMESH sphere;
     sphere = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
     sphere->DrawSubset(0);
@@ -294,26 +312,27 @@ void drawSaturn() {
 
 /* Функция отображения одного кадра */
 void render_frame(void) {
-    // Очистка экрана
+    /* Очистка экрана и буфера глубины */
     d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
     d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
     d3ddev->BeginScene();    // Начало 3D сцены
 
-    // select which vertex format we are using
+    // Выбор формата вершин
     d3ddev->SetFVF(CUSTOMFVF);
     
-    rotation+=0.02f;    // an ever-increasing float value
+    rotation+=0.02f;    // Увеличение угла поворота
 
-    viewTransform();
+    viewTransform(); // Трансформация матрицы представления и проекции
 
+    /* Отображение объектов */
     drawSky();
     drawSaturn();
     drawTitan(); 
     drawRing();
 
     d3ddev->EndScene();    // Окончание 3D сцены 
-    d3ddev->Present(NULL, NULL, NULL, NULL);   // Отобразить созданный кадр на экране
+    d3ddev->Present(NULL, NULL, NULL, NULL);   // Отображение созданного кадра на экране
 }
 
 
