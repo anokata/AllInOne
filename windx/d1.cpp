@@ -22,6 +22,7 @@ https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
 https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 */
 
+/* Разрешение окна по ширине и высоте */
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 /* Подключение библиотеки Direct3D */
@@ -34,27 +35,43 @@ https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
 LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устройства
 LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
-LPDIRECT3DTEXTURE9 saturnTexture;
-LPDIRECT3DTEXTURE9 titanTexture;
-LPDIRECT3DTEXTURE9 ringsTexture;
-LPDIRECT3DTEXTURE9 skyTexture;
+LPDIRECT3DTEXTURE9 saturnTexture; // Указатель на текстуру Сатурна
+LPDIRECT3DTEXTURE9 titanTexture; // Указатель на текстуру Титана
+LPDIRECT3DTEXTURE9 ringsTexture; // Указатель на текстуру Колец
+LPDIRECT3DTEXTURE9 skyTexture; // Указатель на текстуру космоса
 LPDIRECTINPUT dinput;
 
-D3DXMATRIX matRotateY;    // a matrix to store the rotation information
-D3DXMATRIX matTranslate;
-D3DXMATRIX matRotateX;
-float rotation = 0.0f; 
+D3DXMATRIX matRotateY;    // Матрица поворота по оси Y
+D3DXMATRIX matTranslate;  // Матрица параллельного переноса
+D3DXMATRIX matRotateX;    // Матрица поворота по оси X
+float rotation = 0.0f;    // Угол вращения планеты в радианах
 
 
 /* Прототипы функций */
 void initD3D(HWND hWnd);    // Функция настроийки и инициализации Direct3D
 void render_frame(void);    // Функция отображения одного кадра
 void cleanD3D(void);    // Функция закрытия Direct3D и освобождения памяти
-void init_graphics(void);
+void init_graphics(void); // Функция инициализации графических объектов
+void viewTransform(); // Трансформация матрицы представления и проекции
+void drawSky(); // Функция отображения заднего фона
+void drawRing(); // Функция отображения колец
+void drawTitan(); // Функция отображения Титана
+void drawSaturn(); // Функция отображения Сатурна
+
+// Функция создания модели сферы с текстурными координатами 
 LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks);
 
+// Структура формата вершин
 struct CUSTOMVERTEX {FLOAT X, Y, Z; FLOAT nx, ny, nz; FLOAT tu, tv; DWORD COLOR; };
 #define CUSTOMFVF (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1 | D3DFVF_DIFFUSE )
+
+/* Структура формата вершин для сферы с текстурными координатами */
+typedef struct {
+    D3DXVECTOR3 pos;     // Вектор позиции вершины
+    D3DXVECTOR3 norm;    // Вектон нормали вершины
+    float tu; float tv;  // Текстурные координаты
+} *LPVERTEX;
+#define FVF_VERTEX    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1
 
 /* Прототип функции обработчика оконных сообщений */
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -113,11 +130,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch(message) {
         case WM_DESTROY: {
+                /* Выход при получении сообщения завершения */
                 PostQuitMessage(0);
                 return 0;
             } break;
     }
 
+    /* Стандартная обработка остальных сообщений */
     return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
@@ -148,9 +167,10 @@ void initD3D(HWND hWnd) {
                       &d3ddev);
 
     init_graphics();
-    d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);    // turn off the 3D lighting
-    d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включить z-буффер
+    d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);    // Выключение 3D освещения
+    d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включения буфера глубины
 
+    /* Включение и настройка смешивания цветов для реализации прозрачности через альфа-канал */
     d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
     d3ddev->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
     d3ddev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
@@ -159,7 +179,7 @@ void initD3D(HWND hWnd) {
 
 void init_graphics(void)
 {
-    // create a vertex buffer interface called v_buffer
+    // Создание буфера вершин
     d3ddev->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX),
                                0,
                                CUSTOMFVF,
@@ -167,7 +187,7 @@ void init_graphics(void)
                                &v_buffer,
                                NULL);
 
-    // create the vertices using the CUSTOMVERTEX struct
+    // Создание массива вершин формата CUSTOMVERTEX 
     CUSTOMVERTEX vertices[] = 
     {
         { -3.0f, 3.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, },
@@ -176,18 +196,20 @@ void init_graphics(void)
         { 3.0f, -3.0f, 0.0f,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, },
     }; 
 
-    VOID* pVoid;    // a void pointer
-    // lock v_buffer and load the vertices into it
+    VOID* pVoid;    // Нулевой указатель
+    // Блокировка вершенного буфера и загрузка в него вершин
     v_buffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vertices, sizeof(vertices));
+    // Разблокировка вершенного буфера
     v_buffer->Unlock();
 
-    // texture
+    // Загрузка текстур
     D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &saturnTexture);
     D3DXCreateTextureFromFile(d3ddev, "./titan.jpg", &titanTexture);
     D3DXCreateTextureFromFile(d3ddev, "./rings1.png", &ringsTexture);
     D3DXCreateTextureFromFile(d3ddev, "./skys.jpg", &skyTexture);
 
+    // Отключение режима отсечения граней
     d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
 
@@ -297,51 +319,41 @@ void render_frame(void) {
 
 /* Функция освобождения ресурсов Direct3D и COM */
 void cleanD3D(void) {
-    v_buffer->Release();    // close and release the vertex buffer
+    v_buffer->Release();    // Закрытие и освобождение вершенного буфера
     d3ddev->Release();    // Закрыть 3D устройство
     d3d->Release();    // Закрыть Direct3D
 }
 
-typedef struct {
-    D3DXVECTOR3 pos;     // vertex position
-    D3DXVECTOR3 norm;    // vertex normal
-    float tu;            // texture coordinates
-    float tv;
-} *LPVERTEX;
-
-#define FVF_VERTEX    D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1
-
 LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks) {
-    // create the sphere
+    // Создание модели сферы
     LPD3DXMESH mesh;
     if (FAILED(D3DXCreateSphere(pDev,fRad,slices,stacks,&mesh,NULL))) return NULL;
-    // create a copy of the mesh with texture coordinates,
-    // since the D3DX function doesn't include them
+    // Создание копии модели с текстурными координатами, поскольку изначально их нет.
     LPD3DXMESH texMesh;
     if (FAILED(mesh->CloneMeshFVF(D3DXMESH_SYSTEMMEM,FVF_VERTEX,pDev,&texMesh))) return mesh;
-    // finished with the original mesh, release it
+    // Изначальная модель не нужна - освобождаем
     mesh->Release();
 
-    // lock the vertex buffer
+    // Блокировка буфера вершин
     LPVERTEX pVerts;
     if (SUCCEEDED(texMesh->LockVertexBuffer(0,(void **) &pVerts))) {
 
-        // get vertex count
+        // Получение количества вершин
         int numVerts=texMesh->GetNumVertices();
 
-        // loop through the vertices
+        // Цикл по всем вершинам
         for (int i=0;i<numVerts;i++) {
-            // calculate texture coordinates
+            // Расчёт текстурных координат
             pVerts->tu=asinf(pVerts->norm.x)/D3DX_PI+0.5f;
             pVerts->tv=asinf(pVerts->norm.y)/D3DX_PI+0.5f;
-            // go to next vertex
+            // Переход к следующей вершине
             pVerts++;
         }
 
-        // unlock the vertex buffer
+        // Разблокирока буфера вершин
         texMesh->UnlockVertexBuffer();
     }
     
-    // return pointer to caller
+    // Возврат указателя на результат
     return texMesh;
 }
