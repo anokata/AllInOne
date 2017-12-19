@@ -6,6 +6,7 @@
 #include <d3dx9shape.h>
 #include <dinput.h>
 #include <dinputd.h>
+#include <iostream>
 /*
  !https://www.ixbt.com/video/3dterms.html
 http://www.cplusplus.com/forum/windows/108166/
@@ -42,10 +43,18 @@ LPDIRECT3DTEXTURE9 ringsTexture; // Указатель на текстуру К�
 LPDIRECT3DTEXTURE9 skyTexture; // Указатель на текстуру космоса
 LPDIRECTINPUT dinput;
 
-D3DXMATRIX matRotateY;    // Матрица поворота по оси Y
 D3DXMATRIX matTranslate;  // Матрица параллельного переноса
 D3DXMATRIX matRotateX;    // Матрица поворота по оси X
+D3DXMATRIX matRotateY;    // Матрица поворота по оси Y
 float rotation = 0.0f;    // Угол вращения планеты в радианах
+float lookRotX = 0.0f;    // Угол поворота взгляда в радианах по оси X
+float lookRotY = 0.0f;    // Угол поворота взгляда в радианах по оси Y
+float lookDX = 0.0f;      // Дельта изменения угла взгляда по оси X
+float lookDY = 0.0f;
+float lookSwX = 0.0f;
+float lookSwY = 0.0f;
+float lookDsX = 0.0f;
+float lookDsY = 0.0f;
 
 
 /* Прототипы функций */
@@ -143,6 +152,54 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 PostQuitMessage(0);
                 return 0;
             } break;
+
+        case WM_KEYDOWN: {
+            switch (wParam) {
+                case 'Q': 
+                case VK_ESCAPE: 
+                    PostQuitMessage(0);
+                    break;
+
+                case 'W':
+                    lookDX = 0.01f;
+                    break;
+                case VK_UP:
+                    lookDsX = 0.01f;
+                    break;
+                case 'S':
+                    lookDX = -0.01f;
+                    break;
+                case VK_DOWN:
+                    lookDsX = -0.01f;
+                    break;
+
+                case 'A':
+                    lookDY = 0.01f;
+                    break;
+                case VK_LEFT:
+                    lookDsY = 0.01f;
+                    break;
+                case 'D':
+                    lookDY = -0.01f;
+                    break;
+                case VK_RIGHT:
+                    lookDsY = -0.01f;
+                    break;
+
+                default:
+                    std::cout << (char)wParam << '\n';
+                    break;
+            }
+            return 0;
+        } break;
+
+
+        case WM_KEYUP: 
+            lookDX = 0.0f;
+            lookDY = 0.0f;
+            lookDsX = 0.0f;
+            lookDsY = 0.0f;
+            break;
     }
 
     /* Стандартная обработка остальных сообщений */
@@ -281,6 +338,15 @@ void viewTransform() {
     D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // Точка направления взгляда
     D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // Направление "вверх"
     D3DXMatrixLookAtLH(&matView, &camPos, &lookAt, &upDir);
+
+    /* Поворот взгляда */
+    D3DXMatrixRotationX(&matRotateX, lookRotX);
+    D3DXMatrixRotationY(&matRotateY, lookRotY);
+    matView = matView * matRotateX * matRotateY;
+    D3DXMatrixRotationX(&matRotateX, lookSwX);
+    D3DXMatrixRotationY(&matRotateY, lookSwY);
+    matView = matRotateX * matRotateY * matView;
+
     d3ddev->SetTransform(D3DTS_VIEW, &matView);    // Применение матрицы трансформации представления
 
     D3DXMATRIX matProjection;     // Матрица трансформации проекции
@@ -322,6 +388,10 @@ void render_frame(void) {
     d3ddev->SetFVF(CUSTOMFVF);
     
     rotation+=0.02f;    // Увеличение угла поворота
+    lookRotX += lookDX; // Увеличение угла взгляда по Х
+    lookRotY += lookDY; // Увеличение угла взгляда по Х
+    lookSwX += lookDsX;
+    lookSwY += lookDsY;
 
     viewTransform(); // Трансформация матрицы представления и проекции
 
