@@ -6,24 +6,8 @@
 #include <d3dx9shape.h>
 #include <dinput.h>
 #include <dinputd.h>
-#include <iostream>
-/*
- !https://www.ixbt.com/video/3dterms.html
-http://www.cplusplus.com/forum/windows/108166/
-http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
-https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
-   +sphere
-   +texture
-   +animation rotate
-   +sattelite
-   +rings
-   ?starts box
-   lightning
-   material
-   !input move
-https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
-*/
 
+#define PI 3.14159265358f
 /* Разрешение окна по ширине и высоте */
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -43,6 +27,8 @@ LPDIRECT3DTEXTURE9 ringsTexture; // Указатель на текстуру К�
 LPDIRECT3DTEXTURE9 skyTexture; // Указатель на текстуру космоса
 LPDIRECTINPUT dinput;
 
+LPD3DXMESH titan; // Модель Титана
+
 D3DXMATRIX matTranslate;  // Матрица параллельного переноса
 D3DXMATRIX matRotateX;    // Матрица поворота по оси X
 D3DXMATRIX matRotateY;    // Матрица поворота по оси Y
@@ -50,23 +36,23 @@ float rotation = 0.0f;    // Угол вращения планеты в рад�
 float lookRotX = 0.0f;    // Угол поворота взгляда в радианах по оси X
 float lookRotY = 0.0f;    // Угол поворота взгляда в радианах по оси Y
 float lookDX = 0.0f;      // Дельта изменения угла взгляда по оси X
-float lookDY = 0.0f;
-float lookSwX = 0.0f;
-float lookSwY = 0.0f;
-float lookDsX = 0.0f;
-float lookDsY = 0.0f;
-
+float lookDY = 0.0f;      // Дельта изменения угла взгляда по оси Y
+float lookSwX = 0.0f;     // Угол поворота точки обзора в радианах по оси X
+float lookSwY = 0.0f;     // Угол поворота точки обзора в радианах по оси Y
+float lookDsX = 0.0f;     // Дельта изменения точки обзора по оси X
+float lookDsY = 0.0f;     // Дельта изменения точки обзора по оси Y
 
 /* Прототипы функций */
 void initD3D(HWND hWnd);    /* Функция настроийки и инициализации Direct3D */
 void render_frame(void);    /* Функция отображения одного кадра */
-void cleanD3D(void);    /* Функция закрытия Direct3D и освобождения памяти */
-void init_graphics(void); /* Функция инициализации графических объектов */
-void viewTransform(); /* Трансформация матрицы представления и проекции */
-void drawSky(); /* Функция отображения заднего фона */
-void drawRing(); /* Функция отображения колец */
-void drawTitan(); /* Функция отображения Титана */
-void drawSaturn(); /* Функция отображения Сатурна */
+void cleanD3D(void);        /* Функция закрытия Direct3D и освобождения памяти */
+void init_graphics(void);   /* Функция инициализации графических объектов */
+void viewTransform();       /* Трансформация матрицы представления и проекции */
+void drawSky();             /* Функция отображения заднего фона */
+void drawRing();            /* Функция отображения колец */
+void drawTitan();           /* Функция отображения Титана */
+void drawSaturn();          /* Функция отображения Сатурна */
+void setTexture(LPDIRECT3DTEXTURE9 texture); /* Функция установки текстуры */
 
 /* Функция создания модели сферы с текстурными координатами  */
 LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks);
@@ -100,7 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     /* Установка параметров класса окна */
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
+    wc.lpfnWndProc = WindowProc; // Назначение обработчика сообщений
     wc.hInstance = hInstance;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
@@ -132,7 +118,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
         // Окончание обработки при получении сообщения завершения работы.
         if(msg.message == WM_QUIT)
             break;
-        // TODO win keys?
 
         /* Отображение одного кадра */
         render_frame();
@@ -153,48 +138,52 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 return 0;
             } break;
 
+        /* Обработка нажатия клавиши */
         case WM_KEYDOWN: {
             switch (wParam) {
+                /* Завершение работы при нажатии клавиши Q или Escape */
                 case 'Q': 
                 case VK_ESCAPE: 
                     PostQuitMessage(0);
                     break;
 
+                /* Управление углом взгляда через клавиши WASD*/
                 case 'W':
                     lookDX = 0.01f;
                     break;
-                case VK_UP:
-                    lookDsX = 0.01f;
-                    break;
                 case 'S':
                     lookDX = -0.01f;
+                    break;
+                case 'A':
+                    lookDY = 0.01f;
+                    break;
+                case 'D':
+                    lookDY = -0.01f;
+                    break;
+
+                /* Управление углом обзора через клавиши стрелочек */
+                case VK_LEFT:
+                    lookDsY = 0.01f;
+                    break;
+                case VK_RIGHT:
+                    lookDsY = -0.01f;
+                    break;
+                case VK_UP:
+                    lookDsX = 0.01f;
                     break;
                 case VK_DOWN:
                     lookDsX = -0.01f;
                     break;
 
-                case 'A':
-                    lookDY = 0.01f;
-                    break;
-                case VK_LEFT:
-                    lookDsY = 0.01f;
-                    break;
-                case 'D':
-                    lookDY = -0.01f;
-                    break;
-                case VK_RIGHT:
-                    lookDsY = -0.01f;
-                    break;
-
                 default:
-                    std::cout << (char)wParam << '\n';
                     break;
             }
             return 0;
         } break;
 
-
+        /* Обработка отпускания клавиши */
         case WM_KEYUP: 
+            /* Обнуление всех дельт для остановки изменений */
             lookDX = 0.0f;
             lookDY = 0.0f;
             lookDsX = 0.0f;
@@ -254,9 +243,8 @@ void init_graphics(void)
                                &v_buffer,
                                NULL);
 
-    // Создание массива вершин формата CUSTOMVERTEX 
-    CUSTOMVERTEX vertices[] = 
-    {
+    // Создание массива вершин формата CUSTOMVERTEX для модели плоскости колец
+    CUSTOMVERTEX vertices[] = {
         { -3.0f, 3.0f, 0.0f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f, },
         { 3.0f, 3.0f, 0.0f,   0.0f, 0.0f, -1.0f, 0.0f, 1.0f, },
         { -3.0f, -3.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, },
@@ -280,9 +268,15 @@ void init_graphics(void)
     d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 }
 
+void setTexture(LPDIRECT3DTEXTURE9 texture) {
+    d3ddev->SetTexture(0, texture);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+}
+
 void drawRing() {
     // Построение матрицы поворота по оси X
-    D3DXMatrixRotationX(&matRotateX, 3.14159265358f/2-0.1);
+    D3DXMatrixRotationX(&matRotateX, PI/2-0.1);
     /* Применение полученной матрицы */
     d3ddev->SetTransform(D3DTS_WORLD, &matRotateX);
     // Выбор буфера вершин для отображения
@@ -323,23 +317,24 @@ void drawTitan() {
     d3ddev->SetTransform(D3DTS_WORLD, &xy);
 
     /* Выбор и настройка текстуры */ // TODO refactor
+    // setTexture(titanTexture);
     d3ddev->SetTexture(0, titanTexture);
     d3ddev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     d3ddev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 
-    LPD3DXMESH titan;
+    // TODO Create on init
     titan = CreateMappedSphere(d3ddev, 0.3f, 32, 32);
     titan->DrawSubset(0);
 }
 
 void viewTransform() {
     D3DXMATRIX matView;    // Матрица транформации представления
-    D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f);    // Позиция камеры
-    D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);    // Точка направления взгляда
-    D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);    // Направление "вверх"
+    D3DXVECTOR3 camPos = D3DXVECTOR3 (0.0f, 0.0f, 10.0f); // Позиция камеры
+    D3DXVECTOR3 lookAt = D3DXVECTOR3 (0.0f, 0.0f, 0.0f);  // Точка направления взгляда
+    D3DXVECTOR3 upDir = D3DXVECTOR3 (0.0f, 1.0f, 0.0f);   // Направление "вверх"
     D3DXMatrixLookAtLH(&matView, &camPos, &lookAt, &upDir);
 
-    /* Поворот взгляда */
+    /* Поворот взгляда и точки обзора */
     D3DXMatrixRotationX(&matRotateX, lookRotX);
     D3DXMatrixRotationY(&matRotateY, lookRotY);
     matView = matView * matRotateX * matRotateY;
@@ -351,10 +346,11 @@ void viewTransform() {
 
     D3DXMATRIX matProjection;     // Матрица трансформации проекции
     D3DXMatrixPerspectiveFovLH(&matProjection,
-                               D3DXToRadian(45),    // Угол поля обзора
-                               (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT, // Соотношение сторон экрана
-                               1.0f,    // Ближняя плоскость отсечения
-                               100.0f);    // Дальняя плоскость отсечения 
+                   D3DXToRadian(45),    // Угол поля обзора
+                   // Соотношение сторон экрана
+                   (FLOAT)SCREEN_WIDTH / (FLOAT)SCREEN_HEIGHT,
+                   1.0f,       // Ближняя плоскость отсечения
+                   100.0f);    // Дальняя плоскость отсечения 
 
     d3ddev->SetTransform(D3DTS_PROJECTION, &matProjection);    // Применение трансформации проекции
 }
@@ -387,13 +383,13 @@ void render_frame(void) {
     // Выбор формата вершин
     d3ddev->SetFVF(CUSTOMFVF);
     
-    rotation+=0.02f;    // Увеличение угла поворота
+    rotation += 0.02f;  // Увеличение угла поворота
     lookRotX += lookDX; // Увеличение угла взгляда по Х
-    lookRotY += lookDY; // Увеличение угла взгляда по Х
-    lookSwX += lookDsX;
-    lookSwY += lookDsY;
+    lookRotY += lookDY; // Увеличение угла взгляда по Y
+    lookSwX += lookDsX; // Увеличение угла поворота точки обзора по оси X
+    lookSwY += lookDsY; // Увеличение угла поворота точки обзора по оси Y
 
-    viewTransform(); // Трансформация матрицы представления и проекции
+    viewTransform();   // Трансформация матрицы представления и проекции
 
     /* Отображение объектов */
     drawSky();
@@ -438,37 +434,10 @@ LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT
             // Переход к следующей вершине
             pVerts++;
         }
-
         // Разблокирока буфера вершин
         texMesh->UnlockVertexBuffer();
     }
-    
     // Возврат указателя на результат
     return texMesh;
 }
 
-/*
-Общая
-    Начало 
-    Создание окна
-    Инициализация Direct3D
-    Инициализации графических объектов
-     
-    цикл
-    Получение сообщения
-    Обработка сообщения
-        Сообщение завершения ->
-    +обработка ввода
-    Отображение одного кадра
-
-    Освобождение ресурсов
-    Конец
-
-Отображение одного кадра
-    Начало 
-    Очистка экрана и буфера глубины
-    Трансформация мира, преставления, проекции
-        Построение объектов
-    Отображение кадра
-    Конец
- */

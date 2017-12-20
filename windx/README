@@ -1,1 +1,41 @@
 http://www.directxtutorial.com/Lesson.aspx?lessonid=9-4-1
+
+https://www.ixbt.com/video/3dterms.html
+http://www.cplusplus.com/forum/windows/108166/
+http://www.intuit.ru/studies/courses/1120/175/lecture/4756?page=1
+https://stackoverflow.com/questions/3899448/c-directx-9-mesh-texture
+https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
+http://www.directxtutorial.com/Lesson.aspx?lessonid=9-4-8
+
+TODO:
+   lightning
+   material
+   input mouse
+
+
+Схемы алгоритмов
+/*
+Общая
+    Начало 
+    Создание окна
+    Инициализация Direct3D
+    Инициализации графических объектов
+     
+    цикл
+    Получение сообщения
+    Обработка сообщения
+        Сообщение завершения ->
+    обработка ввода
+    Отображение одного кадра
+
+    Освобождение ресурсов
+    Конец
+
+Отображение одного кадра
+    Начало 
+    Очистка экрана и буфера глубины
+    Трансформация мира, преставления, проекции
+        Построение объектов
+    Отображение кадра
+    Конец
+ */
