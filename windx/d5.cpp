@@ -4,6 +4,7 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <d3dx9shape.h>
+#include <iostream>
 
 /* Разрешение окна по ширине и высоте */
 #define SCREEN_WIDTH 800
@@ -25,10 +26,11 @@ bool light = TRUE; // Состояние освещения
 LPD3DXMESH titan; // Модель Титана
 LPD3DXMESH sky; // Модель сферы для окружения
 LPD3DXMESH saturn; // Модель Сатурна
-bool mouse = false; // Состояние левой кнопки мыши
+bool mouse_l = false; // Состояние левой кнопки мыши
+bool mouse_r = false; // Состояние правой кнопки мыши
 int ox = 0; // Прошлое значение координаты курсора по оси X
 int oy = 0; // Прошлое значение координаты курсора по оси Y
-int fov = 45;
+float fov = 45;
 
 D3DXMATRIX matTranslate;  // Матрица параллельного переноса
 D3DXMATRIX matRotateX;    // Матрица поворота по оси X
@@ -169,6 +171,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 case 'D':
                     lookDY = -0.01f;
                     break;
+                case 'Z':
+                    fov += 1;
+                    break;
 
                 /* Управление углом обзора через клавиши стрелочек */
                 case VK_LEFT:
@@ -201,7 +206,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
         /* Обработка нажатия левой кнопки */
         case WM_LBUTTONDOWN:
-            mouse = true;
+            mouse_l = true;
             /* Получение координат курсора */
             x = lParam & 0x0000FFFF; 
             y = (lParam & 0xFFFF0000) >> 16; 
@@ -213,12 +218,27 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
         /* Обработка отпускания левой кнопки */
         case WM_LBUTTONUP:
-            mouse = false;
+            mouse_l = false;
+            break;
+
+        case WM_RBUTTONDOWN:
+            mouse_r = true;
+            /* Получение координат курсора */
+            x = lParam & 0x0000FFFF; 
+            y = (lParam & 0xFFFF0000) >> 16; 
+            
+            /* Сохранение положения курсора */
+            ox = x;
+            oy = y;
+            break;
+
+        case WM_RBUTTONUP:
+            mouse_r = false;
             break;
 
         case WM_MOUSEMOVE:
             /* Обработка только при нажатой левой кнопке */
-            if (!mouse) break;
+            if (!mouse_l && !mouse_r) break;
             /* Получение координат курсора */
             x = lParam & 0x0000FFFF; 
             y = (lParam & 0xFFFF0000) >> 16; 
@@ -226,9 +246,14 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
             int dx = ox - x;
             int dy = y - oy;
 
-            /* Увеличение угла поворота точки обзора в соответсвии со смещением курсора*/
-            lookSwX += dy / 500.0f;
-            lookSwY += dx / 500.0f;
+            if (mouse_l) {
+                /* Увеличение угла поворота точки обзора в соответсвии со смещением курсора*/
+                lookSwX += dy / 500.0f;
+                lookSwY += dx / 500.0f;
+            }
+            if (mouse_r) {
+                fov += dx/10.0f;
+            }
             /* Сохранение положения курсора */
             ox = x;
             oy = y;
