@@ -4,6 +4,8 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <d3dx9shape.h>
+#include <dinput.h>
+#include <dinputd.h>
 
 /* Разрешение окна по ширине и высоте */
 #define SCREEN_WIDTH 800
@@ -11,6 +13,8 @@
 /* Подключение библиотеки Direct3D */
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
+#pragma comment (lib, "dinput.lib")
+#pragma comment (lib, "dxguid.lib")
 
 /* Глобальные объявления */
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
@@ -20,8 +24,9 @@ LPDIRECT3DTEXTURE9 saturnTexture; // Указатель на текстуру С
 LPDIRECT3DTEXTURE9 titanTexture; // Указатель на текстуру Титана
 LPDIRECT3DTEXTURE9 ringsTexture; // Указатель на текстуру Колец
 LPDIRECT3DTEXTURE9 skyTexture; // Указатель на текстуру космоса
+LPDIRECTINPUT dinput;
 
-bool light = TRUE; // Состояние освещения
+
 LPD3DXMESH titan; // Модель Титана
 LPD3DXMESH sky; // Модель сферы для окружения
 LPD3DXMESH saturn; // Модель Сатурна
@@ -101,6 +106,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
     // Отображение окна
     ShowWindow(hWnd, nCmdShow);
     initD3D(hWnd);
+    //DirectInputCreate(hInstance, DIRECTINPUT_VERSION, &dinput, NULL);
+    //DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, NULL);
 
     MSG msg; // Сообщение
     // Главный цикл обработки сообщений и отрисовки
@@ -142,10 +149,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 case VK_ESCAPE: 
                     PostQuitMessage(0);
                     break;
-                /* Включение-выключение освещения */
                 case 'L':
-                    light = !light;
-                    d3ddev->SetRenderState(D3DRS_LIGHTING, light);
+                    d3ddev->SetRenderState(D3DRS_LIGHTING, FALSE);
                     break;
 
                 /* Управление углом взгляда через клавиши WASD*/
@@ -242,22 +247,22 @@ void initD3D(HWND hWnd) {
 }
 
 void init_light(void) {
-    D3DLIGHT9 light;    // Создание структуы освещения
-    D3DMATERIAL9 material;    // Создание структуры материала
+    D3DLIGHT9 light;    // create the light struct
+    D3DMATERIAL9 material;    // create the material struct
 
-    ZeroMemory(&light, sizeof(light));    // Очистка структуры освещения
-    light.Type = D3DLIGHT_DIRECTIONAL;    // Установка освщения типа 'направленный свет'
-    light.Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);    // Установка цвета света
-    light.Direction = D3DXVECTOR3(-1.0f, -0.3f, -1.0f);   // Установка направления света
+    ZeroMemory(&light, sizeof(light));    // clear out the light struct for use
+    light.Type = D3DLIGHT_DIRECTIONAL;    // make the light type 'directional light'
+    light.Diffuse = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);    // set the light's color
+    light.Direction = D3DXVECTOR3(-1.0f, -0.3f, -1.0f);
 
-    d3ddev->SetLight(0, &light);    // Установка настроек освещения для источника света #0
-    d3ddev->LightEnable(0, TRUE);    // Включение источника света #0
+    d3ddev->SetLight(0, &light);    // send the light struct properties to light #0
+    d3ddev->LightEnable(0, TRUE);    // turn on light #0
 
-    ZeroMemory(&material, sizeof(D3DMATERIAL9));    // Очистка структуры материала
-    material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // Установка цвета рассеяния
-    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // Установка цвета окружения
+    ZeroMemory(&material, sizeof(D3DMATERIAL9));    // clear out the struct for use
+    material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set diffuse color to white
+    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set ambient color to white
 
-    d3ddev->SetMaterial(&material);    // Применение настроек материала
+    d3ddev->SetMaterial(&material);    // set the globably-used material to &material
 }
 
 void init_graphics(void)

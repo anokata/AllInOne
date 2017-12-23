@@ -11,7 +11,9 @@ TODO:
    lightning
    material
    input mouse
+!compile on WIN
 
+Управление:
 
 Схемы алгоритмов
 /*
