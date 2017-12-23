@@ -8,9 +8,10 @@ https://www.braynzarsoft.net/viewtutorial/q16390-20-cube-mapping-skybox
 http://www.directxtutorial.com/Lesson.aspx?lessonid=9-4-8
 
 TODO:
-   lightning
-   material
-   input mouse
+   +lightning
+   +material
+   +input mouse
+    zoom
 !compile on WIN
 
 Управление:

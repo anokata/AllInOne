@@ -25,6 +25,9 @@ bool light = TRUE; // Состояние освещения
 LPD3DXMESH titan; // Модель Титана
 LPD3DXMESH sky; // Модель сферы для окружения
 LPD3DXMESH saturn; // Модель Сатурна
+bool mouse = false; // Состояние левой кнопки мыши
+int ox = 0; // Прошлое значение координаты курсора по оси X
+int oy = 0; // Прошлое значение координаты курсора по оси Y
 
 D3DXMATRIX matTranslate;  // Матрица параллельного переноса
 D3DXMATRIX matRotateX;    // Матрица поворота по оси X
@@ -127,6 +130,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 /* Главный обработчик сообщений */
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    // Координаты курсора
+    int x;
+    int y;
+
     switch(message) {
         case WM_DESTROY: {
                 /* Выход при получении сообщения завершения */
@@ -189,6 +196,41 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
             lookDY = 0.0f;
             lookDsX = 0.0f;
             lookDsY = 0.0f;
+            break;
+
+        /* Обработка нажатия левой кнопки */
+        case WM_LBUTTONDOWN:
+            mouse = true;
+            /* Получение координат курсора */
+            x = lParam & 0x0000FFFF; 
+            y = (lParam & 0xFFFF0000) >> 16; 
+            
+            /* Сохранение положения курсора */
+            ox = x;
+            oy = y;
+            break;
+
+        /* Обработка отпускания левой кнопки */
+        case WM_LBUTTONUP:
+            mouse = false;
+            break;
+
+        case WM_MOUSEMOVE:
+            /* Обработка только при нажатой левой кнопке */
+            if (!mouse) break;
+            /* Получение координат курсора */
+            x = lParam & 0x0000FFFF; 
+            y = (lParam & 0xFFFF0000) >> 16; 
+            /* Расчёт смещения относительно прошлого положения */
+            int dx = ox - x;
+            int dy = y - oy;
+
+            /* Увеличение угла поворота точки обзора в соответсвии со смещением курсора*/
+            lookSwX += dy / 500.0f;
+            lookSwY += dx / 500.0f;
+            /* Сохранение положения курсора */
+            ox = x;
+            oy = y;
             break;
     }
 
