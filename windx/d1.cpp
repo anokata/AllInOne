@@ -15,7 +15,7 @@
 /* Глобальные объявления */
 LPDIRECT3D9 d3d;    // Указатель на COM интерфейс Direct3D
 LPDIRECT3DDEVICE9 d3ddev;    // Указатель на класс устройства
-LPDIRECT3DVERTEXBUFFER9 v_buffer = NULL;    // the pointer to the vertex buffer
+LPDIRECT3DVERTEXBUFFER9 vBuffer = NULL;    // the pointer to the vertex buffer
 LPDIRECT3DTEXTURE9 saturnTexture; // Указатель на текстуру Сатурна
 LPDIRECT3DTEXTURE9 titanTexture; // Указатель на текстуру Титана
 LPDIRECT3DTEXTURE9 ringsTexture; // Указатель на текстуру Колец
@@ -45,16 +45,16 @@ float lookDsY = 0.0f;     // Дельта изменения точки обзо
 
 /* Прототипы функций */
 void initD3D(HWND hWnd);    /* Функция настроийки и инициализации Direct3D */
-void render_frame(void);    /* Функция отображения одного кадра */
+void renderFrame(void);     /* Функция отображения одного кадра */
 void cleanD3D(void);        /* Функция закрытия Direct3D и освобождения памяти */
-void init_graphics(void);   /* Функция инициализации графических объектов */
+void initGraphics(void);    /* Функция инициализации графических объектов */
 void viewTransform();       /* Трансформация матрицы представления и проекции */
 void drawSky();             /* Функция отображения заднего фона */
 void drawRing();            /* Функция отображения колец */
 void drawTitan();           /* Функция отображения Титана */
 void drawSaturn();          /* Функция отображения Сатурна */
 void setTexture(LPDIRECT3DTEXTURE9 texture); /* Функция установки текстуры */
-void init_light(void);      /* Функция инициализации освещения и материала */
+void initLight(void);       /* Функция инициализации освещения и материала */
 
 /* Функция создания модели сферы с текстурными координатами  */
 LPD3DXMESH CreateMappedSphere(LPDIRECT3DDEVICE9 pDev,float fRad,UINT slices,UINT stacks);
@@ -120,7 +120,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
             break;
 
         /* Отображение одного кадра */
-        render_frame();
+        renderFrame();
     }
 
     // Освобождение ресурсов
@@ -266,11 +266,11 @@ void initD3D(HWND hWnd) {
                       &d3dpp,
                       &d3ddev);
 
-    init_graphics();
+    initGraphics();
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);    // Включения буфера глубины
     d3ddev->SetRenderState(D3DRS_LIGHTING, TRUE);    // Включение 3D освещения
     d3ddev->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(50, 50, 50));    // Окружающий свет
-    init_light();
+    initLight();
 
     /* Включение и настройка смешивания цветов для реализации прозрачности через альфа-канал */
     d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -284,7 +284,7 @@ void initD3D(HWND hWnd) {
     saturn = CreateMappedSphere(d3ddev, 1.0f, 32, 32);
 }
 
-void init_light(void) {
+void initLight(void) {
     D3DLIGHT9 light;    // Создание структуы освещения
     D3DMATERIAL9 material;    // Создание структуры материала
 
@@ -303,14 +303,14 @@ void init_light(void) {
     d3ddev->SetMaterial(&material);    // Применение настроек материала
 }
 
-void init_graphics(void)
+void initGraphics(void)
 {
     // Создание буфера вершин
     d3ddev->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX),
                                0,
                                CUSTOMFVF,
                                D3DPOOL_MANAGED,
-                               &v_buffer,
+                               &vBuffer,
                                NULL);
 
     // Создание массива вершин формата CUSTOMVERTEX для модели плоскости колец
@@ -323,10 +323,10 @@ void init_graphics(void)
 
     VOID* pVoid;    // Нулевой указатель
     // Блокировка вершенного буфера и загрузка в него вершин
-    v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+    vBuffer->Lock(0, 0, (void**)&pVoid, 0);
     memcpy(pVoid, vertices, sizeof(vertices));
     // Разблокировка вершенного буфера
-    v_buffer->Unlock();
+    vBuffer->Unlock();
 
     // Загрузка текстур
     D3DXCreateTextureFromFile(d3ddev, "./saturn.jpg", &saturnTexture);
@@ -350,7 +350,7 @@ void drawRing() {
     /* Применение полученной матрицы */
     d3ddev->SetTransform(D3DTS_WORLD, &matRotateX);
     // Выбор буфера вершин для отображения
-    d3ddev->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+    d3ddev->SetStreamSource(0, vBuffer, 0, sizeof(CUSTOMVERTEX));
 
     setTexture(ringsTexture);
     // Копирование буфера вершин во вторичный буфер
@@ -427,7 +427,7 @@ void viewTransform() {
 }
 
 /* Функция отображения одного кадра */
-void render_frame(void) {
+void renderFrame(void) {
     /* Очистка экрана и буфера глубины */
     d3ddev->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
     d3ddev->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
@@ -458,7 +458,7 @@ void render_frame(void) {
 
 /* Функция освобождения ресурсов Direct3D и COM */
 void cleanD3D(void) {
-    v_buffer->Release();    // Закрытие и освобождение вершенного буфера
+    vBuffer->Release();    // Закрытие и освобождение вершенного буфера
     d3ddev->Release();    // Закрыть 3D устройство
     d3d->Release();    // Закрыть Direct3D
 }
