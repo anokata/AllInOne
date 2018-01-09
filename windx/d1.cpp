@@ -96,7 +96,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     RegisterClassEx(&wc); // Реристрация класса окна
     /* Создание главного окна приложения по зарегестрированному классу */
-    hWnd = CreateWindowEx(0, "WindowClass", "Our First Direct3D Program",
+    hWnd = CreateWindowEx(0, "WindowClass", "Saturn",
                           WS_OVERLAPPEDWINDOW,
                           300, 300,
                           800, 600,
