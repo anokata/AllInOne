@@ -1,0 +1,13 @@
+{
+    "name": "ksi/php",
+    "description": "Site",
+    "type": "project",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "anokata",
+            "email": "anokata8@mail.ru"
+        }
+    ],
+    "require": {}
+}
