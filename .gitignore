@@ -8,3 +8,5 @@ settings.php
 setting
 build
 dist
+vendor
+*.lock

@@ -9,5 +9,7 @@
             "email": "anokata8@mail.ru"
         }
     ],
-    "require": {}
+    "require": {
+        "shopware/shopware": "^5.4"
+    }
 }
