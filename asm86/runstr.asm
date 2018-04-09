@@ -32,13 +32,14 @@ Start:
 
 ; 
            lea   bx,Image    ;bx - указатель на массив образов
-           mov   dx,string   ; загружаем значение цифры из стоки
+           lea   dx,string   ; загружаем значение цифры из стоки
             ; index pos
            add   bx, dx      ; вычисляем адрес образа цифры
            mov   al,[bx]     ; Выводим цифру на индикатор
            out   0,al
             ; вторая цифра
-           lea   bx,Image + dx
+           lea   bx,Image
+           add   bx, dx
            inc   bx
            mov   al,[bx]     ; Выводим цифру на индикатор
            out   1,al
