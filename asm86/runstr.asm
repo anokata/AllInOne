@@ -7,7 +7,7 @@ Stk        SEGMENT AT 100h use16
 StkTop     Label Word
 Stk        ENDS
 
-Data       SEGMENT AT 40h use16
+Data       SEGMENT use16
 ;Здесь размещаются описания переменных
            ;бегущая строка
 string     db    01h, 01h, 01h, 01h, 01h, 01h, 01h, 01h, 01h 
