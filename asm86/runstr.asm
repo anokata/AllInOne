@@ -21,42 +21,44 @@ Code       SEGMENT use16
 Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
 
 Start:
-    mov   ax,Data
-    mov   ds,ax
-    mov   es,ax
-    mov   ax,Stk
-    mov   ss,ax
-    lea   sp,StkTop
+    mov   ax, Data
+    mov   ds, ax
+    mov   es, ax
+    mov   ax, Stk
+    mov   ss, ax
+    lea   sp, StkTop
     mov   di, 0 ; index
 
-
-    lea   bx,Image    ;bx - указатель на массив образов
-    lea   dx,string+di   ; загружаем значение цифры из стоки
+InfLoop:
+    lea   bx, Image    ;bx - указатель на массив образов
+    lea   dx, string+di   ; загружаем значение цифры из стоки
     ; index pos
     add   bx, dx      ; вычисляем адрес образа цифры
     mov   al,[bx]     ; Выводим цифру на индикатор
-    out   0,al
+    out   0, al
     ; вторая цифра
-    lea   bx,Image
+    lea   bx, Image
     add   bx, dx
     inc   bx
     mov   al,[bx]     ; Выводим цифру на индикатор
     out   1,al
     ; третья цифра
-    lea   bx,Image
+    lea   bx, Image
     add   bx, dx
     inc   bx
     inc   bx
     mov   al,[bx]     ; Выводим цифру на индикатор
     out   2,al
     ; четвертая цифра
-    lea   bx,Image
+    lea   bx, Image
     add   bx, dx
     add   bx, 3
-    mov   al,[bx]     ; Выводим цифру на индикатор
-    out   3,al
+    mov   al, [bx]     ; Выводим цифру на индикатор
+    out   3, al
 
 ; считываем скорость движения строки с ацп
+    mov  cx, 0
+    ;in  0,cl
     ;mov  cx, ?
     ;call Delay
         
@@ -66,12 +68,12 @@ Start:
     jnz   Savedi
     mov   di, 0
 Savedi:
- 
 
-InfLoop:
-           nop
-           
-           jmp   InfLoop
+; ввод цифр с клавиатуры
+
+; сброс
+ 
+    jmp   InfLoop
 
 
 
