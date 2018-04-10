@@ -7,10 +7,10 @@ Stk        SEGMENT AT 100h use16
 StkTop     Label Word
 Stk        ENDS
 
-Data       SEGMENT use16
+Data       SEGMENT at 0 use16
 ;Здесь размещаются описания переменных
            ;бегущая строка 10
-string     db    01h, 01h, 01h, 01h, 01h, 01h, 01h, 01h, 01h, 01h
+string     db   10 dup (1) 
 Data       ENDS
 
 Code       SEGMENT use16
@@ -58,8 +58,8 @@ InfLoop:
 
 ; считываем скорость движения строки с ацп
     mov  cx, 0
-    ;in  0,cl
-    ;mov  cx, ?
+    in   al, 0
+    mov  cl, al
     ;call Delay
         
 ; смещаем индекс текущего символа
