@@ -11,6 +11,7 @@ Data       SEGMENT at 0 use16
 ;Здесь размещаются описания переменных
            ;бегущая строка 10
 string     db   10 dup (1) 
+delayc     db   1
 Data       ENDS
 
 Code       SEGMENT use16
@@ -57,10 +58,24 @@ InfLoop:
     out   3, al
 
 ; считываем скорость движения строки с ацп
+mov cl, delayc
+test cl, 0
+jnz okcount
+    mov al, 0
+    out 8, al
+    mov al, 1
+    out 8, al
+    waitrdy:
+    in al, 8
+    test al, 1
+    jz waitrdy
+    in al, 0
+    mov  delayc, al
     mov  cx, 0
-    in   al, 0
     mov  cl, al
-    ;call Delay
+okcount:
+    shl cx, 8
+    call Delay
         
 ; смещаем индекс текущего символа
     inc   di
