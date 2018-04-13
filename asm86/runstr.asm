@@ -73,9 +73,9 @@ InfLoop:
     out   3, al
 
 ; считываем скорость движения строки с ацп
-    mov cl, delayc
-    test cl, 0
-    jnz okcount ; ?? всё пропустим, надо прерыванием
+    #mov cl, delayc
+    #test cl, 0
+    #jnz okcount ; ?? всё пропустим, надо прерыванием
 ; он выдаёт дельту? надо её добавлять, знаково
     mov al, 0
     out 8, al
