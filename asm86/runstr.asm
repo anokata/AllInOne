@@ -1,6 +1,7 @@
 .386
 RomSize    EQU   4096
 NMax       EQU   50
+KbdPort    EQU   9
 
 Stk        SEGMENT AT 100h use16
 ; размер стека
@@ -35,6 +36,7 @@ Start:
     mov   ss, ax
     lea   sp, StkTop
 
+    mov   si, 0
     mov   di, 11 
     mov   al, 0
     FillLoop:
@@ -46,37 +48,8 @@ Start:
     mov   dx, 0
 
 InfLoop:
-    lea   bx, Image    ;bx - указатель на массив образов
-    mov   dl, string+di   ; загружаем значение цифры из стоки
-    ; index pos
-    add   bx, dx      ; вычисляем адрес образа цифры
-    mov   al,es:[bx]     ; Выводим цифру на индикатор
-    out   0, al
-    ; вторая цифра
-    lea   bx, Image
-    add   bx, dx
-    inc   bx
-    mov   al,es:[bx]     ; Выводим цифру на индикатор
-    out   1,al
-    ; третья цифра
-    lea   bx, Image
-    add   bx, dx
-    inc   bx
-    inc   bx
-    mov   al,es:[bx]     ; Выводим цифру на индикатор
-    out   2,al
-    ; четвертая цифра
-    lea   bx, Image
-    add   bx, dx
-    add   bx, 3
-    mov   al, es:[bx]     ; Выводим цифру на индикатор
-    out   3, al
 
 ; считываем скорость движения строки с ацп
-    #mov cl, delayc
-    #test cl, 0
-    #jnz okcount ; ?? всё пропустим, надо прерыванием
-; он выдаёт дельту? надо её добавлять, знаково
     mov al, 0
     out 8, al
     mov al, 1
@@ -90,8 +63,39 @@ InfLoop:
     mov  cx, 0
     mov  cl, al
 okcount:
-    shl cx, 8
     call Delay
+
+    lea   bx, Image    ;bx - указатель на массив образов
+    mov   dl, string+di   ; загружаем значение цифры из стоки
+    ; index pos
+    add   bx, dx      ; вычисляем адрес образа цифры
+    mov   al,es:[bx]     ; Выводим цифру на индикатор
+    out   0, al
+    ; вторая цифра
+    add   di, 1
+    lea   bx, Image
+    mov   dl, string+di   
+    sub   di, 1
+    add   bx, dx
+    mov   al,es:[bx]     ; Выводим цифру на индикатор
+    out   1,al
+    ; третья цифра
+    add   di, 2
+    lea   bx, Image
+    mov   dl, string+di   
+    sub   di, 2
+    add   bx, dx
+    mov   al,es:[bx]     ; Выводим цифру на индикатор
+    out   2,al
+    ; четвертая цифра
+    add   di, 3
+    lea   bx, Image
+    mov   dl, string+di   
+    sub   di, 3
+    add   bx, dx
+    mov   al, es:[bx]     ; Выводим цифру на индикатор
+    out   3, al
+
         
 ; смещаем индекс текущего символа
     inc   di
@@ -109,17 +113,19 @@ Savedi:
 
 
 Delay      proc  near ; param cx=count
-           mov   ax, 10
+    inc   cx
+    not   cl
+    add   ax, 4000
 LoopTen:
-           push  cx
+    push  cx
 DelayLoop:
-           inc   cx
-           dec   cx
-           loop  DelayLoop
-           pop   cx
-           dec   ax
-           jnz   LoopTen
-           ret
+    inc   cx
+    dec   cx
+    loop  DelayLoop
+    pop   cx
+    dec   ax
+    jnz   LoopTen
+    ret
 Delay      endp
 
 VibrDestr  PROC  NEAR
