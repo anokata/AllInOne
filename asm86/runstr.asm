@@ -34,6 +34,16 @@ Code       SEGMENT use16
 Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
 
 Start:
+;main is
+;call main_step
+;call delay
+;jmp start
+;main_step:
+;display
+;if move: shift
+;check buttons
+;check spd acp
+;check keys
     mov   ax, Data
     mov   ds, ax
     mov   ax, Code
@@ -56,6 +66,8 @@ Start:
 InfLoop:
 
 ; считываем скорость движения строки с ацп
+;check spd acp
+;acp_spd      proc  near ; out cx
     mov al, 0
     out ACPPort, al
     mov al, 1
@@ -68,12 +80,13 @@ InfLoop:
     mov  delayc, al
     mov  cx, 0
     mov  cl, al
+;acp_spd      endp
 okcount:
     call Delay
 
+;display_digits     proc near
     lea   bx, Image    ;bx - указатель на массив образов
     mov   dl, string+di   ; загружаем значение цифры из стоки
-    ; index pos
     add   bx, dx      ; вычисляем адрес образа цифры
     mov   al,es:[bx]     ; Выводим цифру на индикатор
     out   0, al
@@ -101,6 +114,7 @@ okcount:
     add   bx, dx
     mov   al, es:[bx]     ; Выводим цифру на индикатор
     out   3, al
+; display_digits endp
 
         
 ; смещаем индекс текущего символа
