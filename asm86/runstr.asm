@@ -2,6 +2,12 @@
 RomSize    EQU   4096
 NMax       EQU   50
 KbdPort    EQU   9
+ACPPort    EQU   8
+ACPIN      EQU   0
+DELAY      EQU   4000
+BtnStart   EQU   2
+BtnStop    EQU   3
+BtnReset   EQU   4
 
 Stk        SEGMENT AT 100h use16
 ; размер стека
@@ -14,10 +20,10 @@ Data       SEGMENT at 0 use16
            ;бегущая строка 10
 string     db   10 dup (?) 
 delayc     db   ?
-KbdImage   DB    4 DUP(?)
-EmpKbd     DB    ?
-KbdErr     DB    ?
-NextDig    DB    ?
+KbdImage   DB   4 DUP(?)
+EmpKbd     DB   ?
+KbdErr     DB   ?
+NextDig    DB   ?
 Data       ENDS
 
 Code       SEGMENT use16
@@ -51,14 +57,14 @@ InfLoop:
 
 ; считываем скорость движения строки с ацп
     mov al, 0
-    out 8, al
+    out ACPPort, al
     mov al, 1
-    out 8, al
+    out ACPPort, al
     waitrdy:
-    in al, 8
+    in al, ACPPort
     test al, 1
     jz waitrdy
-    in al, 0
+    in al, ACPIN
     mov  delayc, al
     mov  cx, 0
     mov  cl, al
@@ -115,7 +121,7 @@ Savedi:
 Delay      proc  near ; param cx=count
     inc   cx
     not   cl
-    add   ax, 4000
+    add   ax, DELAY
 LoopTen:
     push  cx
 DelayLoop:
@@ -127,6 +133,7 @@ DelayLoop:
     jnz   LoopTen
     ret
 Delay      endp
+
 
 VibrDestr  PROC  NEAR
 VD1:       mov   ah,al       ;Сохранение исходного состояния
