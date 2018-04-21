@@ -11,20 +11,21 @@ BtnReset   EQU   4
 
 Stk        SEGMENT AT 100h use16
 ; размер стека
-           dw    1100 dup (?)
+           DW    1100 DUP (?)
 StkTop     Label Word
 Stk        ENDS
 
 Data       SEGMENT at 0 use16
 ;Здесь размещаются описания переменных
            ;бегущая строка 10
-string     db   10 dup (?) 
-delayc     db   ?
+string     DB   10 DUP (?) 
+delayc     DB   ?
 KbdImage   DB   4 DUP(?)
 EmpKbd     DB   ?
 KbdErr     DB   ?
 NextDig    DB   ?
-InputPos   DB   ?
+InputPos   DW   ?
+OutputPos  DW   ?
 Data       ENDS
 
 Code       SEGMENT use16
@@ -45,20 +46,28 @@ Start:
     call init
 
 InfLoop:
-;   wait start
+    in   al, KbdPort
+    and  al, 80h
+    jz   CycleOutput
+
 ; ввод цифр с клавиатуры
     call  KbdInput
     call  KbdInContr
     call  NxtDigTrf
     call  InputKey
-    
-    in   al, KbdPort
-    and  al, 80h
-    jnz  InfLoop
+
+    mov   di, InputPos
+    call  display_digits
+
+    jmp   InfLoop
+
+CycleOutput:
 ; считываем скорость движения строки с ацп
-    call acp_spd
-    call Delay
-    call display_digits
+    call  acp_spd
+    call  Delay
+    mov   di, OutputPos
+    call  display_digits
+    mov   OutputPos, di
 
 ; сброс 
     jmp   InfLoop
@@ -77,10 +86,11 @@ init proc
     mov   dx, 0
     mov   KbdErr, 0
     mov   InputPos, 0
+    mov   OutputPos, 0
     ret
 init endp
 
-display_digits     proc near
+display_digits     proc near ; input di - index  
     mov   dx, 0
     lea   bx, Image    ;bx - указатель на массив образов
     mov   dl, string+di   ; загружаем значение цифры из стоки
@@ -161,10 +171,10 @@ InputKey proc
     xor   ah,ah
     mov   al, NextDig
     lea   bx, string
-    add   bl, InputPos
+    add   bx, InputPos
     mov   [bx], al
     inc   InputPos
-    mov   al, InputPos
+    mov   ax, InputPos
     cmp   al, LENGTH string
     jl    no_data
     mov   InputPos, 0
