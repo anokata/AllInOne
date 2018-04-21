@@ -1,7 +1,7 @@
 .386
 RomSize    EQU   4096
 NMax       EQU   50
-KbdPort    EQU   9
+KbdPort    EQU   09h
 ACPPort    EQU   8
 ACPIN      EQU   0
 DELAYN     EQU   4000
@@ -51,9 +51,35 @@ Start:
     mov   ax, Stk
     mov   ss, ax
     lea   sp, StkTop
+    call init
 
+InfLoop:
+
+; считываем скорость движения строки с ацп
+;check spd acp
+    call acp_spd
+okcount:
+    call Delay
+    call display_digits
+        
+; смещаем индекс текущего символа
+    inc   di
+    cmp   di, 10
+    jnz   Savedi
+    mov   di, 0
+Savedi:
+
+; ввод цифр с клавиатуры
+    call  KbdInput
+    call  KbdInContr
+    call  NxtDigTrf
+; сброс 
+    jmp   InfLoop
+
+
+init proc
     mov   si, 0
-    mov   di, 11 
+    mov   di, LENGTH string
     mov   al, 0
     FillLoop:
     mov   string+di, al
@@ -62,29 +88,10 @@ Start:
 
     mov   di, 0 ; index
     mov   dx, 0
+    ret
+init endp
 
-InfLoop:
-
-; считываем скорость движения строки с ацп
-;check spd acp
-;acp_spd      proc  near ; out cx
-    mov al, 0
-    out ACPPort, al
-    mov al, 1
-    out ACPPort, al
-    waitrdy:
-    in al, ACPPort
-    test al, 1
-    jz waitrdy
-    in al, ACPIN
-    mov  delayc, al
-    mov  cx, 0
-    mov  cl, al
-;acp_spd      endp
-okcount:
-    call Delay
-
-;display_digits     proc near
+display_digits     proc near
     lea   bx, Image    ;bx - указатель на массив образов
     mov   dl, string+di   ; загружаем значение цифры из стоки
     add   bx, dx      ; вычисляем адрес образа цифры
@@ -114,26 +121,24 @@ okcount:
     add   bx, dx
     mov   al, es:[bx]     ; Выводим цифру на индикатор
     out   3, al
-; display_digits endp
+    ret
+display_digits endp
 
-        
-; смещаем индекс текущего символа
-    inc   di
-    cmp   di, 10
-    jnz   Savedi
-    mov   di, 0
-Savedi:
-
-; ввод цифр с клавиатуры
-    call  KbdInput
-    call  KbdInContr
-    call  NxtDigTrf
-; сброс
-
- 
-    jmp   InfLoop
-
-
+acp_spd      proc  near ; out cx
+    mov al, 0
+    out ACPPort, al
+    mov al, 1
+    out ACPPort, al
+    waitrdy:
+    in al, ACPPort
+    test al, 1
+    jz waitrdy
+    in al, ACPIN
+    mov  delayc, al
+    mov  cx, 0
+    mov  cl, al
+    ret
+acp_spd      endp
 
 Delay      proc  near ; param cx=count
     inc   cx
@@ -170,8 +175,6 @@ KbdInput   PROC  NEAR
            mov   cx,LENGTH KbdImage  ;счётчика циклов
            mov   bl,0FEh             ;и номера исходной строки
 KI4:       mov   al,bl       ;Выбор строки
-           ;and   al,3Fh     ;Объединение номера с
-           ;or    al,MesBuff ;сообщением "Тип ввода"
            out   KbdPort,al  ;Активация строки
            in    al,KbdPort  ;Ввод строки
            and   al,0Fh      ;Включено?
