@@ -53,7 +53,7 @@ Start:
     lea   sp, StkTop
 
     mov   si, 0
-    mov   di, LENGTH string
+    mov   di, 11 
     mov   al, 0
     FillLoop:
     mov   string+di, al

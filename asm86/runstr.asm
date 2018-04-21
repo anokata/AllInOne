@@ -34,16 +34,6 @@ Code       SEGMENT use16
 Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
 
 Start:
-;main is
-;call main_step
-;call delay
-;jmp start
-;main_step:
-;display
-;if move: shift
-;check buttons
-;check spd acp
-;check keys
     mov   ax, Data
     mov   ds, ax
     mov   ax, Code
@@ -56,9 +46,7 @@ Start:
 InfLoop:
 
 ; считываем скорость движения строки с ацп
-;check spd acp
     call acp_spd
-okcount:
     call Delay
     call display_digits
         
@@ -88,6 +76,7 @@ init proc
 
     mov   di, 0 ; index
     mov   dx, 0
+    mov   KbdErr, 0
     ret
 init endp
 

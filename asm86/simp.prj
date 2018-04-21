@@ -1,0 +1,7 @@
+[SOURCE]=00000000,simple.asm
+[ARCH]=00000000,simp.arh
+[ROMSIZE]=4
+[FREQ]=1000000
+[FREEPINLEVEL]=0
+[WND.asm]=(66,81,932,530)C:\RGATA\asm86\simple.asm
+[WND.arh]=(648,66,1514,515)C:\RGATA\asm86\simp.arh

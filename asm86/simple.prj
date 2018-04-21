@@ -1,0 +1,6 @@
+[ARCH]=00000000,simple.arh
+[SOURCE]=00000001,simple.asm
+[ROMSIZE]=4
+[FREQ]=1000000
+[FREEPINLEVEL]=0
+[WND.prj]=(0,0,866,449)C:\RGATA\asm86\simple.prj
