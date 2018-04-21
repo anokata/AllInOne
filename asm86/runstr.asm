@@ -4,14 +4,14 @@ NMax       EQU   50
 KbdPort    EQU   9
 ACPPort    EQU   8
 ACPIN      EQU   0
-DELAY      EQU   4000
+DELAYN     EQU   4000
 BtnStart   EQU   2
 BtnStop    EQU   3
 BtnReset   EQU   4
 
 Stk        SEGMENT AT 100h use16
 ; размер стека
-           dw    100 dup (?)
+           dw    1100 dup (?)
 StkTop     Label Word
 Stk        ENDS
 
@@ -125,8 +125,11 @@ okcount:
 Savedi:
 
 ; ввод цифр с клавиатуры
-
+    call  KbdInput
+    call  KbdInContr
+    call  NxtDigTrf
 ; сброс
+
  
     jmp   InfLoop
 
@@ -135,7 +138,7 @@ Savedi:
 Delay      proc  near ; param cx=count
     inc   cx
     not   cl
-    add   ax, DELAY
+    add   ax, DELAYN
 LoopTen:
     push  cx
 DelayLoop:
