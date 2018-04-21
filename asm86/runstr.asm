@@ -61,6 +61,13 @@ Savedi:
     call  KbdInput
     call  KbdInContr
     call  NxtDigTrf
+    cmp   KbdErr,0FFh
+    jz    InfLoop
+    cmp   EmpKbd,0FFh
+    jz    InfLoop
+    xor   ah,ah
+    mov   al, NextDig
+    mov   string, al
 ; сброс 
     jmp   InfLoop
 
@@ -81,6 +88,7 @@ init proc
 init endp
 
 display_digits     proc near
+    mov   dx, 0
     lea   bx, Image    ;bx - указатель на массив образов
     mov   dl, string+di   ; загружаем значение цифры из стоки
     add   bx, dx      ; вычисляем адрес образа цифры
