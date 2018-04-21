@@ -1,7 +1,7 @@
-[SOURCE]=00000001,runstr.asm
 [ARCH]=00000000,runstr.arh
+[SOURCE]=00000001,runstr.asm
 [ROMSIZE]=4
 [FREQ]=1000000
 [FREEPINLEVEL]=1
 [WND.asm]=(155,26,1021,501)C:\RGATA\asm86\runstr.asm
-[WND.arh]=(-8,115,858,564)C:\RGATA\asm86\runstr.arh
+[WND.arh]=(0,0,866,449)C:\RGATA\asm86\runstr.arh

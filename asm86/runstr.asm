@@ -24,6 +24,7 @@ KbdImage   DB   4 DUP(?)
 EmpKbd     DB   ?
 KbdErr     DB   ?
 NextDig    DB   ?
+InputPos   DB   ?
 Data       ENDS
 
 Code       SEGMENT use16
@@ -44,30 +45,21 @@ Start:
     call init
 
 InfLoop:
-
-; считываем скорость движения строки с ацп
-    call acp_spd
-    call Delay
-    call display_digits
-        
-; смещаем индекс текущего символа
-    inc   di
-    cmp   di, 10
-    jnz   Savedi
-    mov   di, 0
-Savedi:
-
+;   wait start
 ; ввод цифр с клавиатуры
     call  KbdInput
     call  KbdInContr
     call  NxtDigTrf
-    cmp   KbdErr,0FFh
-    jz    InfLoop
-    cmp   EmpKbd,0FFh
-    jz    InfLoop
-    xor   ah,ah
-    mov   al, NextDig
-    mov   string, al
+    call  InputKey
+    
+    in   al, KbdPort
+    and  al, 80h
+    jnz  InfLoop
+; считываем скорость движения строки с ацп
+    call acp_spd
+    call Delay
+    call display_digits
+
 ; сброс 
     jmp   InfLoop
 
@@ -84,6 +76,7 @@ init proc
     mov   di, 0 ; index
     mov   dx, 0
     mov   KbdErr, 0
+    mov   InputPos, 0
     ret
 init endp
 
@@ -118,6 +111,13 @@ display_digits     proc near
     add   bx, dx
     mov   al, es:[bx]     ; Выводим цифру на индикатор
     out   3, al
+    
+    ; смещаем индекс текущего символа
+    inc   di
+    cmp   di, LENGTH string - 4
+    jnz   Savedi
+    mov   di, 0
+Savedi:
     ret
 display_digits endp
 
@@ -152,6 +152,25 @@ DelayLoop:
     jnz   LoopTen
     ret
 Delay      endp
+
+InputKey proc    
+    cmp   KbdErr,0FFh
+    jz    no_data
+    cmp   EmpKbd,0FFh
+    jz    no_data
+    xor   ah,ah
+    mov   al, NextDig
+    lea   bx, string
+    add   bl, InputPos
+    mov   [bx], al
+    inc   InputPos
+    mov   al, InputPos
+    cmp   al, LENGTH string
+    jl    no_data
+    mov   InputPos, 0
+no_data:
+    ret
+InputKey endp
 
 
 VibrDestr  PROC  NEAR
