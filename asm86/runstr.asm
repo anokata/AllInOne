@@ -57,6 +57,10 @@ InfLoop:
     call  InputKey
 
     mov   di, InputPos
+    sub   di, 4
+    jge   positiveIdx
+    mov   di, 0
+positiveIdx:
     call  display_digits
 
     jmp   InfLoop
@@ -78,8 +82,8 @@ init proc
     mov   di, LENGTH string
     mov   al, 0
     FillLoop:
-    mov   string+di, al
     dec   di
+    mov   string+di, al
     jnz   FillLoop
 
     mov   di, 0 ; index
@@ -90,6 +94,7 @@ init proc
     ret
 init endp
 
+; BUG on di in end - display part from begin
 display_digits     proc near ; input di - index  
     mov   dx, 0
     lea   bx, Image    ;bx - указатель на массив образов
