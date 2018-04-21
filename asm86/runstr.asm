@@ -56,7 +56,7 @@ InfLoop:
     call  NxtDigTrf
     call  InputKey
 
-    mov   di, InputPos
+    mov   di, InputPos 
     sub   di, 4
     jge   positiveIdx
     mov   di, 0
@@ -94,8 +94,20 @@ init proc
     ret
 init endp
 
+rotate_di   proc near
+    mov   ax, di
+    mov   bl, length string
+    div   bl
+    mov   al, ah
+    mov   ah, 0
+    mov   di, ax
+    ret
+rotate_di    endp
+
 ; BUG on di in end - display part from begin
 display_digits     proc near ; input di - index  
+    mov   si, di
+    call  rotate_di  
     mov   dx, 0
     lea   bx, Image    ;bx - указатель на массив образов
     mov   dl, string+di   ; загружаем значение цифры из стоки
@@ -104,32 +116,35 @@ display_digits     proc near ; input di - index
     out   0, al
     ; вторая цифра
     add   di, 1
+    call  rotate_di    
     lea   bx, Image
     mov   dl, string+di   
-    sub   di, 1
+    mov   di, si
     add   bx, dx
     mov   al,es:[bx]     ; Выводим цифру на индикатор
     out   1,al
     ; третья цифра
     add   di, 2
+    call  rotate_di  
     lea   bx, Image
     mov   dl, string+di   
-    sub   di, 2
+    mov   di, si
     add   bx, dx
     mov   al,es:[bx]     ; Выводим цифру на индикатор
     out   2,al
     ; четвертая цифра
     add   di, 3
+    call  rotate_di  
     lea   bx, Image
     mov   dl, string+di   
-    sub   di, 3
+    mov   di, si
     add   bx, dx
     mov   al, es:[bx]     ; Выводим цифру на индикатор
     out   3, al
     
     ; смещаем индекс текущего символа
     inc   di
-    cmp   di, LENGTH string - 4
+    cmp   di, LENGTH string - 1;4
     jnz   Savedi
     mov   di, 0
 Savedi:
@@ -178,7 +193,7 @@ InputKey proc
     lea   bx, string
     add   bx, InputPos
     mov   [bx], al
-    inc   InputPos
+    inc   InputPos 
     mov   ax, InputPos
     cmp   al, LENGTH string
     jl    no_data
