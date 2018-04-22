@@ -1,12 +1,12 @@
 .386
 RomSize    EQU   4096
 NMax       EQU   50
-KbdPort    EQU   09h
-ACPPort    EQU   8
-ACPIN      EQU   0
-DELAYN     EQU   4000
-BtnStart   EQU   80h
-BtnReset   EQU   40h
+KbdPort    EQU   09h  ; Номер порта клавиатуры
+ACPPort    EQU   8    ; Номер порта АЦП
+ACPIN      EQU   0    ; Номер порта входа АЦП 
+DELAYN     EQU   4000 ; Единичная задержка
+BtnStart   EQU   80h  ; Маска кнопки старт/стоп
+BtnReset   EQU   40h  ; Маска кнопки сброса
 
 Stk        SEGMENT AT 100h use16
 ; размер стека
@@ -16,27 +16,24 @@ Stk        ENDS
 
 Data       SEGMENT at 0 use16
 ;Здесь размещаются описания переменных
-           ;бегущая строка 10
-string     DB   10 DUP (?) 
-delayc     DB   ?
-KbdImage   DB   4 DUP(?)
+string     DB   10 DUP (?) ; Массив цифр бегущей строки
+delayc     DB   ?          ; Текущее значение задержки
+KbdImage   DB   4 DUP(?)   ; Данные с клавиатуры
 EmpKbd     DB   ?
 KbdErr     DB   ?
-NextDig    DB   ?
-InputPos   DW   ?
-OutputPos  DW   ?
+NextDig    DB   ?          ; Введенной значение 
+InputPos   DW   ?          ; Позиция при вводе
+OutputPos  DW   ?          ; Позиция при выводе
 Data       ENDS
 
 Code       SEGMENT use16
            ASSUME cs:Code,ds:Data,es:Code,ss:Stk
 
-;Здесь размещаются описания констант
-           ;Образы десятичных цифр от 0 до 9
-                  ; 0   1     2   3     4    5   6    7    8    9
-;Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
+;Образы десятичных цифр в порядке как на клавиатуре
 Image      db    05Eh,076h,00Ch,00Eh,07Bh,05Bh,04Dh,07Fh,05Fh, 07Fh,0Eh,0,0,0,03Fh
 
 Start:
+; Инициализация сегментов
     mov   ax, Data
     mov   ds, ax
     mov   ax, Code
@@ -46,45 +43,48 @@ Start:
     lea   sp, StkTop
     
 reset:
-    call init
+    call init ; Сброс 
 
-InfLoop:
+InfLoop:  ; Главный цикл
+; Проверка нажатия кнопки сброса
     in   al, KbdPort
     and  al, BtnReset
     jz   reset
 
+; Проверка нажатия кнопки старт/стоп
     in   al, KbdPort
     and  al, BtnStart   
+; Если нажата - циклический вывод строки
     jz   CycleOutput
-
-; ввод цифр с клавиатуры
+; Иначе ввод
+; Ввод цифр с клавиатуры
     call  KbdInput
     call  KbdInContr
     call  NxtDigTrf
     call  InputKey
-
+; Отображение введённых цифр
     mov   di, InputPos 
     sub   di, 4
     jge   positiveIdx
     mov   di, 0
 positiveIdx:
     call  display_digits
-
     jmp   InfLoop
 
-CycleOutput:
-; считываем скорость движения строки с ацп
+CycleOutput: ; Циклический вывод строки
+; Считываем скорость движения строки с ацп
     call  acp_spd
-    call  Delay
+    call  Delay    ; Ждем
+; Отображение цифр в текущей позиции
     mov   di, OutputPos
     call  display_digits
     mov   OutputPos, di
-
     jmp   InfLoop
 
 
-init proc
-    mov   si, 0
+init proc ; Подпрограмма инициализации/сброса
+;mov   si, 0
+; Очистка строки цифр
     mov   di, LENGTH string
     mov   al, 11
     FillLoop:
@@ -100,7 +100,8 @@ init proc
     ret
 init endp
 
-rotate_di   proc near
+; Подпрограмма вычисления позиции с учётом прокрутки
+rotate_di   proc near ; Входное и выходное значение в di
     mov   ax, di
     mov   bl, length string
     div   bl
@@ -110,23 +111,25 @@ rotate_di   proc near
     ret
 rotate_di    endp
 
-display_digits     proc near ; input di - index  
+; Подпрограмма вывода 4 цифр на индикаторы
+display_digits     proc near ; Входное значение - di индекс начала
+    ; Первая цифра
     mov   si, di
-    call  rotate_di  
+    call  rotate_di     ; Вычисление позиции
     mov   dx, 0
-    lea   bx, Image    ;bx - указатель на массив образов
-    mov   dl, string+di   ; загружаем значение цифры из стоки
-    add   bx, dx      ; вычисляем адрес образа цифры
-    mov   al,es:[bx]     ; Выводим цифру на индикатор
-    out   0, al
-    ; вторая цифра
+    lea   bx, Image     ; bx - указатель на массив образов
+    mov   dl, string+di ; Загружаем значение цифры из стоки
+    add   bx, dx        ; Вычисляем адрес образа цифры
+    mov   al,es:[bx]    ; Читаем образ цифры
+    out   0, al         ; Выводим цифру на индикатор
+    ; Вторая цифра
     add   di, 1
     call  rotate_di    
     lea   bx, Image
     mov   dl, string+di   
     mov   di, si
     add   bx, dx
-    mov   al,es:[bx]     ; Выводим цифру на индикатор
+    mov   al,es:[bx] 
     out   1,al
     ; третья цифра
     add   di, 2
@@ -135,7 +138,7 @@ display_digits     proc near ; input di - index
     mov   dl, string+di   
     mov   di, si
     add   bx, dx
-    mov   al,es:[bx]     ; Выводим цифру на индикатор
+    mov   al,es:[bx]
     out   2,al
     ; четвертая цифра
     add   di, 3
@@ -144,10 +147,10 @@ display_digits     proc near ; input di - index
     mov   dl, string+di   
     mov   di, si
     add   bx, dx
-    mov   al, es:[bx]     ; Выводим цифру на индикатор
+    mov   al, es:[bx]
     out   3, al
     
-    ; смещаем индекс текущего символа
+    ; Смещаем индекс текущего символа
     inc   di
     cmp   di, LENGTH string
     jnz   Savedi
@@ -156,7 +159,8 @@ Savedi:
     ret
 display_digits endp
 
-acp_spd      proc  near ; out cx
+; Подпрограмма ввода скорости с АЦП
+acp_spd      proc  near ; Выходное значение в cx
     mov al, 0
     out ACPPort, al
     mov al, 1
@@ -165,15 +169,16 @@ acp_spd      proc  near ; out cx
     in al, ACPPort
     test al, 1
     jz waitrdy
-    in al, ACPIN
-    mov  delayc, al
+    in al, ACPIN    ; Ввод значения
+    mov  delayc, al ; Сохранение значения
     mov  cx, 0
     mov  cl, al
     ret
 acp_spd      endp
 
-Delay      proc  near ; param cx=count
-    not   cl
+; Подпрограмма задержки
+Delay      proc  near ; Входной параметр cx - число циклов
+    not   cl          ; Задержка обратна значению
     test  cl, cl
     jnz   notZeroCount
     inc   cl
@@ -191,17 +196,18 @@ DelayLoop:
     ret
 Delay      endp
 
+; Подпрограмма записи значения с клавиатуры
 InputKey proc    
-    cmp   KbdErr,0FFh
+    cmp   KbdErr,0FFh ; Проверка наличия данных
     jz    no_data
     cmp   EmpKbd,0FFh
     jz    no_data
     xor   ah,ah
-    mov   al, NextDig
-    lea   bx, string
+    mov   al, NextDig ; Чтение введенного значения
+    lea   bx, string  ; Вычисление позиции
     add   bx, InputPos
-    mov   [bx], al
-    inc   InputPos 
+    mov   [bx], al   ; Запись введенной цифры
+    inc   InputPos   ; Сдвиг позиции текущей цифры
     mov   ax, InputPos
     cmp   al, LENGTH string
     jl    no_data
@@ -209,7 +215,6 @@ InputKey proc
 no_data:
     ret
 InputKey endp
-
 
 VibrDestr  PROC  NEAR
 VD1:       mov   ah,al       ;Сохранение исходного состояния
@@ -224,6 +229,7 @@ VD2:       in    al,dx       ;Ввод текущего состояния
            ret
 VibrDestr  ENDP
 
+; Подпрограмма ввода значения с клавиатуры
 KbdInput   PROC  NEAR
            lea   si,KbdImage         ;Загрузка адреса,
            mov   cx,LENGTH KbdImage  ;счётчика циклов
