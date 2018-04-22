@@ -5,9 +5,8 @@ KbdPort    EQU   09h
 ACPPort    EQU   8
 ACPIN      EQU   0
 DELAYN     EQU   4000
-BtnStart   EQU   2
-BtnStop    EQU   3
-BtnReset   EQU   4
+BtnStart   EQU   80h
+BtnReset   EQU   40h
 
 Stk        SEGMENT AT 100h use16
 ; размер стека
@@ -33,7 +32,9 @@ Code       SEGMENT use16
 
 ;Здесь размещаются описания констант
            ;Образы десятичных цифр от 0 до 9
-Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
+                  ; 0   1     2   3     4    5   6    7    8    9
+;Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
+Image      db    0,05Eh,076h,00Ch,00Eh,07Bh,05Bh,04Dh,07Fh,05Fh, 07Fh,0Eh,0,0,0,03Fh
 
 Start:
     mov   ax, Data
@@ -43,11 +44,17 @@ Start:
     mov   ax, Stk
     mov   ss, ax
     lea   sp, StkTop
+    
+reset:
     call init
 
 InfLoop:
     in   al, KbdPort
-    and  al, 80h
+    and  al, BtnReset
+    jz   reset
+
+    in   al, KbdPort
+    and  al, BtnStart   
     jz   CycleOutput
 
 ; ввод цифр с клавиатуры
@@ -144,7 +151,7 @@ display_digits     proc near ; input di - index
     
     ; смещаем индекс текущего символа
     inc   di
-    cmp   di, LENGTH string - 1;4
+    cmp   di, LENGTH string - 0;4
     jnz   Savedi
     mov   di, 0
 Savedi:
