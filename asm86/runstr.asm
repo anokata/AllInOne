@@ -34,7 +34,7 @@ Code       SEGMENT use16
            ;Образы десятичных цифр от 0 до 9
                   ; 0   1     2   3     4    5   6    7    8    9
 ;Image      db    03Fh,00Ch,076h,05Eh,04Dh,05Bh,07Bh,00Eh,07Fh,05Fh
-Image      db    0,05Eh,076h,00Ch,00Eh,07Bh,05Bh,04Dh,07Fh,05Fh, 07Fh,0Eh,0,0,0,03Fh
+Image      db    05Eh,076h,00Ch,00Eh,07Bh,05Bh,04Dh,07Fh,05Fh, 07Fh,0Eh,0,0,0,03Fh
 
 Start:
     mov   ax, Data
@@ -80,14 +80,13 @@ CycleOutput:
     call  display_digits
     mov   OutputPos, di
 
-; сброс 
     jmp   InfLoop
 
 
 init proc
     mov   si, 0
     mov   di, LENGTH string
-    mov   al, 0
+    mov   al, 11
     FillLoop:
     dec   di
     mov   string+di, al
@@ -111,7 +110,6 @@ rotate_di   proc near
     ret
 rotate_di    endp
 
-; BUG on di in end - display part from begin
 display_digits     proc near ; input di - index  
     mov   si, di
     call  rotate_di  
@@ -151,7 +149,7 @@ display_digits     proc near ; input di - index
     
     ; смещаем индекс текущего символа
     inc   di
-    cmp   di, LENGTH string - 0;4
+    cmp   di, LENGTH string
     jnz   Savedi
     mov   di, 0
 Savedi:
@@ -175,9 +173,12 @@ acp_spd      proc  near ; out cx
 acp_spd      endp
 
 Delay      proc  near ; param cx=count
-    inc   cx
     not   cl
-    add   ax, DELAYN
+    test  cl, cl
+    jnz   notZeroCount
+    inc   cl
+notZeroCount:
+    mov   ax, DELAYN
 LoopTen:
     push  cx
 DelayLoop:
