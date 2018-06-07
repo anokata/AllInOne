@@ -2,6 +2,7 @@ import math
 
 def test():
     pass
+    a = [1,1]
 
 def a(n):
     return 2*n - 1
