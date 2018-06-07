@@ -1,5 +1,8 @@
 import math
 
+def test():
+    pass
+
 def a(n):
     return 2*n - 1
 
