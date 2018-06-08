@@ -3,6 +3,7 @@ import math
 def test():
     pass
     __a = [1,1,12,312,312,3,3123]
+    __b = [1,1,12,312,312,3,3123]
 
 def a(n):
     return 2*n - 1
