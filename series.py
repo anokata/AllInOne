@@ -1,6 +1,7 @@
 import math
 
 def test():
+    __a=[1]
     pass
 
 def a(n):
