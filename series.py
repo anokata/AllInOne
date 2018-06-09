@@ -1,7 +1,7 @@
 import math
 
 def test():
-    __a=[1,2]
+    __a=[1,2,3]
     pass
 
 def a(n):
