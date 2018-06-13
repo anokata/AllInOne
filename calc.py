@@ -72,3 +72,5 @@ def g():
 
     return r
 print(g())
+
+print(2,2)
