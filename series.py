@@ -3,6 +3,7 @@ import math
 print(2222);
 print(3);
 print(4);
+print(5);
 
 def test():
     __a=[1, 2, 3, 4, 5, 6]
