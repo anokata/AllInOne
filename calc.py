@@ -80,3 +80,4 @@ class TestOne():
     # no doc
     def __init__():
         pass
+        print(28*28)
