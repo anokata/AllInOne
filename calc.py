@@ -75,3 +75,8 @@ def g():
 print(g())
 
 print(2,2)
+
+class TestOne():
+    # no doc
+    def __init__():
+        pass
