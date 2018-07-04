@@ -169,15 +169,15 @@ def process_diff(content):
                         #print(i, file.path, line.source_line_no)
                         error = check_doc_in_class(file.path, i)
                         if error:
-                            error_list.append("{}: {}".format(file.path, error))
+                            error_list.append("{}:{}".format(file.path, error))
 
             if hunk.target_start:
                 error = check_doc_in_class(file.path, hunk.target_start)
                 if error:
-                    error_list.append("{}: {}".format(file.path, error))
+                    error_list.append("{}:{}".format(file.path, error))
                 error = check_doc_in_fun(file.path, hunk.target_start)
                 if error:
-                    error_list.append("{}: {}".format(file.path, error))
+                    error_list.append("{}:{}".format(file.path, error))
 
     for e in set(error_list):
         print(e)
