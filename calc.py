@@ -5,6 +5,7 @@ def a():
     z = y/(169/24.000)
     u = x/z
     print(x, y, z, u)
+    pass
     return u
 
 #a()
