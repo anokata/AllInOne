@@ -13,3 +13,11 @@ win2:
 
 clean:
 	rm *.exe
+
+chatserver:
+	mcs $@.cs -r:System.Windows.Forms.dll -r:System.Drawing.dll
+	mono $@.exe
+
+chatclient:
+	mcs $@.cs -r:System.Windows.Forms.dll -r:System.Drawing.dll
+	mono $@.exe
