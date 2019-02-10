@@ -58,8 +58,9 @@ namespace ChatServer {
             TcpClient tClient = (TcpClient)client;
  
             Console.WriteLine("Client (Thread: {0}): Connected!", Thread.CurrentThread.ManagedThreadId);
-            byte[] bytes = Encoding.ASCII.GetBytes("Enter name: ");
-            tClient.GetStream().Write(bytes, 0, bytes.Length);
+            //byte[] bytes = Encoding.ASCII.GetBytes("Enter name: ");
+            byte[] bytes = null;
+            //tClient.GetStream().Write(bytes, 0, bytes.Length);
  
             string name = string.Empty;
             bool done = false;

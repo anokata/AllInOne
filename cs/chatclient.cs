@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Threading;
 
 public class Client : Form
 {
@@ -11,6 +12,7 @@ public class Client : Form
     private System.Windows.Forms.Button sendButton;
     private System.Windows.Forms.Button connectButton;
     private TcpClient tcp;
+    private System.Net.Sockets.NetworkStream stream;
 
     static public void Main ()
     {
@@ -46,26 +48,38 @@ public class Client : Form
         this.messageBox = new System.Windows.Forms.TextBox();
         this.Controls.Add(this.messageBox);
         this.messageBox.Location = new System.Drawing.Point(150, 280);
+        Thread readThread = new Thread(new ParameterizedThreadStart(read));
+        readThread.Start(null);
     }
 
-    private void read() 
+    private void read(object o) 
     {
-        int i;
-        Byte[] bytes = new Byte[256];
-        String data = null;
-        var stream = tcp.GetStream();
-        i = stream.Read(bytes, 0, bytes.Length);
-        data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-        this.multiLineBox.Text += data;
+        while (true) {
+            if (stream == null) continue;
+            //Console.WriteLine("read 2");
+            int i;
+            Byte[] bytes = new Byte[256];
+            String data = null;
+            if (stream.CanRead) {
+                i = stream.Read(bytes, 0, bytes.Length); 
+                data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                this.multiLineBox.Text += data;
+            }
+        }
     }
  
     private void Connect_Click(object sender, EventArgs e)
     {
         this.tcp = new TcpClient("localhost", 4004);
-        read();
+        stream = tcp.GetStream();
         StreamWriter writer = new StreamWriter(tcp.GetStream());
-        writer.Write("alice\n");
-        //writer.Flush();
+
+        Random rand = new Random();
+        String name = "guest_" + rand.Next();
+        writer.Write(name + "\n");
+
+        writer.Flush();
+        this.multiLineBox.Text += "Connected as " + name + "\n";
     }
 
     private void Send_Click (object sender, EventArgs e)
@@ -73,11 +87,9 @@ public class Client : Form
         StreamWriter writer = new StreamWriter(tcp.GetStream());
  
         writer.Write(this.messageBox.Text + "\n");
-        //writer.Flush();
-        read();
- 
+        writer.Flush();
+        this.multiLineBox.Text += "you> " + this.messageBox.Text + "\n";
     }
-        //tcp.Close();
 }
 
 
