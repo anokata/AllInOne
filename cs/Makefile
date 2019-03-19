@@ -14,7 +14,7 @@ win2:
 clean:
 	rm *.exe
 
-chatserver:
+server:
 	mcs $@.cs -r:System.Windows.Forms.dll -r:System.Drawing.dll
 	mono $@.exe
 

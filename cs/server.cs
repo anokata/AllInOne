@@ -32,7 +32,7 @@ namespace ChatServer {
         static Dictionary<int, State> connections = new Dictionary<int, State>();
  
         static void Main(string[] args) {
-            listen = new TcpListener(System.Net.IPAddress.Parse("127.0.0.1"), 4004);
+            listen = new TcpListener(System.Net.IPAddress.Any, 4004);
             serverthread = new Thread(new ThreadStart(DoListen));
             serverthread.Start();
         }
