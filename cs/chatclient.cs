@@ -69,14 +69,14 @@ public class Client : Form
         this.messageBox.Size = new Size(200, 20);
 
         // Запускаем поток чтения
-        Thread readThread = new Thread(new ParameterizedThreadStart(read));
+        Thread readThread = new Thread(new ParameterizedThreadStart(Read));
         readThread.Start(null);
         // Изменяем размер формы
         Size = new Size(500,400);
     }
 
     // Процедура чтения данных от сервера
-    private void read(object o) 
+    private void Read(object o) 
     {
         while (true) {
             if (stream == null) continue;
@@ -98,7 +98,6 @@ public class Client : Form
     {
         // Создаём подключение к серверу и потоки ввода вывода
         this.tcp = new TcpClient(this.ipBox.Text, 4004);this.tcp = new TcpClient(this.ipBox.Text, 4004);
-          //this.tcp = new TcpClient("192.168.1.2", 4004);
         stream = tcp.GetStream();
         StreamWriter writer = new StreamWriter(tcp.GetStream());
 
@@ -111,7 +110,8 @@ public class Client : Form
         // Запись соединения в лог
         this.multiLineBox.Text += "Connected as " + name + "\r\n";
     }
-
+    
+    // Процедура отправки сообщения
     private void Send_Click(object sender, EventArgs e)
     {
         // Создаём поток записи для соединения с сервером

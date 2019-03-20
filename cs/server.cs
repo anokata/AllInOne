@@ -42,7 +42,7 @@ namespace ChatServer {
             // Запускаем поток
             serverthread.Start();
         }
- 
+        // Процедура обработки входящих соединений
         private static void DoListen() {
             // Запуск сокета
             listen.Start();
@@ -50,7 +50,7 @@ namespace ChatServer {
  
             while (true) {
                 Console.WriteLine("Server: Waiting...");
-                // Создаём клиентское соединение
+                // Получение клиентского соединения
                 TcpClient client = listen.AcceptTcpClient();
                 Console.WriteLine("Server: Waited");
  
@@ -60,7 +60,7 @@ namespace ChatServer {
                 clientThread.Start(client);
             }
         }
- 
+        // Процедура обработки клиента
         private static void DoClient(object client) {
             // Преобразуем параметр client к типу TcpClient
             TcpClient tClient = (TcpClient)client;
@@ -68,22 +68,17 @@ namespace ChatServer {
             
             byte[] bytes = null;
             string name = string.Empty;
-            bool done = false;
-            
-            do {
-                // Если клиент не подсоединён
-                if (!tClient.Connected) {
-                    Console.WriteLine("Client (Thread: {0}): Terminated!", Thread.CurrentThread.ManagedThreadId);
-                    // Закрываем сокет клиента
-                    tClient.Close();
-                    // Завершаем поток
-                    Thread.CurrentThread.Abort();
-                }
- 
-                // Получаем имя клиента
-                name = Receive(tClient);
-                done = true;
-            } while (!done);
+            // Если клиент не подсоединён
+            if (!tClient.Connected) {
+                Console.WriteLine("Client (Thread: {0}): Terminated!", Thread.CurrentThread.ManagedThreadId);
+                // Закрываем сокет клиента
+                tClient.Close();
+                // Завершаем поток
+                Thread.CurrentThread.Abort();
+            }
+
+            // Получаем имя клиента
+            name = Receive(tClient);
  
             // Добавляем имя клиента и его сокет в словарь под ID потока
             connections.Add(Thread.CurrentThread.ManagedThreadId, new State(name, tClient));
@@ -123,7 +118,7 @@ namespace ChatServer {
         private static string Receive(TcpClient client) {
             StringBuilder sb = new StringBuilder(); // Аккумулятор данных
             do {
-                // Если у клиента доспны данные
+                // Если у клиента доступны данные
                 if (client.Available > 0) {
                     // Пока есть данные
                     while (client.Available > 0) {
