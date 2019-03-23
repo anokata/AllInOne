@@ -11,17 +11,15 @@ document.addEventListener("DOMContentLoaded", ready);
 
 function ready() {
     console.log("test");
-    var query = 'https://api.weather.yandex.ru/v1/forecast?'; 
-    query += "lat=" + document.getElementById("lat").value;
-    query += "&lon=" + document.getElementById("lon").value;
+    var query = 'localhost:5000/pogoda/'
+    query += document.getElementById("lat").value;
+    query += "/" + document.getElementById("lon").value;
     console.log(query);
     var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
     var xhr = new XHR();
     xhr.open('GET', query, true);
-    xhr.setRequestHeader('X-Yandex-API-Key', 'a57bd39d-59d5-47e1-9bfe-00d40e2676c8');
-    xhr.setRequestHeader('Origin', '*');
     xhr.onload = function() {
-  alert( this.responseText );
+        alert( this.responseText );
 }
     xhr.onreadystatechange = function() {
         console.log(this.responseText);
