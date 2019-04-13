@@ -1,0 +1,35 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script>
+window.onload = function () {
+  function init() {
+    setMap();
+  }
+   
+  function setMap() {
+    loadData();
+  }
+   
+  function loadData() {
+    // карта в topoJSON-формате
+    queue()
+      .defer(d3.json, "http://map/topoworld.json")  
+      .await(processData);  // обработка загруженных данных
+  }
+   
+  function processData(error, worldMap, countryData) {
+    if (error) return console.error(error);
+    console.log(worldMap);
+    console.log(countryData);
+  }
+   
+  init();
+};
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
