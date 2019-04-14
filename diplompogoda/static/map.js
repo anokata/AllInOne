@@ -4,6 +4,7 @@ window.onload = function () {
 var width, height, svg, path, projection;
 var sens = 0.25;
 var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
+//colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"]
 
   function init() {
     setMap();
@@ -84,6 +85,18 @@ var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
         .attr("class", "points")
         .attr("d", path);
 
+
+      /*
+    svg.selectAll(".temp")
+        .data(cities)
+        .enter().append("text")
+        .attr("d", path)
+        .attr("class", "temp")
+        .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
+        .attr("dy", ".35em")
+        .text(function(d) { return d.properties.name; });
+        */
+
     var pointsd = 
 [
   {
@@ -104,7 +117,14 @@ var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
         .attr("stroke-width", 5)
         .attr("stroke", "white")
         .attr("fill", "white")
-        .attr("d", path);
+        .attr("d", path)
+        .append("text")
+        .attr("class", "temp")
+        .text("+88")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "20px")
+        .attr("fill", "red")
+      ;
   }
    
   init();

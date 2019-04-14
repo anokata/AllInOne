@@ -13,7 +13,6 @@ d3js
 http://bl.ocks.org/KoGor/5994804
 http://marcneuwirth.com/blog/2012/06/24/creating-the-earth-with-d3-js/
 https://d3-wiki.readthedocs.io/zh_CN/master/Geo-Projections/
-https://d3js.org/d3-geo-projection.v2.min.js
 https://frontender.info/d3js-map-visualization/
 
 https://github.com/SamHasler/sphere/blob/master/sphere.js
@@ -22,7 +21,7 @@ https://github.com/csparpa/pyowm
 
 
 Как мы знаем, карта представляет из себя контуры, линии, границы государств, береговые линии и много другой геометрии. Для получения этих данных мы будем обращаться к shapefile — популярному формату геоданных. Shapefile позволяет хранить точки, линии, полигоны и другие объекты. Также может содержать информацию о параметрах типа температуры, названий, глубины и т.д. Hа самом деле, shapefile представляет из себя набор из трёх файлов: *.shp, *.shx и *.dbf. Важно, чтобы все три файла находились в одной директории.
-https://www.naturalearthdata.com/downloads/110m-physical-vectors/
+https://www.naturalearthdata.com/downloads/
 org2org (gdal)
 sudo npm install -g topojson
 
