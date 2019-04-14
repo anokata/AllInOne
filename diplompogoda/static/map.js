@@ -3,6 +3,7 @@ window.onload = function () {
 
 var width, height, svg, path, projection;
 var sens = 0.25;
+var colors = ["#441", "#522", "#552", "#252", "#225", "#530", "#350"];
 
   function init() {
     setMap();
@@ -56,6 +57,14 @@ var sens = 0.25;
         .data(countries)
         .enter().append("path")
         .attr("class", "land")
+        .attr("stroke-width", 2)
+        .attr("stroke", "black")
+        .attr("fill", function (d) { 
+            var c = d.properties.MAPCOLOR7 || 0;
+            //console.log(d, c);
+            //var n = Math.round(d.geometry.coordinates[0][0][0]) || 0;
+            var n = Math.abs(c % colors.length);
+            return colors[n]; })
         .attr("d", path);
 
     svg.selectAll("path")
