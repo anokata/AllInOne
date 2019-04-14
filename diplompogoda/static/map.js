@@ -75,12 +75,35 @@ var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
             projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
             svg.selectAll("path.points").attr("d", path);
             svg.selectAll("path.land").attr("d", path);
+            svg.selectAll("path.temp").attr("d", path);
       }));
 
     var citysvg = svg.selectAll("path.points")
         .data(cities)
         .enter().append("path")
         .attr("class", "points")
+        .attr("d", path);
+
+    var pointsd = 
+[
+  {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        38.5,
+        58.5
+      ]
+    }
+  }
+];
+    svg.selectAll("path.temp")
+        .data(pointsd)
+        .enter().append("path")
+        .attr("class", "temp")
+        .attr("stroke-width", 5)
+        .attr("stroke", "white")
+        .attr("fill", "white")
         .attr("d", path);
   }
    
