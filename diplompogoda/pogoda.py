@@ -15,6 +15,14 @@ def pogoda(lat, lon):
 def root():
     return render_template('yandex.html')
 
+@app.route('/s')
+def map():
+    return render_template('map.html')
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),

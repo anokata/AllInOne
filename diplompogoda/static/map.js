@@ -1,36 +1,3 @@
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-<style>
-body {
-    background: #232323;
-}
-svg {
-    background: #232323;
-    border:solid black 1px;
-}
-.country {
-    stroke: black;
-    stroke-width: 0.1;
-}
-.water {
-  fill: #234c75;
-}
-.points {
-    fill: #732;
-    stroke: none;
-    stroke-width: 1px;
-    stroke-linejoin: round;
-}
-</style>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="http://d3js.org/queue.v1.min.js"></script>
-    <script src="http://d3js.org/topojson.v1.min.js"></script>
-    <script src="https://d3js.org/d3-array.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-    <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
-    <script>
 var aitoff = d3.geoAitoff();
 window.onload = function () {
 
@@ -70,8 +37,8 @@ var sens = 0.25;
   function loadData() {
     // карта в topoJSON-формате
     queue()
-      .defer(d3.json, "geo/topoworld.json")  
-      .defer(d3.json, "geo/topocitybig.json")  
+      .defer(d3.json, "static/geo/topoworld.json")  
+      .defer(d3.json, "static/geo/topocitybig.json")  
       .await(processData);  // обработка загруженных данных
   }
    
@@ -110,9 +77,3 @@ var sens = 0.25;
    
   init();
 };
-    </script>
-  </head>
-  <body>
-<div id="map"></div>
-  </body>
-</html>

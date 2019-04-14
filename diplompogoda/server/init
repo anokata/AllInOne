@@ -1,2 +1,0 @@
-epip install requests
-virtualenv env
