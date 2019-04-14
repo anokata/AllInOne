@@ -3,7 +3,7 @@ window.onload = function () {
 
 var width, height, svg, path, projection;
 var sens = 0.25;
-var colors = ["#441", "#522", "#552", "#252", "#225", "#530", "#350"];
+var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
 
   function init() {
     setMap();
