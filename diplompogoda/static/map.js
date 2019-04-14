@@ -9,14 +9,14 @@ var sens = 0.25;
   }
    
   function setMap() {
-    width = 818, height = 600;
+    width = 1000, height = 800;
      
     svg = d3.select('#map').append('svg')
         .attr('width', width)
         .attr('height', height);
 
     projection = d3.geo.orthographic()
-        .scale(245)
+        .scale(380)
         .rotate([0, 0])
         .translate([width / 2, height / 2])
         .clipAngle(90);
@@ -44,21 +44,21 @@ var sens = 0.25;
    
   function processData(error, worldMap, cityMap) {
     if (error) return console.error(error);
-    console.log(worldMap);
     var world = topojson.feature(worldMap, worldMap.objects.world);
     var cities = topojson.feature(cityMap, cityMap.objects.citybig).features;
     countries = world.features;
-    //var map = svg.append("g");
-    console.log(world);
+    console.log(worldMap);
     console.log(cityMap);
+    console.log(world);
     console.log(cities);
-
 
     var world2 = svg.selectAll("path.land")
         .data(countries)
         .enter().append("path")
         .attr("class", "land")
-        .attr("d", path)
+        .attr("d", path);
+
+    svg.selectAll("path")
         .call(d3.behavior.drag()
         .origin(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
         .on("drag", function() {
