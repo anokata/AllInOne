@@ -58,6 +58,7 @@ function renderCities() {
 
 function send(wheather_data, city, lat, lon) {
     var query = 'http://127.0.0.1:5000/pogoda/'
+    //var query = 'http://ksilenomen.pythonanywhere.com/pogoda/'
     query += lat;
     query += "/" + lon;
     var xhr = new XMLHttpRequest();
