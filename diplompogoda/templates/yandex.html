@@ -22,9 +22,21 @@ svg {
 }
 .points {
     fill: #888;
-    stroke: none;
+    stroke: #ccc;
     stroke-width: 2px;
     stroke-linejoin: round;
+}
+.tooltip {
+  position: absolute;
+  display: none;
+  pointer-events: none;
+  background: #fff;
+  padding: 5px;
+  text-align: left;
+  border: solid #ccc 1px;
+  color: #666;
+  font-size: 14px;
+  font-family: sans-serif;
 }
 </style>
     <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -56,7 +68,7 @@ function renderCities() {
     }
 }
 
-function send(wheather_data, city, lat, lon) {
+function send(wheather_data, city, lat, lon, f) {
     var query = 'http://127.0.0.1:5000/pogoda/'
     //var query = 'http://ksilenomen.pythonanywhere.com/pogoda/'
     query += lat;
@@ -70,8 +82,10 @@ function send(wheather_data, city, lat, lon) {
             "temp": data['fact']['temp'],
             "condition": data['fact']['condition'],
             "humidity": data['fact']['humidity'],
+            "info": data['info']['url'],
         };
-        console.log(wheather_data);
+        if (f) f(wheather_data);
+        //console.log(wheather_data);
         return data;
     }
   

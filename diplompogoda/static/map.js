@@ -4,6 +4,8 @@ window.onload = function () {
 var width, height, svg, path, projection;
 var sens = 0.25;
 var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
+var tooltip = d3.select("body").append("div").attr("class", "tooltip");
+var tempById = {};
 //colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"]
 
   function init() {
@@ -79,11 +81,43 @@ var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
             svg.selectAll("path.temp").attr("d", path);
       }));
 
+    cities.forEach(function(d) {
+      //tempById[d.id] = d.name;
+    });
+
     var citysvg = svg.selectAll("path.points")
         .data(cities)
         .enter().append("path")
         .attr("class", "points")
         .attr("d", path);
+
+    citysvg.on("mouseover", function(d) {
+        //console.log(d, tempById);
+        lat = d.geometry.coordinates[1];
+        lon = d.geometry.coordinates[0];
+        var text = "";
+        text += d.properties.adm0name || ""; 
+        text += "<br/>";
+        text += d.properties.adm1name || "";
+        text += "<br/>";
+        var wheather_data = {};
+        send(wheather_data, d.properties.geonameid, lat, lon, function (wheather_data) {
+              text += wheather_data[d.properties.geonameid]["temp"] + "°";
+              tooltip.html(text)
+              .style("left", (d3.event.pageX + 7) + "px")
+              .style("top", (d3.event.pageY - 15) + "px")
+              .style("display", "block")
+              .style("opacity", 1)
+            .on("mouseout", function(d) {
+              tooltip.style("opacity", 0)
+              .style("display", "none");
+            })
+            .on("mousemove", function(d) {
+              tooltip.style("left", (d3.event.pageX + 7) + "px")
+              .style("top", (d3.event.pageY - 15) + "px");
+            });
+            });
+        });
 
 
       /*
