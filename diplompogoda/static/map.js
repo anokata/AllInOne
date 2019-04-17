@@ -64,8 +64,6 @@ var tempById = {};
         .attr("stroke", "black")
         .attr("fill", function (d) { 
             var c = d.properties.MAPCOLOR7 || 0;
-            //console.log(d, c);
-            //var n = Math.round(d.geometry.coordinates[0][0][0]) || 0;
             var n = Math.abs(c % colors.length);
             return colors[n]; })
         .attr("d", path);
@@ -79,6 +77,8 @@ var tempById = {};
             svg.selectAll("path.points").attr("d", path);
             svg.selectAll("path.land").attr("d", path);
             svg.selectAll("path.temp").attr("d", path);
+            //console.log(path.centroid());
+            //svg.selectAll("text.temp").attr("x", );
       }));
 
     cities.forEach(function(d) {
@@ -151,10 +151,16 @@ var tempById = {};
         .attr("stroke-width", 5)
         .attr("stroke", "white")
         .attr("fill", "white")
-        .attr("d", path)
+        .attr("d", path);
+
+    svg.selectAll("text")
+        .data(pointsd)
+        .enter()
         .append("text")
         .attr("class", "temp")
         .text("+88")
+        .attr("x", function(d) { return d.geometry.coordinates[0]; })
+        .attr("y", function(d) { return d.geometry.coordinates[1]; })
         .attr("font-family", "sans-serif")
         .attr("font-size", "20px")
         .attr("fill", "red")
