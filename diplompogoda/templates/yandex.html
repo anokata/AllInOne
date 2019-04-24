@@ -38,6 +38,15 @@ svg {
   font-size: 14px;
   font-family: sans-serif;
 }
+
+#map {
+    float: left;
+    color: #eee;
+}
+#info {
+    float: left;
+    color: #eee;
+}
 </style>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
@@ -60,6 +69,10 @@ svg {
 </div>
 
 <div id="map"></div>
+<div id="info">
+    <span>Информация о месте:</span>
+    <div id="wheather">x</div>
+</div>
 </body>
 
 </html>

@@ -42,7 +42,7 @@ var tempById = {};
     // карта в topoJSON-формате
     queue()
       .defer(d3.json, "static/geo/topoworld.json")  
-      .defer(d3.json, "static/geo/topocitymin.json")  
+      .defer(d3.json, "static/geo/topocitymini.json")  
       .await(processData);  // обработка загруженных данных
   }
    
@@ -51,7 +51,7 @@ var tempById = {};
     console.log(worldMap);
     console.log(cityMap);
     var world = topojson.feature(worldMap, worldMap.objects.world);
-    var cities = topojson.feature(cityMap, cityMap.objects.citymin).features;
+    var cities = topojson.feature(cityMap, cityMap.objects.citymini).features;
     countries = world.features;
     console.log(world);
     console.log(cities);
@@ -96,13 +96,16 @@ var tempById = {};
         lat = d.geometry.coordinates[1];
         lon = d.geometry.coordinates[0];
         var text = "";
-        text += d.properties.adm0name || ""; 
-        text += "<br/>";
-        text += d.properties.adm1name || "";
+        text += d.properties.name_ru || "";
         text += "<br/>";
         var wheather_data = {};
         send(wheather_data, d.properties.geonameid, lat, lon, function (wheather_data) {
+              text += "Температура: ";
               text += wheather_data[d.properties.geonameid]["temp"] + "°";
+              text += "<br/>";
+              text += "Влажность: ";
+              text += wheather_data[d.properties.geonameid]["humidity"] + "%";
+              text += "<br/>";
               tooltip.html(text)
               .style("left", (d3.event.pageX + 7) + "px")
               .style("top", (d3.event.pageY - 15) + "px")
