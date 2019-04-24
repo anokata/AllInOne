@@ -42,17 +42,17 @@ var tempById = {};
     // карта в topoJSON-формате
     queue()
       .defer(d3.json, "static/geo/topoworld.json")  
-      .defer(d3.json, "static/geo/topocitybig.json")  
+      .defer(d3.json, "static/geo/topocitymin.json")  
       .await(processData);  // обработка загруженных данных
   }
    
   function processData(error, worldMap, cityMap) {
     if (error) return console.error(error);
-    var world = topojson.feature(worldMap, worldMap.objects.world);
-    var cities = topojson.feature(cityMap, cityMap.objects.citybig).features;
-    countries = world.features;
     console.log(worldMap);
     console.log(cityMap);
+    var world = topojson.feature(worldMap, worldMap.objects.world);
+    var cities = topojson.feature(cityMap, cityMap.objects.citymin).features;
+    countries = world.features;
     console.log(world);
     console.log(cities);
 
@@ -157,9 +157,11 @@ var tempById = {};
         .data(pointsd)
         .enter()
         .append("text")
+        .attr("transform", function(d) { return "translate(" + 
+                projection([d.geometry.coordinates[0], d.geometry.coordinates[1]]) + ")" })
         .attr("class", "temp")
         .text("+88")
-        .attr("x", function(d) { return d.geometry.coordinates[0]; })
+        .attr("x", function(d) { console.log(d); return d.geometry.coordinates[0]; })
         .attr("y", function(d) { return d.geometry.coordinates[1]; })
         .attr("font-family", "sans-serif")
         .attr("font-size", "20px")
