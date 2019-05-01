@@ -57,11 +57,20 @@ svg {
     <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
     <script src="static/wheather.js"></script>
     <script src="static/map.js"></script>
+    <!-- jq autocomplete --> 
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 </head>
 
 <body>
 <input id="lat" type=text value="55.75396" />
 <input id="lon" type=text value="37.620393" />
+<div class="ui-widget">
+  <label for="tags">Город: </label>
+  <input id="tags">
+</div>
 <input type=button value="send" onclick="renderCities()" />
 
 <div id=a >
