@@ -42,3 +42,15 @@ https://on55.ru/articles/2
 http://qaru.site/questions/80912/need-a-list-of-all-countries-in-the-world-with-a-longitude-and-latitude-coordinate
 https://data.opendatasoft.com/explore/dataset/geonames-all-cities-with-a-population-1000%40public/export/?disjunctive.country
 http://download.geonames.org/export/dump/
+
+
+AIzaSyDQ_agVcB3g5dZaoaFVZM07wkloXNJv3TM
+https://maps.googleapis.com/maps/api/geocode/json?address=%D0%A1%D0%BE%D1%87%D0%B8&sensor=false&key=AIzaSyDQ_agVcB3g5dZaoaFVZM07wkloXNJv3TM
+
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -H "Authorization: Token a21ae8d8246ebf44e4c99a8dd9e6786d3a56ca0a" \
+    -d '{ "query": "москва хабар", "count": 10 }' \
+    https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address
+
+https://dadata.ru/api/suggest/address/
