@@ -6,6 +6,7 @@ import json
 cities = [
 "Нью-Йорк",
 "Дели",
+"Tokyo"
 ]
 
 for city in cities:
