@@ -20,11 +20,30 @@ function renderCities() {
 function view(wheather_data) {
     console.log(wheather_data);
     var info = "";
-    city = Object.keys(wheather_data)[0];
+    city = wheather_data["city"] || Object.keys(wheather_data)[0];
     info += city;
     info += "<br/>";
     info += "Температура: ";
     info += wheather_data[city]["temp"] + "°";
+    info += "<br/>";
+    info += "Ощущается как: ";
+    info += wheather_data[city]["feels_like"] + "°";
+    info += "<br/>";
+
+    if (wheather_data[city]["temp_water"]) {
+        info += "Температура воды: ";
+        info += wheather_data[city]["temp_water"] + "°";
+        info += "<br/>";
+    }
+
+    info += "Скорость ветра: ";
+    info += wheather_data[city]["wind_speed"] + " м/с";
+    info += "<br/>";
+    info += "Давление: ";
+    info += wheather_data[city]["pressure_mm"] + " мм.рт.ст.";
+    info += "<br/>";
+    info += "Сезон: ";
+    info += wheather_data[city]["season"] + "";
     info += "<br/>";
     info += "Влажность: ";
     info += wheather_data[city]["humidity"] + "%";
@@ -53,11 +72,17 @@ function send(wheather_data, city, lat, lon, f) {
     
     xhr.onload = function() {
         data = JSON.parse(this.responseText);
+        //console.log(this.responseText);
         wheather_data[city] = {
             "temp": data['fact']['temp'],
             "condition": data['fact']['condition'],
             "humidity": data['fact']['humidity'],
             "info": data['info']['url'],
+            "feels_like": data['fact']['feels_like'],
+            "temp_water": data['fact']['temp_water'],
+            "wind_speed": data['fact']['wind_speed'],
+            "pressure_mm": data['fact']['pressure_mm'],
+            "season": data['fact']['season'],
         };
         if (f) f(wheather_data);
         //console.log(wheather_data);

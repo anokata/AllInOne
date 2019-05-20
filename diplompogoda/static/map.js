@@ -26,9 +26,10 @@ var tempById = {};
         .clipAngle(90);
 
     path = d3.geo.path().projection(projection);
-    path.pointRadius(1.5);
+    // Размер точек
+    path.pointRadius(1.8);
 
-    //Adding water 
+    // Добавление круга океанов
     svg.append("path")
         .datum({type: "Sphere"})
         .attr("class", "water")
@@ -91,6 +92,7 @@ var tempById = {};
         .attr("class", "points")
         .attr("d", path);
 
+      // При наведении мыши - показать подсказку с данными
     citysvg.on("mouseover", function(d) {
         //console.log(d, tempById);
         lat = d.geometry.coordinates[1];
@@ -99,28 +101,30 @@ var tempById = {};
         text += d.properties.name_ru || "";
         text += "<br/>";
         var wheather_data = {};
-        send(wheather_data, d.properties.geonameid, lat, lon, function (wheather_data) {
+        send(wheather_data, d.properties.name_ru, lat, lon, function (wheather_data) {
+            wheather_data["city"] = d.properties.name_ru;
+              view(wheather_data);
               text += "Температура: ";
-              text += wheather_data[d.properties.geonameid]["temp"] + "°";
+              text += wheather_data[d.properties.name_ru]["temp"] + "°";
               text += "<br/>";
               text += "Влажность: ";
-              text += wheather_data[d.properties.geonameid]["humidity"] + "%";
+              text += wheather_data[d.properties.name_ru]["humidity"] + "%";
               text += "<br/>";
               tooltip.html(text)
               .style("left", (d3.event.pageX + 7) + "px")
               .style("top", (d3.event.pageY - 15) + "px")
               .style("display", "block")
               .style("opacity", 1)
-            .on("mouseout", function(d) {
-              tooltip.style("opacity", 0)
-              .style("display", "none");
-            })
             .on("mousemove", function(d) {
               tooltip.style("left", (d3.event.pageX + 7) + "px")
               .style("top", (d3.event.pageY - 15) + "px");
             });
             });
         });
+    citysvg.on("mouseout", function(d) {
+              tooltip.style("opacity", 0)
+              .style("display", "none");
+            })
 
 
       /*
