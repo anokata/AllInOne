@@ -7,9 +7,6 @@ document.addEventListener("DOMContentLoaded", ready);
 
 function renderCities() {
     wheather_data = {};
-    // for (var c in cities) {
-    //     send(wheather_data, c, cities[c][0], cities[c][1]);
-    // }
     lat = document.getElementById("lat");
     lon = document.getElementById("lon");
     city = document.getElementById("cities").value;
@@ -36,9 +33,19 @@ function view(wheather_data) {
     info_div.innerHTML = info;
 }
 
+function where_am_i() {
+    if (location.host == "ksilenomen.pythonanywhere.com") return 1;
+    if (location.host == "127.0.0.1:5000") return 0;
+    return 0;
+}
+
 function send(wheather_data, city, lat, lon, f) {
-    var query = 'http://127.0.0.1:5000/pogoda/'
-    //var query = 'http://ksilenomen.pythonanywhere.com/pogoda/'
+    var query = '';
+    if (where_am_i()) {
+        query = 'http://ksilenomen.pythonanywhere.com/pogoda/'
+    } else {
+        query = 'http://127.0.0.1:5000/pogoda/'
+    }
     query += lat;
     query += "/" + lon;
     var xhr = new XMLHttpRequest();
