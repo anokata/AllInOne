@@ -7,12 +7,9 @@ cities_names = ["Азов", "Александров", "Алексин", "Аль�
 // Установка обработчика события готовности веб-страницы
 document.addEventListener("DOMContentLoaded", ready);
 
-// DEL? Подпрограмма 
-function renderCities() {
+// Подпрограмма показывающая данные для выбранного города
+function renderCities(city) {
     wheather_data = {};
-    lat = document.getElementById("lat");
-    lon = document.getElementById("lon");
-    city = document.getElementById("cities").value;
     city_data = cities[city];
     console.log(city_data);
     lat = city_data[0];
@@ -125,10 +122,25 @@ function send(wheather_data, city, lat, lon, f) {
     xhr.send(); 
 }
 
+function upper_first(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 // Подпрограмма конфигурации поля ввода городов с автодополнением
 function ready() {
     $("#cities").autocomplete({
-          source: cities_names
+          source: cities_names,
+          select: function(event, ui) {
+              console.log(ui.item.value);
+              renderCities(ui.item.value);
+          }
+    });
+    $("#cities").keypress(function(e){
+        if(e.keyCode==13) {
+            var city = upper_first($("#cities").val());
+            $("#cities").val(city);
+            renderCities(city);
+        }
     });
 }
    

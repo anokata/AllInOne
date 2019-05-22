@@ -8,10 +8,34 @@ var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 var tempById = {}; // DEL?
 
-  function init() {
-    setMap();
-  }
-   
+    function refresh_projection() {
+            svg.selectAll("path.points").attr("d", path);
+            svg.selectAll("path.land").attr("d", path);
+            svg.selectAll("path.temp").attr("d", path);
+            svg.selectAll("path.water").attr("d", path);
+    }
+
+    function scale_projection(value) {
+        projection.scale(projection.scale() + value);
+        refresh_projection();
+    }
+
+    function init() {
+        setMap();
+        $("#scaleup").on("click", function() { scale_projection(10) });
+        $("#scaledown").on("click", function() { scale_projection(-10) });
+        $("#map").bind('mousewheel DOMMouseScroll', function(event){
+            if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+            console.log('scrolling');
+                scale_projection(5);
+            }
+            else {
+            console.log('scrolling');
+                scale_projection(-5);
+            }
+        });
+    }
+
   // Подпрограмма настройки карты
   function setMap() {
     // Высота и ширина карты
@@ -109,12 +133,15 @@ var tempById = {}; // DEL?
         text += d.properties.name_ru || "";
         text += "<br/>";
         var wheather_data = {};
+        var city = d.properties.name_ru;
         // Получение погодных данных в выбранной точке
         send(wheather_data, d.properties.name_ru, lat, lon, function (wheather_data) {
               // Обработка погодных данных и формирование текста для сводки
               wheather_data["city"] = d.properties.name_ru;
               // Вывод текста с данными на веб-странице
               view(wheather_data);
+              $("#cities").val(city);
+              //renderCities(city);
               // Формирование текста с погодной сводкой
               text += "Температура: ";
               text += wheather_data[d.properties.name_ru]["temp"] + "°";
