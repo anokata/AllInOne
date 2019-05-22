@@ -20,9 +20,12 @@ def save_json(filename, data):
 
 
 def is_old():
-    time = os.path.getmtime(CACHE_FILE)
-    expire = datetime.timestamp(datetime.now() - timedelta(hours=1))
-    return time < expire
+    try:
+        time = os.path.getmtime(CACHE_FILE)
+        expire = datetime.timestamp(datetime.now() - timedelta(hours=1))
+        return time < expire
+    except:
+        return False
 
 def load_cache():
     wheather = {}
