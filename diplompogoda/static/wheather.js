@@ -22,7 +22,7 @@ function renderCities() {
 
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
-    //console.log(wheather_data);
+    console.log(wheather_data);
     // Текст с информацией
     var info = "";
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
@@ -53,6 +53,19 @@ function view(wheather_data) {
     info += "Влажность: ";
     info += wheather_data[city]["humidity"] + "%";
     info += "<br/>";
+
+    info += "Прогноз ";
+    info += "<br/>";
+
+    //for (var i=1; i < wheather_data[city]["forecasts"].length-1; i++) {
+    for (var i=1; i < 4; i++) { // на 3 дня
+        cast = wheather_data[city]["forecasts"][i];
+        parts = cast['parts'];
+        info += parts['day']['temp_avg'] + "°";
+        // morning evening night
+        info += "<br/>";
+    }
+
     // Вывод информации на страницу
     var info_div = document.getElementById("wheather");
     info_div.innerHTML = info;
@@ -99,6 +112,8 @@ function send(wheather_data, city, lat, lon, f) {
             "wind_speed": data['fact']['wind_speed'],
             "pressure_mm": data['fact']['pressure_mm'],
             "season": data['fact']['season'],
+            "forecasts": data['forecasts'],
+
         };
         // Вызов функции обработки результата
         if (f) f(wheather_data);
