@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 import requests
 import os
 import json
@@ -70,9 +70,9 @@ def refresh_cache():
         save_json(CACHE_FILE, wheather)
 
 
-@app.route("/pogoda/<lat>/<lon>")
-def pogoda(lat, lon):
+def get_wheather(lat, lon):
     wheather = load_cache()
+    # TODO Если не forrbidden
     # Если нет кеша или он устарел
     if not wheather.get(lat+lon):
         wheather = get_wheather_from_yandex(lat, lon)
@@ -81,6 +81,17 @@ def pogoda(lat, lon):
         wheather = wheather[lat+lon]
 
     return wheather
+
+
+@app.route("/pogoda/<lat>/<lon>", methods=['GET'])
+@app.route("/pogoda/", methods=['POST'])
+def pogoda(lat="", lon="", methods=['POST']):
+    if request.method == "POST":
+        lat = request.form.get("lat")
+        lon = request.form.get("lon")
+        return get_wheather(lat, lon)
+    else:
+        return get_wheather(lat, lon)
 
 @app.route('/')
 def root():
