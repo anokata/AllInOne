@@ -86,12 +86,15 @@ function send(wheather_data, city, lat, lon, f) {
         query = 'http://127.0.0.1:5000/pogoda/'
     }
     // Формирование параметров запроса
-    query += lat;
-    query += "/" + lon;
+    //query += lat;
+    //query += "/" + lon;
     // Создание объекта для AJAX запроса
     var xhr = new XMLHttpRequest();
     // Конфигурация объекта запроса
-    xhr.open('GET', query, false);
+    var params = "lat=" + lat + "&lon=" + lon;
+    xhr.open('POST', query, false);
+    //xhr.open('GET', query, false);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     
     // Установка функции обработки результата запроса
     xhr.onload = function() {
@@ -119,7 +122,7 @@ function send(wheather_data, city, lat, lon, f) {
     }
   
     // Выполение AJAX запроса к Яндекс.Погоде
-    xhr.send(); 
+    xhr.send(params); 
 }
 
 function upper_first(string) {
