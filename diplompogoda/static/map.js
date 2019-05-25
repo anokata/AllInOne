@@ -13,6 +13,8 @@ var tempById = {}; // DEL?
             svg.selectAll("path.land").attr("d", path);
             svg.selectAll("path.temp").attr("d", path);
             svg.selectAll("path.water").attr("d", path);
+            svg.selectAll("path.lakes").attr("d", path);
+            svg.selectAll("path.rivers").attr("d", path);
     }
 
     function scale_projection(value) {
@@ -22,16 +24,16 @@ var tempById = {}; // DEL?
 
     function init() {
         setMap();
-        $("#scaleup").on("click", function() { scale_projection(10) });
-        $("#scaledown").on("click", function() { scale_projection(-10) });
+        $("#scaleup").on("click", function() { scale_projection(30) });
+        $("#scaledown").on("click", function() { scale_projection(-30) });
         $("#map").bind('mousewheel DOMMouseScroll', function(event){
             if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
             console.log('scrolling');
-                scale_projection(5);
+                scale_projection(15);
             }
             else {
             console.log('scrolling');
-                scale_projection(-5);
+                scale_projection(-15);
             }
         });
     }
@@ -74,20 +76,27 @@ var tempById = {}; // DEL?
     queue()
       .defer(d3.json, "static/geo/topoworld.json")  
       .defer(d3.json, "static/geo/topocitymini.json")  
+      .defer(d3.json, "static/geo/topolakes.json")  
+      .defer(d3.json, "static/geo/toporivers.json")  
       .await(processData);  // обработка загруженных данных
   }
    
   // Подпрограмма обработки загруженных геоданных
-  function processData(error, worldMap, cityMap) {
+  function processData(error, worldMap, cityMap, lakesMap, riversMap) {
     if (error) return console.error(error);
     console.log(worldMap);
     console.log(cityMap);
     var world = topojson.feature(worldMap, worldMap.objects.world);
     var cities = topojson.feature(cityMap, cityMap.objects.citymini).features;
+    var lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
+    var rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
     countries = world.features;
-    console.log(world);
-    console.log(cities);
+    console.log("Мир", world);
+    console.log("Города", cities);
+    console.log("Озёра", lakes);
+    console.log("Реки", rivers);
 
+      // Добавление границ стран
     var world2 = svg.selectAll("path.land")
         .data(countries)
         .enter().append("path")
@@ -100,27 +109,42 @@ var tempById = {}; // DEL?
             return colors[n]; })
         .attr("d", path);
 
+      // Обработчик поворода шара
     svg.selectAll("path")
         .call(d3.behavior.drag()
         .origin(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
         .on("drag", function() {
             var rotate = projection.rotate();
             projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
-            svg.selectAll("path.points").attr("d", path);
-            svg.selectAll("path.land").attr("d", path);
-            svg.selectAll("path.temp").attr("d", path);
+            refresh_projection();
             //console.log(path.centroid());
             //svg.selectAll("text.temp").attr("x", );
       }));
 
-    cities.forEach(function(d) {
-      //tempById[d.id] = d.name;
-    });
-
+    // Добавление точек городов
     var citysvg = svg.selectAll("path.points")
         .data(cities)
         .enter().append("path")
         .attr("class", "points")
+        .attr("d", path);
+
+    // Добавление озёр
+    var lakes_svg = svg.selectAll("path.lakes")
+        .data(lakes)
+        .enter().append("path")
+        .attr("class", "lakes")
+        .attr("stroke-width", 0)
+        .attr("fill", "#234c75")
+        .attr("d", path);
+
+    // Добавление рек
+    var rivers_svg = svg.selectAll("path.rivers")
+        .data(rivers)
+        .enter().append("path")
+        .attr("class", "rivers")
+        .attr("stroke-width", 1)
+        .attr("stroke", "#234c75")
+        .attr("fill", "none")
         .attr("d", path);
 
     // Установка обработчика при наведении мыши показывающего подсказку с данными

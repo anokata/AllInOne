@@ -6,9 +6,13 @@ from datetime import datetime
 from datetime import timedelta  
 
 app = Flask(__name__)
-YANDEX_WHEATHER_APIKEY = "73f1e491-d7be-40b2-8f72-d69e4cdf09cd"
+YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
 CACHE_FILE = "wheather.json"
 #"a57bd39d-59d5-47e1-9bfe-00d40e2676c8"
+#"73f1e491-d7be-40b2-8f72-d69e4cdf09cd"
+# keys:
+#fc2d8810-310e-44c7-86ce-1beb9ff466e7
+#2d001a12-9851-4254-ae73-b95e65a4170c
 # Кеш - {координаты+дата}
 
 def save_json(filename, data):
@@ -76,7 +80,8 @@ def get_wheather(lat, lon):
     # Если нет кеша или он устарел
     if not wheather.get(lat+lon):
         wheather = get_wheather_from_yandex(lat, lon)
-        save_cache(lat, lon, wheather)
+        if "Forbidden" not in wheather:
+            save_cache(lat, lon, wheather)
     else:
         wheather = wheather[lat+lon]
 
