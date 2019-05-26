@@ -52,6 +52,7 @@ function view(wheather_data) {
 	}
 
 	$("#moon").text(human_moon(wheather_data[city]["forecasts"][0]["moon_text"]));
+	$("#icon img").attr("src", "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city]["icon"] + ".svg");
 	
 }
 
@@ -103,6 +104,7 @@ function send(wheather_data, city, lat, lon, f) {
             "pressure_mm": data['fact']['pressure_mm'],
             "season": data['fact']['season'],
             "forecasts": data['forecasts'],
+			"icon": data['fact']['icon'],
 
         };
         // Вызов функции обработки результата
@@ -151,30 +153,30 @@ function human_wind(w, val) {
 		"с":  "штиль"
 		};
 		if (w != "c")
-			return val  + " м/с " + table[w];
+			return val  + " м/с, " + table[w];
 		return table[w];
 }
 
 function human_condition(c) {
 	table = {
-		"clear": "ясно",
-		"partly-cloudy": "малооблачно",
-		"cloudy": "облачно с прояснениями",
-		"overcast": "пасмурно",
-		"partly-cloudy-and-light-rain": "небольшой дождь",
-		"partly-cloudy-and-rain": "дождь",
-		"overcast-and-rain": "сильный дождь",
-		"overcast-thunderstorms-with-rain": "сильный дождь, гроза",
-		"cloudy-and-light-rain": "небольшой дождь",
-		"overcast-and-light-rain": "небольшой дождь",
-		"cloudy-and-rain": "дождь",
-		"overcast-and-wet-snow": "дождь со снегом",
-		"partly-cloudy-and-light-snow": "небольшой снег",
-		"partly-cloudy-and-snow": "снег",
-		"overcast-and-snow": "снегопад",
-		"cloudy-and-light-snow": "небольшой снег",
-		"overcast-and-light-snow": "небольшой снег",
-		"cloudy-and-snow": "снег"
+		"clear": "Ясно",
+		"partly-cloudy": "Малооблачно",
+		"cloudy": "Облачно с прояснениями",
+		"overcast": "Пасмурно",
+		"partly-cloudy-and-light-rain": "Небольшой дождь",
+		"partly-cloudy-and-rain": "Дождь",
+		"overcast-and-rain": "Сильный дождь",
+		"overcast-thunderstorms-with-rain": "Сильный дождь, гроза",
+		"cloudy-and-light-rain": "Небольшой дождь",
+		"overcast-and-light-rain": "Небольшой дождь",
+		"cloudy-and-rain": "Дождь",
+		"overcast-and-wet-snow": "Дождь со снегом",
+		"partly-cloudy-and-light-snow": "Небольшой снег",
+		"partly-cloudy-and-snow": "Снег",
+		"overcast-and-snow": "Снегопад",
+		"cloudy-and-light-snow": "Небольшой снег",
+		"overcast-and-light-snow": "Небольшой снег",
+		"cloudy-and-snow": "Снег"
 		};
 		return table[c];
 }

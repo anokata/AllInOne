@@ -260,15 +260,21 @@ function add_cities(cities) {
               // Обработка погодных данных и формирование текста для сводки
               wheather_data["city"] = d.properties.name_ru;
               // Вывод текста с данными на веб-странице
-              view(wheather_data);
+              //view(wheather_data);
               $("#cities").val(city);
               //renderCities(city);
               // Формирование текста с погодной сводкой
+			  text += "<img class='tooltip_img' src='" + "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city]["icon"] + ".svg" + "'/>";
+			  text += human_condition(wheather_data[city]["condition"]);
+			  text += "<br/>";
               text += "Температура: ";
               text += human_temp(wheather_data[d.properties.name_ru]["temp"]) + "°";
               text += "<br/>";
               text += "Влажность: ";
               text += wheather_data[d.properties.name_ru]["humidity"] + "%";
+              text += "<br/>";
+              text += "Ветер: ";
+              text += human_wind(wheather_data[city]["wind_dir"], wheather_data[city]["wind_speed"]);
               text += "<br/>";
               // Настройка всплывающей подсказки
               tooltip.html(text)

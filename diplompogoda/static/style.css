@@ -48,3 +48,10 @@ table {
 th {border: 1px solid grey;}
 /* границы ячеек тела таблицы */
 td {border: 1px solid grey;}
+
+img {
+	width: 50px;	
+}
+.tooltip_img {
+	width: 25px;
+}
