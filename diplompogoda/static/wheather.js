@@ -12,33 +12,6 @@ function view(wheather_data) {
     // Текст с информацией
     var info = "";
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
-    info += city;
-    info += "<br/>";
-    info += "Температура: ";
-    info += wheather_data[city]["temp"] + "°";
-    info += "<br/>";
-    info += "Ощущается как: ";
-    info += wheather_data[city]["feels_like"] + "°";
-    info += "<br/>";
-
-    if (wheather_data[city]["temp_water"]) {
-        info += "Температура воды: ";
-        info += wheather_data[city]["temp_water"] + "°";
-        info += "<br/>";
-    }
-
-    info += "Скорость ветра: ";
-    info += wheather_data[city]["wind_speed"] + " м/с";
-    info += "<br/>";
-    info += "Давление: ";
-    info += wheather_data[city]["pressure_mm"] + " мм.рт.ст.";
-    info += "<br/>";
-    info += "Сезон: ";
-    info += wheather_data[city]["season"] + "";
-    info += "<br/>";
-    info += "Влажность: ";
-    info += wheather_data[city]["humidity"] + "%";
-    info += "<br/>";
 
     info += "Прогноз ";
     info += "<br/>";
@@ -59,6 +32,27 @@ function view(wheather_data) {
 	$("#city_name").text(city);
 	$("#time").text(timeConverter(wheather_data[city]["time"]));
 	$("#temp").text(human_temp(wheather_data[city]["temp"]) + "°");
+	$("#feel").text(human_temp(wheather_data[city]["feels_like"]) + "°");
+	$("#wind").text(human_wind(wheather_data[city]["wind_dir"], wheather_data[city]["wind_speed"]));
+	$("#pressure").text(wheather_data[city]["pressure_mm"] + " мм рт. ст.");
+	$("#condition").text(human_condition(wheather_data[city]["condition"]));
+	$("#humidity").text(wheather_data[city]["humidity"] + "%")
+    if (wheather_data[city]["temp_water"]) {
+		$("#temp_water_tr").css("display", "table-row");
+		$("#temp_water").text(human_temp(wheather_data[city]["temp_water"]) + "°");
+	} else {
+		$("#temp_water_tr").css("display", "none");
+	}
+	if (wheather_data[city]["forecasts"][0]["sunrise"]) {
+		$("#rise").text(wheather_data[city]["forecasts"][0]["sunrise"]);
+	}
+	if (wheather_data[city]["forecasts"][0]["sunset"]) {
+		$("#sunset").text(wheather_data[city]["forecasts"][0]["sunset"]);
+		$("#day_long").text(daylong(wheather_data[city]["forecasts"][0]["sunrise"], wheather_data[city]["forecasts"][0]["sunset"]));
+	}
+
+	$("#moon").text(human_moon(wheather_data[city]["forecasts"][0]["moon_text"]));
+	
 }
 
 
@@ -94,9 +88,11 @@ function send(wheather_data, city, lat, lon, f) {
         //console.log(this.responseText);
         // Парсинг ответа в JSON формате
         data = JSON.parse(this.responseText);
+		console.log(data);
         // Формирование результирующих данных на основе ответа
         wheather_data[city] = {
 			"time": data['fact']['obs_time'],
+			"wind_dir": data['fact']['wind_dir'],
             "temp": data['fact']['temp'],
             "condition": data['fact']['condition'],
             "humidity": data['fact']['humidity'],
@@ -140,4 +136,76 @@ function timeConverter(UNIX_timestamp){
 function human_temp(t) {
 	if (t > 0) { t = "+" + t; }
 	return t;	
+}
+
+function human_wind(w, val) {
+	table =  {
+		"nw": "СЗ",
+		"n":  "С",
+		"ne": "СВ",
+		"e":  "В",
+		"sw": "ЮЗ",
+		"s":  "Ю",
+		"se": "ЮВ",
+		"w":  "З",
+		"с":  "штиль"
+		};
+		if (w != "c")
+			return val  + " м/с " + table[w];
+		return table[w];
+}
+
+function human_condition(c) {
+	table = {
+		"clear": "ясно",
+		"partly-cloudy": "малооблачно",
+		"cloudy": "облачно с прояснениями",
+		"overcast": "пасмурно",
+		"partly-cloudy-and-light-rain": "небольшой дождь",
+		"partly-cloudy-and-rain": "дождь",
+		"overcast-and-rain": "сильный дождь",
+		"overcast-thunderstorms-with-rain": "сильный дождь, гроза",
+		"cloudy-and-light-rain": "небольшой дождь",
+		"overcast-and-light-rain": "небольшой дождь",
+		"cloudy-and-rain": "дождь",
+		"overcast-and-wet-snow": "дождь со снегом",
+		"partly-cloudy-and-light-snow": "небольшой снег",
+		"partly-cloudy-and-snow": "снег",
+		"overcast-and-snow": "снегопад",
+		"cloudy-and-light-snow": "небольшой снег",
+		"overcast-and-light-snow": "небольшой снег",
+		"cloudy-and-snow": "снег"
+		};
+		return table[c];
+}
+
+function prec_null(n) {
+	if (n < 10) {
+		return "0" + n;
+	}
+	else return String(n);
+}
+
+function daylong(d1, d2) {
+	var d1_m = Number(d1.split(":")[0]) * 60  + Number(d1.split(":")[1]);
+	var d2_m = Number(d2.split(":")[0]) * 60  + Number(d2.split(":")[1]);
+	if (d2_m > d1_m) {
+		var diff = d2_m - d1_m;
+	} else {
+		var diff = 24*60 - d2_m + d1_m;
+	}
+	diff = ~~(diff / 60) + ":" + prec_null(diff - ~~(diff / 60)*60);
+	return diff;
+}
+
+function human_moon(m) {
+	moon_phase = {
+		"full-moon": "полнолуние",
+		"decreasing-moon": "убывающая Луна",
+		"last-quarter": "последняя четверть",
+		"new-moon": "новолуние",
+		"growing-moon": "растущая Луна",
+		"first-quarter": "первая четверть",    
+	};
+	return moon_phase[m];
 }

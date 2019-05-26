@@ -265,7 +265,7 @@ function add_cities(cities) {
               //renderCities(city);
               // Формирование текста с погодной сводкой
               text += "Температура: ";
-              text += wheather_data[d.properties.name_ru]["temp"] + "°";
+              text += human_temp(wheather_data[d.properties.name_ru]["temp"]) + "°";
               text += "<br/>";
               text += "Влажность: ";
               text += wheather_data[d.properties.name_ru]["humidity"] + "%";
