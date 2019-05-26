@@ -21,10 +21,13 @@ svg {
   fill: #234c75;
 }
 .points {
-    fill: #888;
+    fill: #f000;
+    stroke-width: 0px;
+}
+.points_dot {
+    fill: #ccc;
     stroke: #ccc;
     stroke-width: 2px;
-    stroke-linejoin: round;
 }
 .tooltip {
   position: absolute;
@@ -69,9 +72,9 @@ svg {
 <div class="ui-widget">
   <label for="cities">Город: </label>
   <input id="cities">
-</div>
 <input type=button value="+" id="scaleup" onclick="" />
 <input type=button value="-" id="scaledown" onclick="" />
+</div>
 
 <div id=a >
 
@@ -80,7 +83,7 @@ svg {
 <div id="map"></div>
 <div id="info">
     <span>Информация о месте:</span>
-    <div id="wheather">x</div>
+    <div id="wheather"></div>
 </div>
 </body>
 
