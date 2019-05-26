@@ -1,28 +1,50 @@
-/* for presentation only */
-
 body {
-	font: 16px Arial, Helvetica, sans-serif;
-	margin: 0;
+  padding: 20px;
+  font-family: Helvetica;
+  background-color: #0000;
 }
 
-.weather-wrapper {
-	background: skyblue;
-	margin: 5% 0 5% 5%;
-	padding: 40px 5%;
-	float: left;
-	color: white;
-	width: 70%;
-	max-width: 400px;
+ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-gap: 10px;
 }
 
-strong {
-	color: steelblue;
+li {
+  background-color: #d9ddde;
+  border-radius: 3px;
+  padding: 20px;
+  font-size: 14px;
 }
 
-.capitalize {
-	text-transform: capitalize;
+span {
+  background-color: #d9ddde;
+  border-radius: 3px;
+  padding: 20px;
+  font-size: 14px;
 }
 
-.hide {
-	display: none;
+.info {
+  text-align: center;
+  font-size: 13px;
+  padding-top: 20px;
+  color: #fffff;
 }
+
+
+
+.second {
+  height: 25%;
+}
+
+
+/* внешние границы таблицы серого цвета толщиной 1px */
+table {
+  border: 1px solid grey;
+  width: 100%;
+} 
+
+/* границы ячеек первого ряда таблицы */
+th {border: 1px solid grey;}
+/* границы ячеек тела таблицы */
+td {border: 1px solid grey;}

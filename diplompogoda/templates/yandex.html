@@ -48,7 +48,7 @@ svg {
 }
 #info {
     float: left;
-    color: #eee;
+    color: #000;
 }
 </style>
     <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -63,6 +63,7 @@ svg {
     <script src="static/map.js"></script>
     <!-- jq autocomplete --> 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="static/style.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
@@ -84,6 +85,39 @@ svg {
 <div id="info">
     <span>Информация о месте:</span>
     <div id="wheather"></div>
+	<ul>
+	
+  <span>
+      <table  class="main">
+        <tr><th id="city_name">Рыбинск</th><th>----</th></tr>
+        <tr><td id="time">сейчас 15.00</td><td>----</td></tr>
+        <tr><td id="temp">+20 С</td><td id="condition">Дождь</td></tr>
+        <tr><td>ощущается как</td><td id="feel"> +18 С</td></tr>
+        <tr><td>Ветер</td><td id="wind">1 м/с, ЮВ</td></tr>
+        <tr><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
+        <tr><td>Влажность</td><td id="humidity">80%</td></tr>
+        <tr><td>Температура воды</td><td id="temp_water">+15 С</td></tr>
+      </table>    
+  </span>
+  <li>
+      <table class="second">
+          <tr><td>Восход</td><td id="rise">6:00</td></tr>
+          <tr><td>Заход</td><td id="dawn">22:00</td></tr>
+          <tr><td>Долгота дня</td><td id="day_long">16 ч.</td></tr>
+          <tr><td>Фаза луны</td><td id="moon">Стареющая</td></tr>
+      </table>
+  </li>
+  <li>
+      <table>
+          <tr><td>Сегодня</td><td>Сб</td><td>Вс</td><td>Пн</td><td>Вт</td><td>Ср</td><tr>
+          <tr><td>24 мая</td><td>25 мая</td><td>26 мая</td><td>27 мая</td><td>28 мая</td><td>29 мая</td><tr>
+          <tr><td>Дождь</td><td>Ясно</td><td>Облачно</td><td>Дождь</td><td>Ясно</td><td>Дождь</td><tr>
+          <tr><td>+8С...+20С</td><td>+12С...+25С</td><td>+8С...+20С</td><td>+8С...+20С</td><td>+8С...+20С</td><td>Дождь</td><tr>
+      </table>
+  </li>
+
+</ul>
+
 </div>
 </body>
 

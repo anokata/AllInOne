@@ -55,6 +55,10 @@ function view(wheather_data) {
     // Вывод информации на страницу
     var info_div = document.getElementById("wheather");
     info_div.innerHTML = info;
+	
+	$("#city_name").text(city);
+	$("#time").text(timeConverter(wheather_data[city]["time"]));
+	$("#temp").text(human_temp(wheather_data[city]["temp"]) + "°");
 }
 
 
@@ -92,6 +96,7 @@ function send(wheather_data, city, lat, lon, f) {
         data = JSON.parse(this.responseText);
         // Формирование результирующих данных на основе ответа
         wheather_data[city] = {
+			"time": data['fact']['obs_time'],
             "temp": data['fact']['temp'],
             "condition": data['fact']['condition'],
             "humidity": data['fact']['humidity'],
@@ -119,3 +124,20 @@ function upper_first(string) {
 }
 
 
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
+
+function human_temp(t) {
+	if (t > 0) { t = "+" + t; }
+	return t;	
+}
