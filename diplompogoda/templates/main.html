@@ -85,22 +85,21 @@ svg {
 <canvas width="800" height="400"></canvas>
 </div>
 <div id="info">
-    <span>Информация о месте:</span>
     <div id="wheather"></div>
-	<ul>
 	
-  <span>
+<ul class="one_section">	
+  <li>
       <table  class="main">
-        <tr><th id="city_name">Рыбинск</th><th>----</th></tr>
-        <tr><td id="time">сейчас 15.00</td><td>----</td></tr>
-        <tr><td id="temp">+20 С</td><td id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td id="condition">Дождь</td></tr>
-        <tr><td>ощущается как</td><td id="feel"> +18 С</td></tr>
+        <tr><td id="city_name" colspan="2">Рыбинск</td></tr>
+        <tr><td id="time" colspan="2">сейчас 15.00</td></tr>
+        <tr><td colspan="3"><span id="temp">+20 °С</span><span id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></span><span id="condition">Дождь</span></td></tr>
+        <tr><td colspan="2" class="padding"><span>ощущается как </span><span id="feel">+18 °С</span></td></tr>
         <tr><td>Ветер</td><td id="wind">1 м/с, ЮВ</td></tr>
         <tr><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
         <tr><td>Влажность</td><td id="humidity">80%</td></tr>
-        <tr id="temp_water_tr"><td>Температура воды</td><td id="temp_water">+15 С</td></tr>
+        <tr id="temp_water_tr"><td>Температура воды</td><td id="temp_water">+15 °С</td></tr>
       </table>    
-  </span>
+  </li>
   <li>
       <table class="second">
           <tr><td>Восход</td><td id="rise">6:00</td></tr>
@@ -109,15 +108,18 @@ svg {
           <tr><td>Фаза луны</td><td id="moon">Стареющая</td></tr>
       </table>
   </li>
+</ul>
+
+<ul class="two_section">  
   <li>
-      <table>
+      <table class="forecast">
           <tr><td>Сегодня</td><td>Сб</td><td>Вс</td><td>Пн</td><td>Вт</td><td>Ср</td><tr>
           <tr><td>24 мая</td><td>25 мая</td><td>26 мая</td><td>27 мая</td><td>28 мая</td><td>29 мая</td><tr>
+		  <tr><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><tr>
           <tr><td>Дождь</td><td>Ясно</td><td>Облачно</td><td>Дождь</td><td>Ясно</td><td>Дождь</td><tr>
-          <tr><td>+8С...+20С</td><td>+12С...+25С</td><td>+8С...+20С</td><td>+8С...+20С</td><td>+8С...+20С</td><td>Дождь</td><tr>
+          <tr><td>+8...+20 °С</td><td>+12...+25 °С</td><td>+8...+20 °С</td><td>+8...+20 °С</td><td>+8...+20 °С</td><td>+8...+20 °С</td><tr>
       </table>
-  </li>
-
+  </li>  
 </ul>
 
 </div>

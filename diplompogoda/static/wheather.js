@@ -27,7 +27,7 @@ function view(wheather_data) {
 
     // Вывод информации на страницу
     var info_div = document.getElementById("wheather");
-    info_div.innerHTML = info;
+    //info_div.innerHTML = info;
 	
 	$("#city_name").text(city);
 	$("#time").text(timeConverter(wheather_data[city]["time"]));

@@ -100,7 +100,7 @@ def pogoda(lat="", lon="", methods=['POST']):
 
 @app.route('/')
 def root():
-    return render_template('yandex.html')
+    return render_template('main.html')
 
 @app.route('/static/<path:path>')
 def send_static(path):
