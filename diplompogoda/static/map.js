@@ -46,6 +46,14 @@ function add_selected_city(city, lat, lon) {
     cities = cities.concat([town]);
 }
 
+// TODO
+function town_to_feature(town) {
+    var feature = {};
+    return feature;
+}
+function towns_to_features(towns) {
+}
+
 function scale_projection(value) {
     projection.scale(projection.scale() + value);
     update();

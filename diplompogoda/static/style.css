@@ -1,28 +1,43 @@
 body {
   padding: 20px;
   font-family: Helvetica;
-  background-color: #0000;
+  background: linear-gradient(360deg, #EECFBA, #C5DDE8);
 }
 
-ul {
+.one_section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   grid-gap: 10px;
 }
 
-li {
-  background-color: #d9ddde;
-  border-radius: 3px;
-  padding: 20px;
-  font-size: 14px;
+.two_section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
+  grid-gap: 10px;
 }
 
+
+
+li {
+  padding: 20px;
+  font-size: 14px;  
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #dadada;
+  box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
+  list-style-type: none; 
+}
+
+/*
 span {
-  background-color: #d9ddde;
-  border-radius: 3px;
+  background-color: white;
+  border-radius: 10px;
   padding: 20px;
   font-size: 14px;
+  border: 1px solid #dadada;
+  box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
 }
+*/
 
 .info {
   text-align: center;
@@ -37,17 +52,73 @@ span {
   height: 25%;
 }
 
+.main {
+	border: none;
+}
 
+.padding {	
+    padding-bottom: 15px;
+	color: gray;
+}
+
+.forecast td {
+	text-align: -webkit-center;
+	border-right: 1px solid #c3bfbf;
+}
+
+.forecast {
+	border-collapse: collapse;
+}
+
+.forecast th:last-child, td:last-child {
+	border-right: none;
+}
+
+#city_name {
+	font-size: 25px;
+}
+
+#time {
+	font-size: 14px;
+	color: gray;
+}
+
+#temp {
+	font-size: 22px;
+	 padding-right: 10px;
+}
+
+#icon {
+	padding-right: 5px;
+}
+
+#temp, #icon, #condition {
+	display:  table-cell;
+    height:  50px;
+    vertical-align:  middle;
+}
+
+/*
+#wind, #pressure, #humidity, #temp_water {
+	text-align: -webkit-right;
+}
+*/
 /* внешние границы таблицы серого цвета толщиной 1px */
 table {
-  border: 1px solid grey;
   width: 100%;
 } 
 
-/* границы ячеек первого ряда таблицы */
-th {border: 1px solid grey;}
-/* границы ячеек тела таблицы */
-td {border: 1px solid grey;}
+
+/* границы ячеек первого ряда таблицы 
+th {
+	border: 1px solid grey;
+}
+*/
+/* границы ячеек тела таблицы 
+td {
+	border: 1px solid grey;
+}
+*/
 
 img {
 	width: 50px;	
