@@ -1,10 +1,12 @@
 window.onload = function () {
 
-const CITY_MIN_DIST = 0.03;
+const CITY_MIN_DIST = 0.04;
 const MOUSE_PAUSE = 200;
 const SCALE_VAL = 50;
 const ROTATE_EPSILON = 5;
-const ROTATE_STEPS = 20;
+const ROTATE_STEPS = 10;
+const NEAR_CITY_COLOR = '#d33';
+const SELECTED_CITY_COLOR = '#3d3';
 var width, height, path, projection;
 var sens = 0.25;
 var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
@@ -14,9 +16,10 @@ var tempById = {}; // DEL?
 var context, geoGenerator;
 var world, cities, lakes, rivers;
 var mouse_timer, mouse_point, mouse_xy;
-var tooltip_timer;
+var tooltip_timer, rotate_timer;
 var isDragging = false;
 var startingPos = [];
+var near_city, selected_city;
 
 
 // Подпрограмма показывающая данные для выбранного города
@@ -30,6 +33,9 @@ function renderCities(city, lon, lat) {
     // Повернуть до этого города
     // TODO более плавно
     rotate_timer = setTimeout(city_rotate, 50, -lon, -lat);
+
+    selected_city = make_feature(city, lon, lat);
+    near_city = undefined;
             
     //console.log(city, lon, lat);
     add_selected_city(city, lat, lon);
@@ -54,18 +60,22 @@ function city_rotate(lon, lat, dn, dt) {
         rotate_timer = setTimeout(city_rotate, 50, lon, lat, dn, dt);
 }
 
-function add_selected_city(city, lat, lon) {
+function make_feature(name, lon ,lat) {
     var town = {
         "type":"Feature",
         "properties":{
-            "name_ru": city
+            "name_ru": name
         },
         "geometry":{
             "type": "Point",
             "coordinates": [lon, lat]
         }
     }
-    cities = cities.concat([town]);
+    return town;
+}
+
+function add_selected_city(city, lat, lon) {
+    cities = cities.concat([make_feature(city, lon, lat)]);
 }
 
 // TODO
@@ -173,6 +183,22 @@ function update() {
     }
     context.fill();
     draw_cities(cities);
+
+    // Отображение выбранного и ближайшего города
+    if (near_city) {
+        context.strokeStyle = NEAR_CITY_COLOR;
+        context.lineWidth = 5;
+        context.beginPath();
+        geoGenerator({type: 'FeatureCollection', features: [near_city]})
+        context.stroke();
+    }
+    if (selected_city) {
+        context.strokeStyle = SELECTED_CITY_COLOR;
+        context.lineWidth = 5;
+        context.beginPath();
+        geoGenerator({type: 'FeatureCollection', features: [selected_city]})
+        context.stroke();
+    }
 }
 
 function draw_cities(geojson) {
@@ -262,10 +288,9 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap) {
       .on("mouseup", function () {
           var mouse_point = get_mouse_geopoint(this);
           // Если совпадёт с городом c определённой точностью
-          // расстояние между точками гео
-          // Вычислим расстояние между точкой мыши и каждым городом
           var nearest = nearest_city(mouse_point);
           if (nearest) {
+              //selected_city = nearest;
               //console.log(nearest, nearest.properties.name_ru);
               renderCities(nearest.properties.name_ru, nearest.geometry.coordinates[0], nearest.geometry.coordinates[1]);
           } else {
@@ -315,6 +340,7 @@ function get_mouse_geopoint(self) {
 
 // Подпрограмма поиска ближайшего города
 function nearest_city(p) {
+    // Вычислим расстояние между точкой мыши и каждым городом
     var nearest;
     var min_distance = 10000000;
     for (i = 0; i < cities.length; i++) {
@@ -337,6 +363,8 @@ function mouse_stopped() {
     var nearest = nearest_city(mouse_point);
     if (nearest) {
         //console.log(nearest, nearest.properties.name_ru);
+        near_city = nearest;
+        update();
         make_wheather_text(nearest);
     }
 }
