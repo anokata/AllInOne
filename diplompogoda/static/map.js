@@ -227,19 +227,30 @@ function loadData() {
     // Запрос геоданных границ в topoJSON-формате и точек городов
     queue()
       .defer(d3.json, "static/geo/topoworld.json")  
-      .defer(d3.json, "static/geo/topocitymini.json")  
+      .defer(d3.json, "static/maptowns.json")  
       .defer(d3.json, "static/geo/topolakes.json")  
       .defer(d3.json, "static/geo/toporivers.json")  
+      .defer(d3.json, "static/towns.json")  
       .await(processData);  // обработка загруженных данных
 }
    
 // Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, cityMap, lakesMap, riversMap) {
+function processData(error, worldMap, cityMap, lakesMap, riversMap, towns) {
     if (error) return console.error(error);
     // console.log(worldMap);
-    // console.log(cityMap);
+    console.log(cityMap);
     world = topojson.feature(worldMap, worldMap.objects.world);
-    cities = topojson.feature(cityMap, cityMap.objects.citymini).features;
+    //cities = topojson.feature(cityMap, cityMap.objects.citymini).features;
+    cities = [];
+    cities_names = Object.keys(cityMap);
+    Object.keys(cityMap).map(
+        function(key, index) { 
+            cities.push(make_feature(key, cityMap[key][1], cityMap[key][0])); 
+        });
+    window.cities_coords = towns;
+    cities_coords = Object.assign({}, cities_coords, cityMap);
+    cities_names = Array.concat(cities_names, cities_names_add);
+    autocomplete_init();
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
     countries = world.features;
@@ -421,20 +432,22 @@ function tooltip_hide(){
 }
 
 // конфигурации поля ввода городов с автодополнением
-$("#cities").autocomplete({
-      source: cities_names,
-      select: function(event, ui) {
-          //console.log(ui.item.value);
-          renderCities(ui.item.value);
-      }
-});
-$("#cities").keypress(function(e){
-    if(e.keyCode==13) {
-        var city = upper_first($("#cities").val());
-        $("#cities").val(city);
-        renderCities(city);
-    }
-});
+function autocomplete_init() {
+    $("#cities").autocomplete({
+          source: cities_names,
+          select: function(event, ui) {
+              //console.log(ui.item.value);
+              renderCities(ui.item.value);
+          }
+    });
+    $("#cities").keypress(function(e){
+        if(e.keyCode==13) {
+            var city = upper_first($("#cities").val());
+            $("#cities").val(city);
+            renderCities(city);
+        }
+    });
+}
 
 
 // Вызов главной функции
