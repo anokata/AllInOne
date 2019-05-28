@@ -58,7 +58,7 @@ function view(wheather_data) {
     // TODO С какого часу?
     for (var i = 0; i < 9; i++) {
         $("#hour_" + i).text(human_temp(wheather_data[city].forecasts[0].hours[i].temp));
-        $("#hour_" + i + "_cond").text(human_condition(wheather_data[city].forecasts[0].hours[i].condition));
+        // $("#hour_" + i + "_cond").text(human_condition(wheather_data[city].forecasts[0].hours[i].condition));
         $("#hour_" + i + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[i].icon));
     }
 	
