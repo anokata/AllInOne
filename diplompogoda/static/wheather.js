@@ -55,11 +55,32 @@ function view(wheather_data) {
 	$("#icon img").attr("src", make_icon(wheather_data[city]["icon"]));
 	$("#uv_index").text(wheather_data[city].forecasts[0].parts.day.uv_index);
 
-    // TODO С какого часу?
-    for (var i = 0; i < 13; i++) {
-        $("#hour_" + i).text(human_temp(wheather_data[city].forecasts[0].hours[i].temp));
-        // $("#hour_" + i + "_cond").text(human_condition(wheather_data[city].forecasts[0].hours[i].condition));
-        $("#hour_" + i + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[i].icon));
+    // TODO С текущего часа 12 часов, с учётом пересечения дня
+    // Учитывать часовой пояс
+    var hour = (new Date()).getHours();
+    var j = 1;
+    for (var i = hour; i < hour + 13; i++) {
+        var h = i % 24;
+        //console.log(h, j);
+        $("#hour_" + j + "_time").text(h + ":00");
+        $("#hour_" + j).text(human_temp(wheather_data[city].forecasts[0].hours[h].temp));
+        $("#hour_" + j + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[h].icon));
+        j++;
+    }
+    for (var i = 0; i < 6; i++) {
+        var date = new Date(wheather_data[city].forecasts[i].date);
+        var date_str = date.getDate() + " " + date.toLocaleString('ru-ru', { month: 'long' });
+        var weekday = upper_first(date.toLocaleString('ru-ru', { weekday: 'short' }));
+        $("#day_" + i).text(date_str);
+        $("#day_" + i + "_week").text(weekday);
+        // TODO с какой части дня брать условия
+        var part = wheather_data[city].forecasts[i].parts.day;
+        var evn = wheather_data[city].forecasts[i].parts.evening;
+        $("#day_" + i + "_img" + " img").attr("src", make_icon(part.icon));
+        $("#day_" + i + "_cond").text(human_condition(part.condition));
+        $("#day_" + i + "_temp").text(human_temp(part.temp_min) + "..." + human_temp(part.temp_max));
+
+        console.log(date_str, weekday);
     }
 	
 }

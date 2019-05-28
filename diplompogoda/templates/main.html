@@ -111,12 +111,18 @@ svg {
 	  <div>Почасовой прогноз</div>
 	  <div class="second_2">
 	  <table>
-          <tr><td>16:00</td><td>17:00</td><td>18:00</td><td>19:00</td><td>20:00</td><td>21:00</td><td>22:00</td>
-              <td>23:00</td>
-              <td>0:00</td>
-              <td>1:00</td>
-              <td>2:00</td>
-              <td>3:00</td>
+          <tr><td id="hour_1_time">16:00</td>
+              <td id="hour_2_time">17:00</td>
+              <td id="hour_3_time">18:00</td>
+              <td id="hour_4_time">19:00</td>
+              <td id="hour_5_time">20:00</td>
+              <td id="hour_6_time">21:00</td>
+              <td id="hour_7_time">22:00</td>
+              <td id="hour_8_time">23:00</td>
+              <td id="hour_9_time">0:00</td>
+              <td id="hour_10_time">1:00</td>
+              <td id="hour_11_time">2:00</td>
+              <td id="hour_12_time">3:00</td>
           </tr>
           <tr>
               <td><img id="hour_1_icon" /></td>
@@ -132,15 +138,6 @@ svg {
               <td><img id="hour_11_icon" /></td>
               <td><img id="hour_12_icon" /></td>
           </tr>
-		  <!-- <tr><td id="hour_1_cond">Ясно</td> -->
-              <!-- <td id="hour_2_cond">Ясно</td> -->
-              <!-- <td id="hour_3_cond">Ясно</td> -->
-              <!-- <td id="hour_4_cond">Ясно</td> -->
-              <!-- <td id="hour_5_cond">Ясно</td> -->
-              <!-- <td id="hour_6_cond">Ясно</td> -->
-              <!-- <td id="hour_7_cond">Ясно</td> -->
-              <!-- <td id="hour_8_cond">Ясно</td> -->
-          <!-- </tr> -->
 		  <tr><td id="hour_1">+20</td>
               <td id="hour_2">+21</td>
               <td id="hour_3">+21</td>
@@ -167,11 +164,46 @@ svg {
 <ul class="two_section">  
   <li>
       <table class="forecast">
-          <tr><td>Сегодня</td><td>Сб</td><td>Вс</td><td>Пн</td><td>Вт</td><td>Ср</td><tr>
-          <tr><td>24 мая</td><td>25 мая</td><td>26 мая</td><td>27 мая</td><td>28 мая</td><td>29 мая</td><tr>
-		  <tr><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><tr>
-          <tr><td>Дождь</td><td>Ясно</td><td>Облачно</td><td>Дождь</td><td>Ясно</td><td>Дождь</td><tr>
-          <tr><td>+8...+20 °С</td><td>+12...+25 °С</td><td>+8...+20 °С</td><td>+8...+20 °С</td><td>+8...+20 °С</td><td>+8...+20 °С</td><tr>
+        <tr>
+           <td>Сегодня</td>
+           <td id="day_1_week">Сб</td>
+           <td id="day_2_week">Вс</td>
+           <td id="day_3_week">Пн</td>
+           <td id="day_4_week">Вт</td>
+           <td id="day_5_week">Ср</td>
+        <tr>
+        <tr>
+           <td id="day_0">24 мая</td>
+           <td id="day_1">25 мая</td>
+           <td id="day_2">26 мая</td>
+           <td id="day_3">27 мая</td>
+           <td id="day_4">28 мая</td>
+           <td id="day_5">29 мая</td>
+        <tr>
+        <tr>
+           <td id="day_0_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
+           <td id="day_1_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
+           <td id="day_2_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
+           <td id="day_3_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
+           <td id="day_4_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
+           <td id="day_5_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
+        <tr>
+        <tr>
+           <td id="day_0_cond">Дождь</td>
+           <td id="day_1_cond">Ясно</td>
+           <td id="day_2_cond">Облачно</td>
+           <td id="day_3_cond">Дождь</td>
+           <td id="day_4_cond">Ясно</td>
+           <td id="day_5_cond">Дождь</td>
+        <tr>
+        <tr>
+           <td id="day_0_temp">+8...+20 °С</td>
+           <td id="day_1_temp">+12...+25 °С</td>
+           <td id="day_2_temp">+8...+20 °С</td>
+           <td id="day_3_temp">+8...+20 °С</td>
+           <td id="day_4_temp">+8...+20 °С</td>
+           <td id="day_5_temp">+8...+20 °С</td>
+        <tr>
       </table>
   </li>  
 </ul>
