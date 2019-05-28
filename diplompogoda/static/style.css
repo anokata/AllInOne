@@ -119,6 +119,7 @@ span {
 .forecast td {
 	text-align: -webkit-center;
 	border-right: 1px solid #c3bfbf;
+	width: 100px;
 }
 
 .forecast th:last-child, td:last-child {

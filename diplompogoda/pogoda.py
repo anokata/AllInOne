@@ -8,6 +8,7 @@ from datetime import timedelta
 app = Flask(__name__)
 YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
 CACHE_FILE = "wheather.json"
+CACHE_ONLY = False
 #"a57bd39d-59d5-47e1-9bfe-00d40e2676c8"
 #"73f1e491-d7be-40b2-8f72-d69e4cdf09cd"
 # keys:
@@ -35,7 +36,7 @@ def load_cache():
     wheather = {}
 
     # Каждый час удалять. Смотрим на дату файла. Если старый удаляем
-    if is_old():
+    if is_old() and not CACHE_ONLY:
         os.remove(CACHE_FILE)
         # TODO запустить поток с обновлением
         return wheather
