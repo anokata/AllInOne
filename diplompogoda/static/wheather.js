@@ -8,7 +8,7 @@ cities_names = ["Азов", "Александров", "Алексин", "Аль�
 
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
-    //console.log(wheather_data);
+    console.log(wheather_data);
     // Текст с информацией
     var info = "";
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
@@ -52,8 +52,20 @@ function view(wheather_data) {
 	}
 
 	$("#moon").text(human_moon(wheather_data[city]["forecasts"][0]["moon_text"]));
-	$("#icon img").attr("src", "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city]["icon"] + ".svg");
+	$("#icon img").attr("src", make_icon(wheather_data[city]["icon"]));
+	$("#uv_index").text(wheather_data[city].forecasts[0].parts.day.uv_index);
+
+    // TODO С какого часу?
+    for (var i = 0; i < 9; i++) {
+        $("#hour_" + i).text(human_temp(wheather_data[city].forecasts[0].hours[i].temp));
+        $("#hour_" + i + "_cond").text(human_condition(wheather_data[city].forecasts[0].hours[i].condition));
+        $("#hour_" + i + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[i].icon));
+    }
 	
+}
+
+function make_icon(code) {
+    return "https://yastatic.net/weather/i/icons/blueye/color/svg/" + code + ".svg";
 }
 
 

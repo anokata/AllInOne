@@ -1,5 +1,6 @@
 window.onload = function () {
 
+const WIDTH = 800;
 const CITY_MIN_DIST = 0.04;
 const MOUSE_PAUSE = 200;
 const SCALE_VAL = 50;
@@ -7,6 +8,8 @@ const ROTATE_EPSILON = 5;
 const ROTATE_STEPS = 10;
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
+const WATER_COLOR = "#234c75";
+const SPACE_COLOR = "#82a2ad";
 var width, height, path, projection;
 var sens = 0.25;
 var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
@@ -108,7 +111,7 @@ function init() {
 // Подпрограмма настройки карты
 function setMap() {
     // Высота и ширина карты
-    width = 1000, height = 800;
+    width = WIDTH, height = WIDTH;
      
     // Создание объекта отрогональной проекции
     projection = d3.geo.orthographic()
@@ -139,14 +142,14 @@ function setMap() {
 }
 
 function update() {
-    context.fillStyle = "#333";
+    context.fillStyle = SPACE_COLOR;
     //context.clearRect(0, 0, width, height);
     context.fillRect(0, 0, width, height);
     context.lineWidth = 2.0;
     context.strokeStyle = '#000';
 
     // Сфера воды
-    context.fillStyle = "#234c75";
+    context.fillStyle = WATER_COLOR;
     context.beginPath();
     geoGenerator({type: 'Sphere'});
     context.stroke();
@@ -175,7 +178,7 @@ function update() {
     var geojson = lakes;
     context.strokeStyle = '#00f';
     context.lineWidth = 0.5;
-    context.fillStyle = "#234c75";
+    context.fillStyle = WATER_COLOR;
     context.beginPath();
     for (var i = 0; i < geojson.length; i++) {
         var lake = geojson[i];
