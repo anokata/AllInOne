@@ -25,7 +25,7 @@ function renderCities(city, lon, lat) {
         lat = city_data[0];
         lon = city_data[1];
     }
-    console.log(city, lon, lat);
+    //console.log(city, lon, lat);
     // TODO
     add_selected_city(city, lat, lon);
     send(wheather_data, city, lat, lon, view);
@@ -65,11 +65,9 @@ function init() {
         $("#scaledown").on("click", function() { scale_projection(-SCALE_VAL) });
         $("#map").bind('mousewheel DOMMouseScroll', function(event){
             if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-            console.log('scrolling');
                 scale_projection(SCALE_VAL/2);
             }
             else {
-            console.log('scrolling');
                 scale_projection(-SCALE_VAL/2);
             }
         });
@@ -208,7 +206,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap) {
             var rotate = projection.rotate();
             projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
             update();
-            console.log("drag");
+            //console.log("drag");
       }));
 
 
@@ -224,7 +222,10 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap) {
         });
 
     d3.selectAll("canvas")
-      .on("mousemove", function () {
+      .on("mousedown", function() {
+          clearTimeout(tooltip_timer);
+      })
+      .on("mousemove", function() {
           // Если совпадёт с городом
           //console.log(projection.invert(d3.mouse(this)));
           clearTimeout(mouse_timer);
@@ -242,11 +243,11 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap) {
           // Вычислим расстояние между точкой мыши и каждым городом
           var nearest = nearest_city(mouse_point);
           if (nearest) {
-              console.log(nearest, nearest.properties.name_ru);
+              //console.log(nearest, nearest.properties.name_ru);
               renderCities(nearest.properties.name_ru, nearest.geometry.coordinates[0], nearest.geometry.coordinates[1]);
           } else {
             if (!isDragging) {
-                show_wheather_data("", mouse_point[0], mouse_point[1]);
+                show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
                 // TODO Если есть населённый пунк рядом то подробно
             }
           }
@@ -255,6 +256,30 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap) {
       })
       // Добавление границ стран
 
+}
+
+function human_coord(p) {
+    // Широта latitude сев/юж
+    // Долгода longitude вост/зап
+    // 55°45′21″ с. ш. 37°37′04″ в. д.
+    var lon = p[0];
+    var lat = p[1];
+    var coord_text = "";
+
+    coord_text += Math.abs(Math.floor(lat));
+    if (lat > 0) {
+        coord_text += "° c.ш. ";
+    } else {
+        coord_text += "° ю.ш. ";
+    }
+
+    coord_text += Math.abs(Math.floor(lon));
+    if (lon > 0) {
+        coord_text += "° в.д.";
+    } else {
+        coord_text += "° з.д.";
+    }
+    return coord_text;
 }
    
 function get_mouse_geopoint(self) {
@@ -285,10 +310,10 @@ function nearest_city(p) {
 }
 
 function mouse_stopped() {
-    console.log('stop', mouse_point);
+    //console.log('stop', mouse_point);
     var nearest = nearest_city(mouse_point);
     if (nearest) {
-        console.log(nearest, nearest.properties.name_ru);
+        //console.log(nearest, nearest.properties.name_ru);
         make_wheather_text(nearest);
     }
 }
@@ -345,7 +370,7 @@ function tooltip_hide(){
 $("#cities").autocomplete({
       source: cities_names,
       select: function(event, ui) {
-          console.log(ui.item.value);
+          //console.log(ui.item.value);
           renderCities(ui.item.value);
       }
 });
