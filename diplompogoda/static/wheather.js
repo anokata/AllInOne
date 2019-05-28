@@ -8,7 +8,7 @@ cities_names = ["Азов", "Александров", "Алексин", "Аль�
 
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
-    console.log(wheather_data);
+    //console.log(wheather_data);
     // Текст с информацией
     var info = "";
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
@@ -89,7 +89,7 @@ function send(wheather_data, city, lat, lon, f) {
         //console.log(this.responseText);
         // Парсинг ответа в JSON формате
         data = JSON.parse(this.responseText);
-		console.log(data);
+		//console.log(data);
         // Формирование результирующих данных на основе ответа
         wheather_data[city] = {
 			"time": data['fact']['obs_time'],

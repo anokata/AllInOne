@@ -3,6 +3,8 @@ window.onload = function () {
 const CITY_MIN_DIST = 0.03;
 const MOUSE_PAUSE = 200;
 const SCALE_VAL = 50;
+const ROTATE_EPSILON = 5;
+const ROTATE_STEPS = 20;
 var width, height, path, projection;
 var sens = 0.25;
 var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
@@ -25,11 +27,31 @@ function renderCities(city, lon, lat) {
         lat = city_data[0];
         lon = city_data[1];
     }
+    // Повернуть до этого города
+    // TODO более плавно
+    rotate_timer = setTimeout(city_rotate, 50, -lon, -lat);
+            
     //console.log(city, lon, lat);
-    // TODO
     add_selected_city(city, lat, lon);
     send(wheather_data, city, lat, lon, view);
     update();
+}
+
+function city_rotate(lon, lat, dn, dt) {
+    var rotate = projection.rotate();
+    var n = rotate[0];
+    var t = rotate[1];
+    if (!dn || !dt) {
+        dn = (lon - n) / ROTATE_STEPS;
+        dt = (lat - t) / ROTATE_STEPS;
+    }
+    n += dn;
+    t += dt;
+    projection.rotate([n, t, rotate[2]]);
+    //projection.rotate([-lon, -lat, rotate[2]]); // сразу
+    update();
+    if (Math.abs(n - lon) > ROTATE_EPSILON)
+        rotate_timer = setTimeout(city_rotate, 50, lon, lat, dn, dt);
 }
 
 function add_selected_city(city, lat, lon) {
@@ -224,6 +246,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap) {
     d3.selectAll("canvas")
       .on("mousedown", function() {
           clearTimeout(tooltip_timer);
+          clearTimeout(rotate_timer);
       })
       .on("mousemove", function() {
           // Если совпадёт с городом
