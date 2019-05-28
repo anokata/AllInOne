@@ -240,15 +240,19 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns) {
     // console.log(worldMap);
     console.log(cityMap);
     world = topojson.feature(worldMap, worldMap.objects.world);
-    //cities = topojson.feature(cityMap, cityMap.objects.citymini).features;
     cities = [];
     cities_names = Object.keys(cityMap);
     Object.keys(cityMap).map(
         function(key, index) { 
             cities.push(make_feature(key, cityMap[key][1], cityMap[key][0])); 
         });
+    // Список дополнительных городов
+    cities_names_add = Object.keys(towns);
+    // Координаты дополнительных городов
     window.cities_coords = towns;
+    // Совмещение с городами карты
     cities_coords = Object.assign({}, cities_coords, cityMap);
+    // Слияние списков имён городов
     cities_names = Array.concat(cities_names, cities_names_add);
     autocomplete_init();
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
