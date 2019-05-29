@@ -65,6 +65,15 @@ span {
   padding-bottom: 20px;
 }
 
+.second_1 img {
+	width: 20px;
+	height: 20px;
+}
+
+.second_1 td:nth-child(1), th:nth-child(1) {
+	width: 20px;
+}
+
 .second_2 {
 	overflow-x: scroll;
 	font-size: 12px;
@@ -73,6 +82,7 @@ span {
 .second_2 td{
 	text-align: center;
 }
+
 
 /* Скролл */
 ::-webkit-scrollbar {
@@ -124,6 +134,10 @@ span {
 
 .forecast th:last-child, td:last-child {
 	border-right: none;
+}
+
+.icon_table img {
+	width: 25px;	
 }
 
 #city_name {

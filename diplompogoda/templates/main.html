@@ -58,6 +58,7 @@ svg {
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+    <!-- <script src="static/towns.js"></script> -->
     <script src="static/wheather.js"></script>
     <script src="static/map.js"></script>
     <!-- jq autocomplete --> 
@@ -93,19 +94,19 @@ svg {
         <tr><td id="time" colspan="2">сейчас 15.00</td></tr>
         <tr><td colspan="3"><span id="temp">+20 °С</span><span id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></span><span id="condition">Дождь</span></td></tr>
         <tr><td colspan="2" class="padding"><span>ощущается как </span><span id="feel">+18 °С</span></td></tr>
-        <tr><td>Ветер</td><td id="wind">1 м/с, ЮВ</td></tr>
-        <tr><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
-        <tr><td>Влажность</td><td id="humidity">80%</td></tr>
-        <tr id="temp_water_tr"><td>Температура воды</td><td id="temp_water">+15 °С</td></tr>
+        <tr><td  class='icon_table'><img src="static/icon/wind.svg" /></td><td>Ветер</td></td><td id="wind">1 м/с, ЮВ</td></tr>
+        <tr><td  class='icon_table'><img src="static/icon/wind.svg" /></td><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
+        <tr><td  class='icon_table'><img src="static/icon/humidity.svg" /></td><td>Влажность</td><td id="humidity">80%</td></tr>
+        <tr id="temp_water_tr"><td><span class='icon_table'><img src="static/icon/temp_water.svg" /></span></td><td>Температура воды</td><td id="temp_water">+15 °С</td></tr>
       </table>    
   </li>
   <li>
       <table class="second_1">
-          <tr><td>Восход</td><td id="rise">6:00</td></tr>
-          <tr><td>Заход</td><td id="sunset">22:00</td></tr>
-          <tr><td>Долгота дня</td><td id="day_long">16 ч.</td></tr>
-          <tr><td>Фаза луны</td><td id="moon">Стареющая</td></tr>
-		  <tr><td>УФ-индекс</td><td id="uv_index">5</td></tr>		  
+          <tr><td><img src="static/icon/sunrise.svg"></td><td>Восход</td><td id="rise">6:00</td></tr>
+          <tr><td><img src="static/icon/sunset.svg"></td><td>Заход</td><td id="sunset">22:00</td></tr>
+          <tr><td><img src="static/icon/day_long.svg"></td><td>Долгота дня</td><td id="day_long">16 ч.</td></tr>
+          <tr><td><img src="static/icon/moon.svg"></td><td>Фаза луны</td><td id="moon">Стареющая</td></tr>
+		  <tr><td><img src="static/icon/uv_index.svg"></td><td>УФ-индекс</td><td id="uv_index">5</td></tr>		  
       </table>
 	  <div>Почасовой прогноз</div>
 	  <div class="second_2">
