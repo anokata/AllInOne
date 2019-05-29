@@ -10,9 +10,9 @@ const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
 const WATER_COLOR = "#234c75";
 const SPACE_COLOR = "#82a2ad";
-var width, height, path, projection;
+var width, height, projection;
 var sens = 0.25;
-var colors = ["#883", "#833", "#883", "#383", "#338", "#830", "#380"];
+var colors = ["#573", "#aa5", "#a55", "#5a5", "#27a", "#a50", "#6a2"];
 // Элемент всплывающей подсказки
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 var tempById = {}; // DEL?
@@ -34,7 +34,6 @@ function renderCities(city, lon, lat) {
         lon = city_data[1];
     }
     // Повернуть до этого города
-    // TODO более плавно
     rotate_timer = setTimeout(city_rotate, 50, -lon, -lat);
 
     selected_city = make_feature(city, lon, lat);
@@ -81,7 +80,6 @@ function add_selected_city(city, lat, lon) {
     cities = cities.concat([make_feature(city, lon, lat)]);
 }
 
-// TODO
 function town_to_feature(town) {
     var feature = {};
     return feature;
@@ -120,27 +118,26 @@ function setMap() {
         .translate([width / 2, height / 2])
         .clipAngle(90);
 
-    path = d3.geo.path().projection(projection);
-    path2  = d3.geo.path().projection(projection);
-    // Настойка размера точек
-    path.pointRadius(1.5);
-    path2.pointRadius(6.0);
-
     context = d3.select('#map canvas')
       .node()
       .getContext('2d', { alpha: false });
+
     d3.select('#map canvas')
         .attr('width', width)
         .attr('height', height);
+
     geoGenerator = d3.geoPath()
       .projection(projection)
       .context(context);
+
+    // Настойка размера точек
     geoGenerator.pointRadius(1.5);
 
     // Загрузка данных
     loadData();
 }
 
+// Подпрограмма отрисовки глобуса со всем содержимым
 function update() {
     context.fillStyle = SPACE_COLOR;
     //context.clearRect(0, 0, width, height);
@@ -194,6 +191,9 @@ function update() {
         context.beginPath();
         geoGenerator({type: 'FeatureCollection', features: [near_city]})
         context.stroke();
+        // Вывод названия у города
+        var xy = projection(near_city.geometry.coordinates);
+        context.fillText(near_city.properties.name_ru, xy[0], xy[1]); 
     }
     if (selected_city) {
         context.strokeStyle = SELECTED_CITY_COLOR;
@@ -204,7 +204,10 @@ function update() {
     }
 }
 
+// Подпрограмма отображения точек городов
 function draw_cities(geojson) {
+    var rlon = projection.rotate()[0];
+    var rlat = projection.rotate()[1];
     context.strokeStyle = '#eee';
     context.lineWidth = 0.5;
     context.fillStyle = "#eee";
@@ -212,10 +215,23 @@ function draw_cities(geojson) {
     for (var i = 0; i < geojson.length; i++) {
         var city = geojson[i];
         geoGenerator({type: 'FeatureCollection', features: [city]})
+
+        // Вывод названия у города
+        var lon = city.geometry.coordinates[0];
+        var lat = city.geometry.coordinates[1];
+        //console.log(lon + rlon);
+        if ((lon + rlon) < 20)
+            //&& Math.abs(lat - rlat) > 80) 
+        {
+            //console.log(lon, rlon, lon + rlon);
+            var xy = projection(city.geometry.coordinates);
+            //context.fillText(city.properties.name_ru, xy[0], xy[1]); 
+        }
     }
     context.fill();
 }
 
+// Функция вычисления цвета страны
 function get_color(d) { 
     var c = d.properties.MAPCOLOR7 || 0;
     var n = Math.abs(c % colors.length);
@@ -324,6 +340,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns) {
 
 }
 
+// Подпрограмма форматирования координат
 function human_coord(p) {
     // Широта latitude сев/юж
     // Долгода longitude вост/зап
@@ -348,6 +365,7 @@ function human_coord(p) {
     return coord_text;
 }
    
+// Подпрограмма извлечения координат указателся мыши
 function get_mouse_geopoint(self) {
           var lon, lat;
           lon = projection.invert(d3.mouse(self))[0];
@@ -376,6 +394,7 @@ function nearest_city(p) {
     } else return false;
 }
 
+// Подпрограмма обработки остановки указателя
 function mouse_stopped() {
     //console.log('stop', mouse_point);
     var nearest = nearest_city(mouse_point);
@@ -387,7 +406,7 @@ function mouse_stopped() {
     }
 }
 
-
+// Подпрограмма отображения погоды города
 function make_wheather_text(city) {
     var lon = city.geometry.coordinates[0]; 
     var lat = city.geometry.coordinates[1];
@@ -396,6 +415,7 @@ function make_wheather_text(city) {
     show_wheather_data(city_name, lon, lat);
 }
 
+// Подпрограмма формирования всплывающей подсказки
 function show_wheather_data(city_name, lon, lat) {
     // Формирование текста с данными
     var text = "";
