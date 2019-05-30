@@ -58,7 +58,7 @@ svg {
     <script src="https://d3js.org/d3-geo.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
-    <!-- <script src="static/towns.js"></script> -->
+    <script src="static/towns.js"></script>
     <script src="static/wheather.js"></script>
     <script src="static/map.js"></script>
     <!-- jq autocomplete --> 
@@ -94,10 +94,11 @@ svg {
         <tr><td id="time" colspan="2">сейчас 15.00</td></tr>
         <tr><td colspan="3"><span id="temp">+20 °С</span><span id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></span><span id="condition">Дождь</span></td></tr>
         <tr><td colspan="2" class="padding"><span>ощущается как </span><span id="feel">+18 °С</span></td></tr>
-        <tr><td  class='icon_table'><img src="static/icon/wind.svg" /></td><td>Ветер</td></td><td id="wind">1 м/с, ЮВ</td></tr>
-        <tr><td  class='icon_table'><img src="static/icon/wind.svg" /></td><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
-        <tr><td  class='icon_table'><img src="static/icon/humidity.svg" /></td><td>Влажность</td><td id="humidity">80%</td></tr>
-        <tr id="temp_water_tr"><td><span class='icon_table'><img src="static/icon/temp_water.svg" /></span></td><td>Температура воды</td><td id="temp_water">+15 °С</td></tr>
+        <tr><td class='icon_table'><img src="static/icon/wind.svg" /></td><td>Ветер</td></td><td id="wind">1 м/с, ЮВ</td></tr>
+        <tr><td class='icon_table'><img src="static/icon/pressure.svg" /></td><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
+        <tr><td class='icon_table'><img src="static/icon/humidity.svg" /></td><td>Влажность</td><td id="humidity">80%</td></tr>
+        <tr><td class='icon_table'><img src="static/icon/temp_water.svg" /></td><td>Температура воды</td><td id="temp_water">+15 °С</td></tr>
+	<!--	<tr><td class='icon_table'><img src="static/icon/uv_index.svg"></td><td>УФ-индекс</td><td id="uv_index">5</td></tr>  -->
       </table>    
   </li>
   <li>
@@ -204,6 +205,18 @@ svg {
            <td id="day_4_temp">+8...+20 °С</td>
            <td id="day_5_temp">+8...+20 °С</td>
         <tr>
+      </table>
+  </li>  
+</ul>
+
+<ul class="three_section">  
+  <li>
+      <table class="forecast_detail">
+        <tr><td>25 Мая</td><td></td><td></td></tr>
+        <tr><td>Утро</td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td>+15 °С</td></tr>
+		<tr><td>День</td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td>+20 °С</td></tr>
+        <tr><td>Вечер</td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td><td>+23 °С</td></tr>
+        <tr><td>Ночь</td><td><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td> <td>+18 °С</td></tr>
       </table>
   </li>  
 </ul>
