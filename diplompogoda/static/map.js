@@ -82,6 +82,7 @@ function add_selected_city(city, lat, lon) {
 
 function scale_projection(value) {
     projection.scale(projection.scale() + value);
+    console.log(projection.scale());
     update();
 }
 
@@ -146,6 +147,7 @@ function update() {
     context.stroke();
     context.fill();
 
+    // Отображение границ стран
     var geojson = world.features;
     for (var i = 0; i < geojson.length; i++) {
         var country = geojson[i];
@@ -155,6 +157,24 @@ function update() {
         context.stroke();
         context.fill();
     }
+
+    // TODO WIP
+    context.textAlign = 'center';
+    context.fillStyle = "#eee"
+    context.beginPath();
+    for (var i = 0; i < geojson.length; i++) {
+        var country = geojson[i];
+        var geo_center = geoGenerator.centroid(country);
+        if (is_visible_dotp(projection.invert(geo_center))) {
+            //console.log(country.properties.LABELRANK);
+            var max_zoom = Math.floor(projection.scale() / 120);
+            if (country.properties.LABELRANK < max_zoom) {
+            //if (country.properties.LABELRANK < 3)
+                //context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
+            }
+        }
+    }
+    context.stroke();
 
     var geojson = rivers;
     context.strokeStyle = '#00f';
@@ -231,7 +251,7 @@ function draw_cities(geojson) {
         geoGenerator({type: 'FeatureCollection', features: [city]})
 
         // Вывод названия у города
-        // TODO
+        // TODO WIP
         //show_town_text(city);
     }
     context.fill();
