@@ -10,12 +10,12 @@ const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
 const WATER_COLOR = "#234c75";
 const SPACE_COLOR = "#82a2ad";
+const MAX_DISTANCE = 1;
 var width, height, projection;
 var sens = 0.25;
 var colors = ["#573", "#aa5", "#a55", "#5a5", "#27a", "#a50", "#6a2"];
 // Элемент всплывающей подсказки
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
-var tempById = {}; // DEL?
 var context, geoGenerator;
 var world, cities, lakes, rivers;
 var mouse_timer, mouse_point, mouse_xy;
@@ -78,13 +78,6 @@ function make_feature(name, lon ,lat) {
 
 function add_selected_city(city, lat, lon) {
     cities = cities.concat([make_feature(city, lon, lat)]);
-}
-
-function town_to_feature(town) {
-    var feature = {};
-    return feature;
-}
-function towns_to_features(towns) {
 }
 
 function scale_projection(value) {
@@ -193,8 +186,7 @@ function update() {
         geoGenerator({type: 'FeatureCollection', features: [near_city]})
         context.stroke();
         // Вывод названия у города
-        var xy = projection(near_city.geometry.coordinates);
-        context.fillText(near_city.properties.name_ru, xy[0], xy[1]); 
+        show_town_text(near_city);
     }
     if (selected_city) {
         context.strokeStyle = SELECTED_CITY_COLOR;
@@ -202,13 +194,34 @@ function update() {
         context.beginPath();
         geoGenerator({type: 'FeatureCollection', features: [selected_city]})
         context.stroke();
+        // Вывод названия у города
+        show_town_text(selected_city);
     }
+}
+
+// Вывод названия у города
+function show_town_text(town) {
+    if (is_visible_dotp(town.geometry.coordinates)) {
+        var xy = projection(town.geometry.coordinates);
+        context.fillText(town.properties.name_ru, xy[0], xy[1]); 
+    }
+}
+
+function is_visible_dot(lat, lon) {
+    var rlon = projection.rotate()[0];
+    var rlat = projection.rotate()[1];
+    return d3.geoDistance([lon, lat], [-rlon, -rlat]) < MAX_DISTANCE;
+}
+function is_visible_dotp(geopoint) {
+    var rlon = projection.rotate()[0];
+    var rlat = projection.rotate()[1];
+    var lon = geopoint[0];
+    var lat = geopoint[1];
+    return d3.geoDistance([lon, lat], [-rlon, -rlat]) < MAX_DISTANCE;
 }
 
 // Подпрограмма отображения точек городов
 function draw_cities(geojson) {
-    var rlon = projection.rotate()[0];
-    var rlat = projection.rotate()[1];
     context.strokeStyle = '#eee';
     context.lineWidth = 0.5;
     context.fillStyle = "#eee";
@@ -218,16 +231,8 @@ function draw_cities(geojson) {
         geoGenerator({type: 'FeatureCollection', features: [city]})
 
         // Вывод названия у города
-        var lon = city.geometry.coordinates[0];
-        var lat = city.geometry.coordinates[1];
-        //console.log(lon + rlon);
-        if ((lon + rlon) < 20)
-            //&& Math.abs(lat - rlat) > 80) 
-        {
-            //console.log(lon, rlon, lon + rlon);
-            var xy = projection(city.geometry.coordinates);
-            //context.fillText(city.properties.name_ru, xy[0], xy[1]); 
-        }
+        // TODO
+        //show_town_text(city);
     }
     context.fill();
 }
