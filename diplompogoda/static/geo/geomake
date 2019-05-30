@@ -1,0 +1,4 @@
+unzip $2.zip
+ogr2ogr -f GeoJSON $1.json $2.shp
+geo2topo -o topo$1.json --id-property SU_A3 $1.json
+rm $2.*

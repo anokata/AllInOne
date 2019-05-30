@@ -23,6 +23,7 @@ var tooltip_timer, rotate_timer;
 var isDragging = false;
 var startingPos = [];
 var near_city, selected_city;
+var city_level = {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[], 11:[]};
 
 
 // Подпрограмма показывающая данные для выбранного города
@@ -82,7 +83,7 @@ function add_selected_city(city, lat, lon) {
 
 function scale_projection(value) {
     projection.scale(projection.scale() + value);
-    console.log(projection.scale());
+    //console.log(projection.scale());
     update();
 }
 
@@ -160,7 +161,7 @@ function update() {
 
     // TODO WIP
     context.textAlign = 'center';
-    context.fillStyle = "#eee"
+    context.fillStyle = "#db8"
     context.beginPath();
     for (var i = 0; i < geojson.length; i++) {
         var country = geojson[i];
@@ -170,7 +171,7 @@ function update() {
             var max_zoom = Math.floor(projection.scale() / 120);
             if (country.properties.LABELRANK < max_zoom) {
             //if (country.properties.LABELRANK < 3)
-                //context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
+                context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
             }
         }
     }
@@ -196,7 +197,8 @@ function update() {
         geoGenerator({type: 'FeatureCollection', features: [lake]})
     }
     context.fill();
-    draw_cities(cities);
+    //draw_cities(cities);
+    draw_cities_by_rank();
 
     // Отображение выбранного и ближайшего города
     if (near_city) {
@@ -257,6 +259,27 @@ function draw_cities(geojson) {
     context.fill();
 }
 
+function draw_cities_by_rank() {
+    context.strokeStyle = '#eee';
+    context.lineWidth = 0.5;
+    context.fillStyle = "#eee";
+    context.beginPath();
+    var max_rank = Math.floor(projection.scale() / 14);
+    for (var l = 0; l < max_rank; l++) {
+        var geojson = city_level[l];
+    if (geojson)
+    for (var i = 0; i < geojson.length; i++) {
+        var city = geojson[i];
+        geoGenerator({type: 'FeatureCollection', features: [city]})
+
+        // Вывод названия у города
+        // TODO WIP
+        show_town_text(city);
+    }
+    }
+    context.fill();
+}
+
 // Функция вычисления цвета страны
 function get_color(d) { 
     var c = d.properties.MAPCOLOR7 || 0;
@@ -273,15 +296,27 @@ function loadData() {
       .defer(d3.json, "static/geo/topolakes.json")  
       .defer(d3.json, "static/geo/toporivers.json")  
       .defer(d3.json, "static/towns.json")  
+      .defer(d3.json, "static/geo/topocitymid.json")  
       .await(processData);  // обработка загруженных данных
 }
    
 // Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, cityMap, lakesMap, riversMap, towns) {
+function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
     if (error) return console.error(error);
     // console.log(worldMap);
     console.log(cityMap);
     world = topojson.feature(worldMap, worldMap.objects.world);
+
+    // TODO WIP
+    tw = topojson.feature(t, t.objects.citymid).features;
+    console.log("All ", tw);
+    for (i = 0; i < tw.length; i++) {
+        var lvl = Math.floor(tw[i].properties.min_zoom*10);
+        if (!city_level[lvl]) city_level[lvl] = [];
+        city_level[lvl].push(tw[i]);
+    }
+    console.log("By rank", city_level);
+
     cities = [];
     cities_names = Object.keys(cityMap);
     Object.keys(cityMap).map(
@@ -364,6 +399,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns) {
       })
       // Добавление границ стран
 
+    renderCities("Рыбинск");
 }
 
 // Подпрограмма форматирования координат
@@ -405,6 +441,12 @@ function nearest_city(p) {
     // Вычислим расстояние между точкой мыши и каждым городом
     var nearest;
     var min_distance = 10000000;
+
+    // TODO WIP RANK
+    var max_rank = Math.floor(projection.scale() / 14);
+    for (var l = 0; l < max_rank; l++) {
+        var cities = city_level[l];
+    if (cities)
     for (i = 0; i < cities.length; i++) {
         var city = cities[i];
         var city_point = [city.geometry.coordinates[0], city.geometry.coordinates[1]]
@@ -413,6 +455,7 @@ function nearest_city(p) {
             min_distance = dist;
             nearest = city;
         }
+    }
     }
     //console.log(min_distance, nearest);
     if (min_distance < CITY_MIN_DIST) {

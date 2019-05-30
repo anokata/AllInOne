@@ -43,5 +43,5 @@
 
 В зависимости от масштаба выводить названия городов мелких, погоду, названия стран.
     В зависимости от zoom LABELRANK выводить название страны в path.centroid 
-    POP_RANK
+    POP_RANK labelrank megacity worldcity scalerank
     Загрузить все города
