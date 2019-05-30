@@ -72,3 +72,5 @@ https://ru.wikipedia.org/wiki/%D0%93%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D
 A projection function takes a longitude and latitude co-ordinate (in the form of an array [lon, lat]) and transforms it into an x and y co-ordinate:
 https://www.anaga.ru/goroda.htm
 http://alextyurin.ru/?p=1037
+https://github.com/d3/d3-geo
+https://www.d3indepth.com/geographic/

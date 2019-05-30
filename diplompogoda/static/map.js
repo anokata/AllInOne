@@ -93,6 +93,7 @@ function scale_projection(value) {
 }
 
 function init() {
+        if (!Array.concat) { Array.concat = Array.prototype.concat; }
         setMap();
         $("#scaleup").on("click", function() { scale_projection(SCALE_VAL) });
         $("#scaledown").on("click", function() { scale_projection(-SCALE_VAL) });
