@@ -370,7 +370,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
     countries = world.features;
-    //console.log("Мир", world);
+    console.log("Мир", world);
     //console.log("Города", cities);
     //console.log("Озёра", lakes);
     //console.log("Реки", rivers);
@@ -390,7 +390,6 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
             var rotate = projection.rotate();
             projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
             update();
-            //console.log("drag");
       }));
 
 
@@ -499,7 +498,7 @@ function nearest_city(p) {
         }
     }
     }
-    //console.log(min_distance, nearest);
+    console.log(min_distance, nearest);
     if (min_distance < CITY_MIN_DIST) {
         return nearest;
     } else return false;
