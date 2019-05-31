@@ -5,13 +5,14 @@ const CITY_MIN_DIST = 0.04;
 const MOUSE_PAUSE = 200;
 const SCALE_VAL = 50;
 const ROTATE_EPSILON = 5;
-const ROTATE_STEPS = 10;
+const ROTATE_STEPS = 12;
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
 const WATER_COLOR = "#234c75";
 const SPACE_COLOR = "#82a2ad";
 const MAX_DISTANCE = 1;
 const MIN_ZOOM = 300;
+const ROTATE_TIME = 10;
 var width, height, projection;
 var sens = 0.25;
 var colors = ["#573", "#aa5", "#a55", "#5a5", "#27a", "#a50", "#6a2"];
@@ -25,18 +26,22 @@ var isDragging = false;
 var startingPos = [];
 var near_city, selected_city;
 var city_level = {};
+var country_by_color = {};
 
 
 // Подпрограмма показывающая данные для выбранного города
-function renderCities(city, lon, lat) {
+function renderCities(city, lon, lat, is_rotate) {
+    if (is_rotate == undefined) is_rotate = true;
     wheather_data = {};
     if (!lon || !lat) {
         city_data = cities_coords[city];
         lat = city_data[0];
         lon = city_data[1];
     }
-    // Повернуть до этого города
-    rotate_timer = setTimeout(city_rotate, 50, -lon, -lat);
+    if (is_rotate) {
+        // Повернуть до этого города
+        rotate_timer = setTimeout(city_rotate, ROTATE_TIME, -lon, -lat);
+    }
 
     selected_city = make_feature(city, lon, lat);
     near_city = undefined;
@@ -61,7 +66,7 @@ function city_rotate(lon, lat, dn, dt) {
     //projection.rotate([-lon, -lat, rotate[2]]); // сразу
     update();
     if (Math.abs(n - lon) > ROTATE_EPSILON)
-        rotate_timer = setTimeout(city_rotate, 50, lon, lat, dn, dt);
+        rotate_timer = setTimeout(city_rotate, ROTATE_TIME, lon, lat, dn, dt);
 }
 
 function make_feature(name, lon ,lat) {
@@ -91,6 +96,13 @@ function scale_projection(value) {
     update();
 
     geoGenerator.pointRadius(point_radius(scale));
+
+    if (scale < 500) {
+        sens = 0.25;
+    } else {
+        sens = 0.25 - scale/8000;
+    }
+    if (sens < 0.05) sens = 0.05;
 }
 
 function point_radius(s) {
@@ -145,8 +157,15 @@ function setMap() {
     loadData();
 }
 
+function set_font_size(s) {
+    let scale = projection.scale();
+    let x = s + (scale / 400)**1.07;
+    context.font = x + "px Arial,Helvetica,sans-serif";
+}
+
 // Подпрограмма отрисовки глобуса со всем содержимым
 function update() {
+    set_font_size(10);
     context.fillStyle = SPACE_COLOR;
     //context.clearRect(0, 0, width, height);
     context.fillRect(0, 0, width, height);
@@ -157,30 +176,31 @@ function update() {
     context.fillStyle = WATER_COLOR;
     context.beginPath();
     geoGenerator({type: 'Sphere'});
-    context.stroke();
     context.fill();
 
     // Отображение границ стран
-    var geojson = world.features;
-    for (let i = 0; i < geojson.length; i++) {
-        let country = geojson[i];
-        context.fillStyle = get_color(country);
-        context.beginPath();
-        geoGenerator({type: 'FeatureCollection', features: [country]})
-        context.stroke();
-        context.fill();
+    for (let c = 0; c < Object.keys(country_by_color).length; c++) {
+        let geojson = country_by_color[c];
+            context.beginPath();
+        for (let i = 0; i < geojson.length; i++) {
+            let country = geojson[i];
+            context.fillStyle = get_color(country);
+            geoGenerator({type: 'FeatureCollection', features: [country]})
+        }
+            context.stroke();
+            context.fill();
     }
 
-    // TODO WIP
+    var geojson = world.features;
     context.textAlign = 'center';
     context.fillStyle = "#db8"
     context.beginPath();
     for (let i = 0; i < geojson.length; i++) {
         let country = geojson[i];
         let geo_center = geoGenerator.centroid(country);
+        let max_zoom = Math.floor(projection.scale() / 120);
         if (is_visible_dotp(projection.invert(geo_center))) {
             //console.log(country.properties.LABELRANK);
-            var max_zoom = Math.floor(projection.scale() / 120);
             if (country.properties.LABELRANK < max_zoom) {
             //if (country.properties.LABELRANK < 3)
                 context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
@@ -237,7 +257,7 @@ function update() {
 function show_town_text(town) {
     if (is_visible_dotp(town.geometry.coordinates)) {
         var xy = projection(town.geometry.coordinates);
-        context.fillText(town.properties.name_ru, xy[0], xy[1] - 5); 
+        context.fillText(town.properties.name_ru || "", xy[0], xy[1] - 5); 
     }
 }
 
@@ -254,6 +274,7 @@ function is_visible_dotp(geopoint) {
     return d3.geoDistance([lon, lat], [-rlon, -rlat]) < MAX_DISTANCE;
 }
 
+// TODO DEL
 // Подпрограмма отображения точек городов
 function draw_cities(geojson) {
     context.strokeStyle = '#eee';
@@ -263,10 +284,6 @@ function draw_cities(geojson) {
     for (var i = 0; i < geojson.length; i++) {
         var city = geojson[i];
         geoGenerator({type: 'FeatureCollection', features: [city]})
-
-        // Вывод названия у города
-        // TODO WIP
-        //show_town_text(city);
     }
     context.fill();
 }
@@ -276,8 +293,8 @@ function draw_cities_by_rank() {
     context.lineWidth = 0.5;
     context.fillStyle = "#eee";
     context.beginPath();
-    var max_rank = Math.floor(Math.sqrt(projection.scale()/1));
-    console.log(projection.scale(), max_rank);
+    var max_rank = Math.floor(Math.sqrt(projection.scale()*1.5));
+    //console.log(projection.scale(), max_rank);
     for (var l = 0; l < max_rank; l++) {
         var geojson = city_level[l];
     if (geojson)
@@ -286,18 +303,21 @@ function draw_cities_by_rank() {
         geoGenerator({type: 'FeatureCollection', features: [city]})
 
         // Вывод названия у города
-        // TODO WIP
         show_town_text(city);
     }
     }
     context.fill();
 }
 
-// Функция вычисления цвета страны
-function get_color(d) { 
+function get_color_index(d) { 
     var c = d.properties.MAPCOLOR7 || 0;
     var n = Math.abs(c % colors.length);
-    return colors[n]; 
+    return n; 
+}
+
+// Функция вычисления цвета страны
+function get_color(d) { 
+    return colors[get_color_index(d)]; 
 }
 
 // Подпрограмма загрузки геоданных
@@ -315,43 +335,51 @@ function loadData() {
    
 // Подпрограмма обработки загруженных геоданных
 function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
+//var t0 = performance.now();
+    // 813ms
     if (error) return console.error(error);
     // console.log(worldMap);
-    console.log(cityMap);
+    //console.log(cityMap);
     world = topojson.feature(worldMap, worldMap.objects.world);
 
-    // TODO WIP
     tw = topojson.feature(t, t.objects.citymid).features;
-    console.log("All ", tw);
-    for (i = 0; i < tw.length; i++) {
-        var lvl = Math.floor(tw[i].properties.min_zoom*10);
-        if (!city_level[lvl]) city_level[lvl] = [];
-        city_level[lvl].push(tw[i]);
+    //console.log("All ", tw);
+    for (let i = 0; i < tw.length; i++) {
+        let name = tw[i].properties.name_ru;
+        if (name) {
+            let lvl = Math.floor(tw[i].properties.min_zoom*10);
+            if (!city_level[lvl]) city_level[lvl] = [];
+            city_level[lvl].push(tw[i]);
+            cities_names.push(name);
+            cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
+        }
     }
-    console.log("By rank", city_level);
+    //console.log("By rank", city_level);
 
-    cities = [];
-    cities_names = Object.keys(cityMap);
-    Object.keys(cityMap).map(
-        function(key, index) { 
-            cities.push(make_feature(key, cityMap[key][1], cityMap[key][0])); 
-        });
+    cities = tw; 
+    //cities_names = Object.keys(cityMap);
     // Список дополнительных городов
     cities_names_add = Object.keys(towns);
     // Координаты дополнительных городов
-    window.cities_coords = towns;
+    //window.cities_coords = towns;
     // Совмещение с городами карты
-    cities_coords = Object.assign({}, cities_coords, cityMap);
+    //cities_coords = Object.assign({}, cities_coords, cityMap);
     // Слияние списков имён городов
-    cities_names = Array.concat(cities_names, cities_names_add);
+    //cities_names = Array.concat(cities_names, cities_names_add);
     autocomplete_init();
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
     countries = world.features;
-    console.log("Мир", world);
-    console.log("Города", cities);
-    console.log("Озёра", lakes);
-    console.log("Реки", rivers);
+    //console.log("Мир", world);
+    //console.log("Города", cities);
+    //console.log("Озёра", lakes);
+    //console.log("Реки", rivers);
+    for (let i = 0; i < countries.length; i++) {
+        let country = countries[i];
+        let color_index = get_color_index(country);
+        if (!country_by_color[color_index]) country_by_color[color_index] = [];
+        country_by_color[color_index].push(country);
+    }
 
     update();
       // Обработчик поворода шара
@@ -394,25 +422,27 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
       })
     d3.selectAll("canvas")
       .on("mouseup", function () {
-          var mouse_point = get_mouse_geopoint(this);
-          // Если совпадёт с городом c определённой точностью
-          var nearest = nearest_city(mouse_point);
-          if (nearest) {
-              //selected_city = nearest;
-              //console.log(nearest, nearest.properties.name_ru);
-              renderCities(nearest.properties.name_ru, nearest.geometry.coordinates[0], nearest.geometry.coordinates[1]);
-          } else {
-            if (!isDragging) {
-                show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
-                renderCities(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
-            }
+          if (!isDragging) {
+              var mouse_point = get_mouse_geopoint(this);
+              // Если совпадёт с городом c определённой точностью
+              var nearest = nearest_city(mouse_point);
+              if (nearest) {
+                  //selected_city = nearest;
+                  //console.log(nearest, nearest.properties.name_ru);
+                  renderCities(nearest.properties.name_ru, nearest.geometry.coordinates[0], nearest.geometry.coordinates[1]);
+              } else {
+                    show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
+                    renderCities(human_coord(mouse_point), mouse_point[0], mouse_point[1], false);
+              }
           }
           isDragging = false;
           startingPos = [];
       })
       // Добавление границ стран
 
-    renderCities("Рыбинск");
+    renderCities("Рыбинск", 0, 0, false);
+//var t1 = performance.now();
+//console.log("processData " + (t1 - t0) + " ms")
 }
 
 // Подпрограмма форматирования координат
@@ -455,7 +485,6 @@ function nearest_city(p) {
     var nearest;
     var min_distance = 10000000;
 
-    // TODO WIP RANK
     var max_rank = Math.floor(projection.scale() / 14);
     for (var l = 0; l < max_rank; l++) {
         var cities = city_level[l];
