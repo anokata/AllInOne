@@ -30,6 +30,7 @@
     В зависимости от zoom LABELRANK выводить название страны в path.centroid 
     POP_RANK labelrank megacity worldcity scalerank
     Загрузить все города
+* 31.05.2019
 +подписи выше
 +перенести поиск
 +Т воды
@@ -43,24 +44,21 @@
 +Города для поиска генерить из новых и их коорд city_coords
 +Сгруппировать страны по цвету и рисовать блоками по одному цвету
 +Чувствительность поворота мышкой от зума уменьшать
--профилирование
+?профилирование
++ув индекс
+!?+асинк
++полярный день - нет долготы и подпись что полярный
 
     ОТРЕндерить глобус весь в картинку png и натягивать
     Хранить кеш погоды на сервере и обновлять в фоне весь список (быстро лимит превысим)
 
-+ув индекс
-+полярный день - нет долготы и подпись что полярный
-
-Выводить прогноз
+Выводить прогноз по частям дня
 Масштабирование на правую кнопку
 
-Добавить больше курортов
-Турцию Вьетнам
-
-Зум плавнее 
+Добавить больше курортов Турцию Вьетнам
 Добавить Рыбинск как feature и др
 
-!?+асинк
+Зум плавнее 
 
 dadata in city, +страна
     Учёт часового пояса
@@ -72,3 +70,24 @@ dadata in city, +страна
 
 Рефакторинг
 Комментарии, объяснения
+
+
+
+  <input id="city">
+
+<link href="static/suggestions.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="static/jquery.suggestions.min.js"></script>
+<script type="text/javascript">
+    $("#city").suggestions({
+        //serviceUrl: "http://127.0.0.1:5000/suggestions/",
+        token: "89f7cd1f9b756423ad625117394ade24c5f44bee",
+        "locations": [ { "country": "*" } ],
+        type: "ADDRESS",
+        count: 5,
+        /* Вызывается, когда пользователь выбирает одну из подсказок */
+        onSelect: function(suggestion) {
+            console.log(suggestion);
+            console.log(suggestion.data.geo_lon, suggestion.data.geo_lat);
+        },
+    });
+</script>

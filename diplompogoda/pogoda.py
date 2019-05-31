@@ -7,6 +7,9 @@ from datetime import timedelta
 
 app = Flask(__name__)
 YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
+YANDEX_WHEATHER_URL = "https://api.weather.yandex.ru/v1/forecast"
+DADATA_KEY = "Token a21ae8d8246ebf44e4c99a8dd9e6786d3a56ca0a"
+DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
 CACHE_FILE = "wheather.json"
 CACHE_ONLY = False
 #"a57bd39d-59d5-47e1-9bfe-00d40e2676c8"
@@ -54,10 +57,9 @@ def save_cache(lat, lon, wheather):
     save_json(CACHE_FILE, old)
 
 def get_wheather_from_yandex(lat, lon):
-    url = "https://api.weather.yandex.ru/v1/forecast"
     headers = {"X-Yandex-API-Key": YANDEX_WHEATHER_APIKEY}
     data = {"lat": lat, "lon": lon, "lang": "ru_RU", "limit": "1"}
-    r = requests.get(url, headers=headers, params=data)
+    r = requests.get(YANDEX_WHEATHER_URL, headers=headers, params=data)
     return r.text
 
 # TODO При запросе если кеш старый. пройтись по списку городов и обновить кеш
@@ -98,6 +100,25 @@ def pogoda(lat="", lon="", methods=['POST']):
         return get_wheather(lat, lon)
     else:
         return get_wheather(lat, lon)
+
+
+@app.route("/suggestions/", methods=['POST'])
+def suggestions(q):
+    if request.method == "POST":
+        q = request.form.get("q")
+    headers = {
+            "Content-Type": "application/json", 
+            "Accept": "application/json", 
+            "Authorization": DADATA_KEY}
+    data = {
+            "query": q, 
+            "count":"10",
+            "locations": [ { "country": "*" }]
+            }
+    data = json.dumps(data)
+    r = requests.post(DADATA_URL, data=data, params=data, headers=headers)
+    return r.text
+
 
 @app.route('/')
 def root():

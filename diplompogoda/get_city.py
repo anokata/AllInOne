@@ -478,9 +478,6 @@ for city in cities:
     r = requests.post(url, data=data, params=data, headers=headers)
     data = dump.dump_all(r)
     j = r.json()
-    #lon = j["suggestions"][0]["data"]["geo_lon"]
-    #lat = j["suggestions"][0]["data"]["geo_lat"]
-    #print(j)
     (lon, lat) = find_coord(j)
     if lon is not None:
         print('"{}": ["{}", "{}"],'.format(city, lat, lon))
