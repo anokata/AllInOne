@@ -41,17 +41,33 @@ function view(wheather_data) {
         $("#temp_water").parent().css("display", "none");
 		$("#temp_water_tr").css("display", "none");
 	}
-	if (wheather_data[city]["forecasts"][0]["sunrise"]) {
-		$("#rise").text(wheather_data[city]["forecasts"][0]["sunrise"]);
-	}
-	if (wheather_data[city]["forecasts"][0]["sunset"]) {
-		$("#sunset").text(wheather_data[city]["forecasts"][0]["sunset"]);
-		$("#day_long").text(daylong(wheather_data[city]["forecasts"][0]["sunrise"], wheather_data[city]["forecasts"][0]["sunset"]));
-	}
+    // Если не полярные день/ночь
+    if (!wheather_data[city].forecasts[0].parts.day.polar) {
+        if (wheather_data[city]["forecasts"][0]["sunrise"]) {
+            $("#rise").text(wheather_data[city]["forecasts"][0]["sunrise"]);
+        }
+        if (wheather_data[city]["forecasts"][0]["sunset"]) {
+            $("#sunset").text(wheather_data[city]["forecasts"][0]["sunset"]);
+            $("#day_long").text(daylong(wheather_data[city]["forecasts"][0]["sunrise"], wheather_data[city]["forecasts"][0]["sunset"]));
+        $("#rise").parent().show();
+        $("#sunset").parent().show();
+        $("#day_long").siblings().first().next().text("Долгота дня");
+        }
+    } else {
+        // В случае полядного дня/ночи прячем элементы с восходом и закатом
+        $("#rise").parent().hide();
+        $("#sunset").parent().hide();
+        $("#day_long").text("");
+        if (wheather_data[city].forecasts[0].parts.day.daytime == "n") {
+            $("#day_long").siblings().first().next().text("Полярная ночь");
+        } else {
+            $("#day_long").siblings().first().next().text("Полярный день");
+        }
+    }
 
 	$("#moon").text(human_moon(wheather_data[city]["forecasts"][0]["moon_text"]));
 	$("#icon img").attr("src", make_icon(wheather_data[city]["icon"]));
-	$("#uv_index").text(wheather_data[city].forecasts[0].parts.day.uv_index);
+	$("#uv_index").text(human_uv(wheather_data[city].forecasts[0].parts.day.uv_index));
 
     // TODO С текущего часа 12 часов, с учётом пересечения дня
     // Учитывать часовой пояс
@@ -59,7 +75,6 @@ function view(wheather_data) {
     var j = 1;
     for (var i = hour; i < hour + 13; i++) {
         var h = i % 24;
-        //console.log(h, j);
         $("#hour_" + j + "_time").text(h + ":00");
         $("#hour_" + j).text(human_temp(wheather_data[city].forecasts[0].hours[h].temp));
         $("#hour_" + j + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[h].icon));
@@ -109,13 +124,13 @@ function send(wheather_data, city, lat, lon, f) {
     var xhr = new XMLHttpRequest();
     // Конфигурация объекта запроса
     var params = "lat=" + lat + "&lon=" + lon;
-    xhr.open('POST', query, false);
+    xhr.open('POST', query, true);
+    //xhr.open('POST', query, false);
     //xhr.open('GET', query, false);
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     
     // Установка функции обработки результата запроса
     xhr.onload = function() {
-        //console.log(this.responseText);
         // Парсинг ответа в JSON формате
         data = JSON.parse(this.responseText);
 		//console.log(data);
@@ -239,4 +254,22 @@ function human_moon(m) {
 		"first-quarter": "первая четверть",    
 	};
 	return moon_phase[m];
+}
+
+function human_uv(uv) {
+    uv_table = {
+        "0":" (низкий)",
+        "1":" (низкий)",
+        "2":" (низкий)",
+        "3":" (средний)",
+        "4":" (средний)",
+        "5":" (средний)",
+        "6":" (высокий)",
+        "7":" (высокий)",
+        "8":" (очень высокий)",
+        "9":" (очень высокий)",
+        "10":" (очень высокий)",
+        "11":" (экстремальный)"
+    }
+    return uv + uv_table[uv] || " (экстремальный)";
 }
