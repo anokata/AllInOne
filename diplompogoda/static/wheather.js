@@ -33,10 +33,12 @@ function view(wheather_data) {
 	$("#pressure").text(wheather_data[city]["pressure_mm"] + " мм рт. ст.");
 	$("#condition").text(human_condition(wheather_data[city]["condition"]));
 	$("#humidity").text(wheather_data[city]["humidity"] + "%")
+    // Если есть данные температуры воды
     if (wheather_data[city]["temp_water"]) {
-		$("#temp_water_tr").css("display", "table-row");
+        $("#temp_water").parent().css("display", "table-row");
 		$("#temp_water").text(human_temp(wheather_data[city]["temp_water"]) + "°");
 	} else {
+        $("#temp_water").parent().css("display", "none");
 		$("#temp_water_tr").css("display", "none");
 	}
 	if (wheather_data[city]["forecasts"][0]["sunrise"]) {

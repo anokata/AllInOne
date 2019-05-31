@@ -11,6 +11,7 @@ const SELECTED_CITY_COLOR = '#3d3';
 const WATER_COLOR = "#234c75";
 const SPACE_COLOR = "#82a2ad";
 const MAX_DISTANCE = 1;
+const MIN_ZOOM = 300;
 var width, height, projection;
 var sens = 0.25;
 var colors = ["#573", "#aa5", "#a55", "#5a5", "#27a", "#a50", "#6a2"];
@@ -23,7 +24,7 @@ var tooltip_timer, rotate_timer;
 var isDragging = false;
 var startingPos = [];
 var near_city, selected_city;
-var city_level = {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[], 11:[]};
+var city_level = {};
 
 
 // Подпрограмма показывающая данные для выбранного города
@@ -82,9 +83,20 @@ function add_selected_city(city, lat, lon) {
 }
 
 function scale_projection(value) {
-    projection.scale(projection.scale() + value);
+    let scale = projection.scale();
+    //projection.scale(scale + Math.sign(value)*Math.abs(scale)**0.7);
+    projection.scale(scale**(1 + value/700));
+    if (projection.scale() < MIN_ZOOM) projection.scale(MIN_ZOOM);
     //console.log(projection.scale());
     update();
+
+    geoGenerator.pointRadius(point_radius(scale));
+}
+
+function point_radius(s) {
+    if (s > 1500) return 3;
+    if (s < 1000) return 2;
+    return s/500
 }
 
 function init() {
@@ -150,8 +162,8 @@ function update() {
 
     // Отображение границ стран
     var geojson = world.features;
-    for (var i = 0; i < geojson.length; i++) {
-        var country = geojson[i];
+    for (let i = 0; i < geojson.length; i++) {
+        let country = geojson[i];
         context.fillStyle = get_color(country);
         context.beginPath();
         geoGenerator({type: 'FeatureCollection', features: [country]})
@@ -163,9 +175,9 @@ function update() {
     context.textAlign = 'center';
     context.fillStyle = "#db8"
     context.beginPath();
-    for (var i = 0; i < geojson.length; i++) {
-        var country = geojson[i];
-        var geo_center = geoGenerator.centroid(country);
+    for (let i = 0; i < geojson.length; i++) {
+        let country = geojson[i];
+        let geo_center = geoGenerator.centroid(country);
         if (is_visible_dotp(projection.invert(geo_center))) {
             //console.log(country.properties.LABELRANK);
             var max_zoom = Math.floor(projection.scale() / 120);
@@ -225,7 +237,7 @@ function update() {
 function show_town_text(town) {
     if (is_visible_dotp(town.geometry.coordinates)) {
         var xy = projection(town.geometry.coordinates);
-        context.fillText(town.properties.name_ru, xy[0], xy[1]); 
+        context.fillText(town.properties.name_ru, xy[0], xy[1] - 5); 
     }
 }
 
@@ -264,7 +276,8 @@ function draw_cities_by_rank() {
     context.lineWidth = 0.5;
     context.fillStyle = "#eee";
     context.beginPath();
-    var max_rank = Math.floor(projection.scale() / 14);
+    var max_rank = Math.floor(Math.sqrt(projection.scale()/1));
+    console.log(projection.scale(), max_rank);
     for (var l = 0; l < max_rank; l++) {
         var geojson = city_level[l];
     if (geojson)
@@ -373,7 +386,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
           // Если совпадёт с городом
           //console.log(projection.invert(d3.mouse(this)));
           clearTimeout(mouse_timer);
-          mouse_timer = setTimeout(mouse_stopped, MOUSE_PAUSE);
+          //mouse_timer = setTimeout(mouse_stopped, MOUSE_PAUSE); //TODO
           mouse_point = get_mouse_geopoint(this);
           mouse_xy = d3.mouse(this);
           tooltip_hide();
@@ -391,7 +404,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
           } else {
             if (!isDragging) {
                 show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
-                // TODO Если есть населённый пунк рядом то подробно
+                renderCities(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
             }
           }
           isDragging = false;
