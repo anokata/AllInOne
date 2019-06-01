@@ -1,11 +1,16 @@
+// Основной код, выполняющиейся после загрузки страницы
 window.onload = function () {
-
+// Константы
 const WIDTH = 800;
 const CITY_MIN_DIST = 0.04;
 const MOUSE_PAUSE = 200;
 const SCALE_VAL = 50;
 const ROTATE_EPSILON = 5;
 const ROTATE_STEPS = 12;
+const MAX_DISTANCE = 1;
+const MIN_ZOOM = 300;
+const ROTATE_TIME = 10;
+// Цвета
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
 const WATER_COLOR = "#b1d5e5";
@@ -13,10 +18,7 @@ const SPACE_COLOR = "#7397a4";
 const CITY_COLOR = "#333";
 const COUNTRY_TEXT_COLOR = "#333";
 const RIVER_COLOR = '#0e67a4';
-const MAX_DISTANCE = 1;
-const MIN_ZOOM = 300;
 const EDGE_COLOR = '#111';
-const ROTATE_TIME = 10;
 var width, height, projection;
 var sens = 0.25;
 var colors = ["#dda6ce", "#aebce1", "#fbbb74", "#b9d888", "#fffac2", "#b4cbb7", "#e4c9ae", "#f7a98e", "#ffe17e"];
@@ -275,6 +277,19 @@ function update() {
     }
     context.fill();
 	context.stroke();
+    
+    // coastlines TODO WIP
+    /*
+    var geojson = coast;
+    context.strokeStyle = RIVER_COLOR;
+    context.lineWidth = 1.5;
+    context.beginPath();
+    for (var i = 0; i < geojson.length; i++) {
+        var lake = geojson[i];
+        geoGenerator({type: 'FeatureCollection', features: [lake]})
+    }
+	context.stroke();
+    */
 	
 	draw_country_names();
 	
@@ -389,13 +404,15 @@ function loadData() {
       .defer(d3.json, "static/geo/toporivers.json")  
       .defer(d3.json, "static/towns.json")  
       .defer(d3.json, "static/geo/topocitymid.json")  
+      .defer(d3.json, "static/geo/topocoastlines.json")  
       .await(processData);  // обработка загруженных данных
 }
    
 // Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
+function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, coast) {
     if (error) return console.error(error);
     world = topojson.feature(worldMap, worldMap.objects.world);
+    window.coast = topojson.feature(coast, coast.objects.coastlines).features;
 
     tw = topojson.feature(t, t.objects.citymid).features;
     for (let i = 0; i < tw.length; i++) {
@@ -651,6 +668,4 @@ function autocomplete_init() {
 init();
 
 };
-
-
 
