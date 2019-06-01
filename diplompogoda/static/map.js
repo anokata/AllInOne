@@ -8,18 +8,18 @@ const ROTATE_EPSILON = 5;
 const ROTATE_STEPS = 12;
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
-const WATER_COLOR = "#5895d2";
-const SPACE_COLOR = "#82a2ad";
+const WATER_COLOR = "#b1d5e5";
+const SPACE_COLOR = "#7397a4";
 const CITY_COLOR = "#333";
-const COUNTRY_TEXT_COLOR = "#fff";
-const RIVER_COLOR = '#aaf';
+const COUNTRY_TEXT_COLOR = "#333";
+const RIVER_COLOR = '#0e67a4';
 const MAX_DISTANCE = 1;
 const MIN_ZOOM = 300;
 const EDGE_COLOR = '#111';
 const ROTATE_TIME = 10;
 var width, height, projection;
 var sens = 0.25;
-var colors = ["#a6dc70", "#ece669", "#ef6c6c", "#6acd6a", "#af75cf", "#eaae71", "#4dd6c7"];
+var colors = ["#dda6ce", "#aebce1", "#fbbb74", "#b9d888", "#fffac2", "#b4cbb7", "#e4c9ae", "#f7a98e", "#ffe17e"];
 // Элемент всплывающей подсказки
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 var context, geoGenerator;
@@ -82,7 +82,7 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     if (is_rotate == undefined) is_rotate = true;
     if (city_name == undefined) city_name = city;
 
-    wheather_data = {};
+    wheather_data = {}; // Global
     // TODO DEL?
     if (!lon || !lat) {
         //console.log("DLE");
@@ -265,7 +265,7 @@ function update() {
     context.stroke();
 
     var geojson = lakes;
-    context.strokeStyle = '#00f';
+    context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 0.5;
     context.fillStyle = WATER_COLOR;
     context.beginPath();
@@ -274,6 +274,7 @@ function update() {
         geoGenerator({type: 'FeatureCollection', features: [lake]})
     }
     context.fill();
+	context.stroke();
 	
 	draw_country_names();
 	
@@ -368,7 +369,7 @@ function draw_cities_by_rank() {
 }
 
 function get_color_index(d) { 
-    var c = d.properties.MAPCOLOR7 || 0;
+    var c = d.properties.MAPCOLOR9 || 0;
     var n = Math.abs(c % colors.length);
     return n; 
 }
@@ -483,7 +484,12 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
           isDragging = false;
           startingPos = [];
       })
-      // Добавление границ стран
+
+    for (let i = 0; i < 6; i++)
+        $("#day_" + i).parent()
+            .on("click", function () {
+                show_part_wheather(i);
+            });
 
     render_city(city_by_name("Рыбинск"), false);
     //var t1 = performance.now();

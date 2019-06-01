@@ -5,6 +5,7 @@ cities_names_add = [];
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
     console.log(wheather_data);
+	current_wheather_data = wheather_data;
     // Текст с информацией
     var info = "";
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
@@ -83,7 +84,7 @@ function view(wheather_data) {
     }
     for (var i = 0; i < 6; i++) {
         var date = new Date(wheather_data[city].forecasts[i].date);
-        var date_str = date.getDate() + " " + date.toLocaleString('ru-ru', { month: 'long' });
+        var date_str = make_human_date(wheather_data[city].forecasts[i].date)
         var weekday = upper_first(date.toLocaleString('ru-ru', { weekday: 'short' }));
         $("#day_" + i).text(date_str);
         $("#day_" + i + "_week").text(weekday);
@@ -96,6 +97,46 @@ function view(wheather_data) {
     }
 	
     console.log("ZONE", wheather_data[city].zone);
+	
+	show_part_wheather(0);
+}
+
+function make_human_date(date) {
+    var date = new Date(date);
+    return date.getDate() + " " + date.toLocaleString('ru-ru', { month: 'long' });
+}
+
+function show_part_wheather(n) {
+    var p = wheather_data[city].forecasts[n].parts;
+    $("#part_date").text(make_human_date(wheather_data[city].forecasts[n].date));
+    
+	$("#morning_icon img").attr("src", make_icon(p.morning.icon));
+	$("#morning_temp").text(human_temp_grad(p.morning.temp_avg));
+    $("#morning_feel").text(human_temp_grad(p.morning.feels_like));
+    $("#morning_hum").text(p.morning.humidity + "%");
+    $("#morning_pres").text(p.morning.pressure_mm + " мм рт. ст.");
+    $("#morning_wind").text(human_wind(p.morning.wind_dir, p.morning.wind_speed));
+	
+	$("#day_icon img").attr("src", make_icon(p.day.icon));
+	$("#day_temp").text(human_temp_grad(p.day.temp_avg));
+    $("#day_feel").text(human_temp_grad(p.day.feels_like));
+    $("#day_hum").text(p.day.humidity + "%");
+    $("#day_pres").text(p.day.pressure_mm + " мм рт. ст.");
+    $("#day_wind").text(human_wind(p.day.wind_dir, p.day.wind_speed));
+	
+	$("#evening_icon img").attr("src", make_icon(p.evening.icon));
+	$("#evening_temp").text(human_temp_grad(p.evening.temp_avg));
+    $("#evening_feel").text(human_temp_grad(p.evening.feels_like));
+    $("#evening_hum").text(p.evening.humidity + "%");
+    $("#evening_pres").text(p.evening.pressure_mm + " мм рт. ст.");
+    $("#evening_wind").text(human_wind(p.evening.wind_dir, p.evening.wind_speed));
+	
+	$("#night_icon img").attr("src", make_icon(p.night.icon));
+	$("#night_temp").text(human_temp_grad(p.night.temp_avg));
+    $("#night_feel").text(human_temp_grad(p.night.feels_like));
+    $("#night_hum").text(p.night.humidity + "%");
+    $("#night_pres").text(p.night.pressure_mm + " мм рт. ст.");
+    $("#night_wind").text(human_wind(p.night.wind_dir, p.night.wind_speed));
 }
 
 function make_icon(code) {
