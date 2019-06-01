@@ -8,14 +8,18 @@ const ROTATE_EPSILON = 5;
 const ROTATE_STEPS = 12;
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
-const WATER_COLOR = "#234c75";
+const WATER_COLOR = "#5895d2";
 const SPACE_COLOR = "#82a2ad";
+const CITY_COLOR = "#333";
+const COUNTRY_TEXT_COLOR = "#fff";
+const RIVER_COLOR = '#aaf';
 const MAX_DISTANCE = 1;
 const MIN_ZOOM = 300;
+const EDGE_COLOR = '#111';
 const ROTATE_TIME = 10;
 var width, height, projection;
 var sens = 0.25;
-var colors = ["#573", "#aa5", "#a55", "#5a5", "#27a", "#a50", "#6a2"];
+var colors = ["#a6dc70", "#ece669", "#ef6c6c", "#6acd6a", "#af75cf", "#eaae71", "#4dd6c7"];
 // Элемент всплывающей подсказки
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 var context, geoGenerator;
@@ -32,13 +36,14 @@ function render_city(city, is_rotate) {
     // Поиск страны по городу
     var country_name = country_for_city(city);
     var name = city.properties.name_ru;
+	var cname = "";
     if (country_name) {
-        name += " (" + country_name.properties.NAME_RU + ")";
+        cname = country_name.properties.NAME_RU;
     }
     var timezone = city.properties.TIMEZONE;
     console.log("T1", city, timezone);
     // TODO если null то искать ближайшую
-    render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone);
+    render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone, cname);
 }
 
 function country_for_city(city) {
@@ -73,17 +78,18 @@ function city_by_name(city_name) {
 }
 
 // Подпрограмма показывающая данные для выбранного города
-function render_town(city, lon, lat, is_rotate, city_name, timezone) {
+function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     if (is_rotate == undefined) is_rotate = true;
     if (city_name == undefined) city_name = city;
 
     wheather_data = {};
     // TODO DEL?
     if (!lon || !lat) {
-        console.log("DLE");
-        city_data = cities_coords[city];
-        lat = city_data[0];
-        lon = city_data[1];
+        //console.log("DLE");
+        //city_data = cities_coords[city];
+        //lat = city_data[0];
+        //lon = city_data[1];
+		return;
     }
     if (is_rotate) {
         // Повернуть до этого города
@@ -102,6 +108,7 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone) {
     //TODO moment.js timezone to wheather_data
     wheather_data[city] = {};
     wheather_data[city]['zone'] = timezone;
+	wheather_data[city]['cname'] = cname || "";
     send(wheather_data, city, lat, lon, view);
     update();
 }
@@ -221,12 +228,12 @@ function set_font_size(s) {
 
 // Подпрограмма отрисовки глобуса со всем содержимым
 function update() {
-    set_font_size(10);
+    set_font_size(12);
     context.fillStyle = SPACE_COLOR;
     //context.clearRect(0, 0, width, height);
     context.fillRect(0, 0, width, height);
     context.lineWidth = 2.0;
-    context.strokeStyle = '#000';
+    context.strokeStyle = EDGE_COLOR;
 
     // Сфера воды
     context.fillStyle = WATER_COLOR;
@@ -247,26 +254,8 @@ function update() {
             context.fill();
     }
 
-    // Отображение названий стран
-    var geojson = world.features;
-    context.textAlign = 'center';
-    context.fillStyle = "#db8"
-    context.beginPath();
-    for (let i = 0; i < geojson.length; i++) {
-        let country = geojson[i];
-        if (country.properties.NAME_RU == "Франция") continue;
-        let geo_center = geoGenerator.centroid(country);
-        let max_zoom = Math.floor(projection.scale() / 120);
-        if (is_visible_dotp(projection.invert(geo_center))) {
-            if (country.properties.LABELRANK < max_zoom) {
-                context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
-            }
-        }
-    }
-    context.stroke();
-
     var geojson = rivers;
-    context.strokeStyle = '#00f';
+    context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 0.5;
     context.beginPath();
     for (var i = 0; i < geojson.length; i++) {
@@ -285,6 +274,10 @@ function update() {
         geoGenerator({type: 'FeatureCollection', features: [lake]})
     }
     context.fill();
+	
+	draw_country_names();
+	
+	set_font_size(10);
     draw_cities_by_rank();
 
     // Отображение выбранного и ближайшего города
@@ -306,6 +299,29 @@ function update() {
         // Вывод названия у города
         show_town_text(selected_city);
     }
+}
+
+// Отображение названий стран
+function draw_country_names() {
+    var geojson = world.features;
+    context.textAlign = 'center';
+    context.fillStyle = COUNTRY_TEXT_COLOR;
+    context.beginPath();
+    for (let c = 0; c < Object.keys(country_by_color).length; c++) {
+        let countries = country_by_color[c];
+    for (let i = 0; i < countries.length; i++) {
+        let country = countries[i];
+        if (country.properties.NAME_RU == "Франция") continue;
+        let geo_center = geoGenerator.centroid(country);
+        let max_zoom = Math.floor(projection.scale() / 120);
+        if (is_visible_dotp(projection.invert(geo_center))) {
+            if (country.properties.LABELRANK < max_zoom) {
+                context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
+            }
+        }
+    }
+	}
+    context.stroke();
 }
 
 // Вывод названия у города
@@ -331,9 +347,9 @@ function is_visible_dotp(geopoint) {
 
 // Подпрограмма отображения точек городов
 function draw_cities_by_rank() {
-    context.strokeStyle = '#eee';
+    context.strokeStyle = CITY_COLOR;
     context.lineWidth = 0.5;
-    context.fillStyle = "#eee";
+    context.fillStyle = CITY_COLOR;
     context.beginPath();
     var max_rank = Math.floor(Math.sqrt(projection.scale()*1.5));
     //console.log(projection.scale(), max_rank);
@@ -478,7 +494,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
     //console.log("Реки", rivers);
     //console.log("By rank", city_level);
     //console.log("All ", tw);
-    //console.log("By color ", country_by_color);
+    console.log("By color ", country_by_color);
     // console.log(worldMap);
     //console.log(cityMap);
 }
@@ -490,6 +506,7 @@ function human_coord(p) {
     // 55°45′21″ с. ш. 37°37′04″ в. д.
     var lon = p[0];
     var lat = p[1];
+	if (!lon || !lat) return null;
     var coord_text = "";
 
     coord_text += Math.abs(Math.floor(lat));
@@ -566,6 +583,7 @@ function make_wheather_text(city) {
 
 // Подпрограмма формирования всплывающей подсказки
 function show_wheather_data(city_name, lon, lat) {
+	if (!city_name) return;
     // Формирование текста с данными
     var text = "";
     text += city_name;

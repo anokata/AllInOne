@@ -26,6 +26,7 @@ function view(wheather_data) {
     //info_div.innerHTML = info;
 	
 	$("#city_name").text(city);
+	$("#country_name").text(wheather_data[city].cname);
 	$("#time").text(timeConverter(wheather_data[city]["time"]));
 	$("#temp").text(human_temp(wheather_data[city]["temp"]) + "°C");
 	$("#feel").text(human_temp(wheather_data[city]["feels_like"]) + "°C");
@@ -76,7 +77,7 @@ function view(wheather_data) {
     for (var i = hour; i < hour + 13; i++) {
         var h = i % 24;
         $("#hour_" + j + "_time").text(h + ":00");
-        $("#hour_" + j).text(human_temp(wheather_data[city].forecasts[0].hours[h].temp));
+        $("#hour_" + j).text(human_temp_grad(wheather_data[city].forecasts[0].hours[h].temp));
         $("#hour_" + j + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[h].icon));
         j++;
     }
@@ -91,7 +92,7 @@ function view(wheather_data) {
         var evn = wheather_data[city].forecasts[i].parts.evening;
         $("#day_" + i + "_img" + " img").attr("src", make_icon(part.icon));
         $("#day_" + i + "_cond").text(human_condition(part.condition));
-        $("#day_" + i + "_temp").text(human_temp(part.temp_min) + "..." + human_temp(part.temp_max));
+        $("#day_" + i + "_temp").text(human_temp_grad(part.temp_min) + "..." + human_temp_grad(part.temp_max));
     }
 	
     console.log("ZONE", wheather_data[city].zone);
@@ -114,6 +115,7 @@ function send(wheather_data, city, lat, lon, f) {
     var zone = "";
     if (wheather_data[city]) {
         zone = wheather_data[city]['zone'];
+		cname = wheather_data[city]['cname'];
     }
     var query = '';
     // Определение базового URL сервера (тестовый или продуктивный)
@@ -155,6 +157,7 @@ function send(wheather_data, city, lat, lon, f) {
             "forecasts": data['forecasts'],
 			"icon": data['fact']['icon'],
 			"zone": zone,
+			"cname": cname,
 
         };
         // Вызов функции обработки результата
@@ -189,6 +192,9 @@ function human_temp(t) {
 	if (t > 0) { t = "+" + t; }
 	return t;	
 }
+
+function human_temp_grad(t) {
+	return human_temp(t) + "°";}
 
 function human_wind(w, val) {
 	table =  {

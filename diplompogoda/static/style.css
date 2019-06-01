@@ -76,7 +76,7 @@ span {
 
 .second_2 {
 	overflow-x: scroll;
-	font-size: 12px;
+/*	font-size: 12px;	*/
 }
 
 .second_2 td{
@@ -116,8 +116,9 @@ span {
 
 
 .one_section div:nth-child(2)  {
-  padding-bottom: 7px;
-  padding-top: 10px;
+	padding-bottom: 10px;
+    padding-top: 20px;
+    font-size: 16px;
 }
 
 .main {
@@ -151,16 +152,24 @@ span {
 
 .icon_table img {
 	width: 20px;
-	
+}
+
+.icon_table {
+	width: 25px;
 }
 
 #city_name {
 	font-size: 26px;
 }
 
+#country_name {
+	font-size: 16px;
+}
+
 #time {
 	font-size: 14px;
 	color: gray;
+	padding-bottom: 5px;
 }
 
 #temp {
