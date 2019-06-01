@@ -94,6 +94,7 @@ function view(wheather_data) {
         $("#day_" + i + "_temp").text(human_temp(part.temp_min) + "..." + human_temp(part.temp_max));
     }
 	
+    console.log("ZONE", wheather_data[city].zone);
 }
 
 function make_icon(code) {
@@ -110,6 +111,10 @@ function where_am_i() {
 
 // Подпрограмма отправки API запроса Яндекс.Погоды и обработки результата
 function send(wheather_data, city, lat, lon, f) {
+    var zone = "";
+    if (wheather_data[city]) {
+        zone = wheather_data[city]['zone'];
+    }
     var query = '';
     // Определение базового URL сервера (тестовый или продуктивный)
     if (where_am_i()) {
@@ -149,6 +154,7 @@ function send(wheather_data, city, lat, lon, f) {
             "season": data['fact']['season'],
             "forecasts": data['forecasts'],
 			"icon": data['fact']['icon'],
+			"zone": zone,
 
         };
         // Вызов функции обработки результата

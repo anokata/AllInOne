@@ -65,6 +65,8 @@
 https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requestanimationframe/
 
 Учёт часового пояса
+    Для координатной точки искать ближайший город и брать его регион. CONTINENT у страны. TIMEZONE у города
+Удалить дубликаты
 
 dadata in city, +страна
 Добавить Кипр

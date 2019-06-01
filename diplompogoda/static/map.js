@@ -33,9 +33,12 @@ function render_city(city, is_rotate) {
     var country_name = country_for_city(city);
     var name = city.properties.name_ru;
     if (country_name) {
-        name += " (" + country_name + ")";
+        name += " (" + country_name.properties.NAME_RU + ")";
     }
-    render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru);
+    var timezone = city.properties.TIMEZONE;
+    console.log("T1", city, timezone);
+    // TODO если null то искать ближайшую
+    render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone);
 }
 
 function country_for_city(city) {
@@ -46,7 +49,7 @@ function country_for_city(city) {
         //console.log(country.NAME);
         if (country.properties.NAME == country_name_eng) {
             //console.log(country);
-            return country.properties.NAME_RU;
+            return country;
         }
     }
 }
@@ -70,7 +73,7 @@ function city_by_name(city_name) {
 }
 
 // Подпрограмма показывающая данные для выбранного города
-function render_town(city, lon, lat, is_rotate, city_name) {
+function render_town(city, lon, lat, is_rotate, city_name, timezone) {
     if (is_rotate == undefined) is_rotate = true;
     if (city_name == undefined) city_name = city;
 
@@ -89,8 +92,16 @@ function render_town(city, lon, lat, is_rotate, city_name) {
 
     selected_city = make_feature(city_name, lon, lat);
     near_city = undefined;
+
+    if (timezone == undefined) {
+        // TODO найти ближайшую по координатам
+        timezone = "";
+    }
             
     //console.log(city, lon, lat, city_name);
+    //TODO moment.js timezone to wheather_data
+    wheather_data[city] = {};
+    wheather_data[city]['zone'] = timezone;
     send(wheather_data, city, lat, lon, view);
     update();
 }
@@ -382,13 +393,13 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
     }
 
     cities = tw; 
+    // Список дополнительных городов
     cities_names_add = Object.keys(towns);
     cities_names = Array.concat(cities_names, cities_names_add);
-    // TODO Удалить дубликаты
+    // TODO Удалить дубликаты function additional_city()
     // Совмещение с городами карты
+    // Координаты дополнительных городов
     cities_coords = Object.assign({}, cities_coords, cityMap);
-    // TODO Список дополнительных городов
-    // TODO Координаты дополнительных городов
     autocomplete_init();
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
@@ -449,6 +460,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t) {
                   render_city(nearest);
               } else {
                     show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
+                  // TODO ближайший город - регион
                     render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false);
               }
           }
@@ -598,7 +610,6 @@ function autocomplete_init() {
           source: cities_names,
           select: function(event, ui) {
             //console.log(ui.item.value);
-            //render_town(ui.item.value);
             render_city(city_by_name(ui.item.value));
           }
     });
@@ -606,7 +617,6 @@ function autocomplete_init() {
         if(e.keyCode==13) {
             var city = upper_first($("#cities").val());
             $("#cities").val(city);
-            //render_town(city);
             render_city(city_by_name(city));
         }
     });
