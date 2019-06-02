@@ -9,6 +9,8 @@ function view(wheather_data) {
     // Получение названия города
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
 
+/* Вывод данных о погоде в выбранном пункте */
+    // В элемент странци с id city_name вставить название города в качестве текста
 	$("#city_name").text(city);
 	$("#country_name").text(wheather_data[city].cname);
 	$("#time").text(timeConverter(wheather_data[city]["time"]));
@@ -20,19 +22,23 @@ function view(wheather_data) {
 	$("#humidity").text(wheather_data[city]["humidity"] + "%")
     // Если есть данные температуры воды
     if (wheather_data[city]["temp_water"]) {
+        // Отобразить температуру воды
         $("#temp_water").parent().css("display", "table-row");
 		$("#temp_water").text(human_temp(wheather_data[city]["temp_water"]) + "°");
 	} else {
+        // Если нет, то скрыть элемент с температурой воды
         $("#temp_water").parent().css("display", "none");
 		$("#temp_water_tr").css("display", "none");
 	}
     // Если не полярные день/ночь
     if (!wheather_data[city].forecasts[0].parts.day.polar) {
+        // Вывести время восхода и заката
         if (wheather_data[city]["forecasts"][0]["sunrise"]) {
             $("#rise").text(wheather_data[city]["forecasts"][0]["sunrise"]);
         }
         if (wheather_data[city]["forecasts"][0]["sunset"]) {
             $("#sunset").text(wheather_data[city]["forecasts"][0]["sunset"]);
+            // Вывести долготу дня
             $("#day_long").text(daylong(wheather_data[city]["forecasts"][0]["sunrise"], wheather_data[city]["forecasts"][0]["sunset"]));
         $("#rise").parent().show();
         $("#sunset").parent().show();
@@ -50,16 +56,20 @@ function view(wheather_data) {
         }
     }
 
+    // Вывод фазы луны
 	$("#moon").text(human_moon(wheather_data[city]["forecasts"][0]["moon_text"]));
+    // Отображение иконки соответствующей погодным условиям
 	$("#icon img").attr("src", make_icon(wheather_data[city]["icon"]));
+    // Отображение УФ индекса
 	$("#uv_index").text(human_uv(wheather_data[city].forecasts[0].parts.day.uv_index));
 
-    // С текущего часа 12 часов, с учётом пересечения дня, учитывая часовой пояс
+    // Вычисление текущего часа с учётом часового пояса
     var datetz = moment.tz(new Date(), wheather_data[city].zone);
     var hour = Number(datetz.format("H"));
     console.log("ZONE", wheather_data[city].zone, datetz.format("H"));
 	
     var j = 1;
+    // Вывод почасового прогноза с текущего часа, 12 часов
     for (var i = hour; i < hour + 13; i++) {
         var h = i % 24;
         $("#hour_" + j + "_time").text(h + ":00");
@@ -67,9 +77,11 @@ function view(wheather_data) {
         $("#hour_" + j + "_icon").attr("src", make_icon(wheather_data[city].forecasts[0].hours[h].icon));
         j++;
     }
+    // Отображение краткой сводки погоды на сегодня и 5 дней вперёд
     for (var i = 0; i < 6; i++) {
         var date = new Date(wheather_data[city].forecasts[i].date);
         var date_str = make_human_date(wheather_data[city].forecasts[i].date)
+        // Формирование дня недели
         var weekday = upper_first(date.toLocaleString('ru-ru', { weekday: 'short' }));
         $("#day_" + i).text(date_str);
         $("#day_" + i + "_week").text(weekday);
@@ -80,18 +92,24 @@ function view(wheather_data) {
         $("#day_" + i + "_temp").text(human_temp_grad(part.temp_min) + "..." + human_temp_grad(part.temp_max));
     }
 	
+    // Вывести погоды по времени суток на сегодня
 	show_part_wheather(0);
 }
 
+// Функция формирования даты в человекочитаемом формате
 function make_human_date(date) {
     var date = new Date(date);
+    // Число месяца + название месяца
     return date.getDate() + " " + date.toLocaleString('ru-ru', { month: 'long' });
 }
 
+// Подпрограмма отображения погоды на день по времени суток
 function show_part_wheather(n) {
     var p = wheather_data[city].forecasts[n].parts;
+    // Вывод даты
     $("#part_date").text(make_human_date(wheather_data[city].forecasts[n].date));
     
+    // Прогноз на утро
 	$("#morning_icon img").attr("src", make_icon(p.morning.icon));
 	$("#morning_temp").text(human_temp_grad(p.morning.temp_avg));
     $("#morning_feel").text(human_temp_grad(p.morning.feels_like));
@@ -99,6 +117,7 @@ function show_part_wheather(n) {
     $("#morning_pres").text(p.morning.pressure_mm + " мм рт. ст.");
     $("#morning_wind").text(human_wind(p.morning.wind_dir, p.morning.wind_speed));
 	
+    // Прогноз на день
 	$("#day_icon img").attr("src", make_icon(p.day.icon));
 	$("#day_temp").text(human_temp_grad(p.day.temp_avg));
     $("#day_feel").text(human_temp_grad(p.day.feels_like));
@@ -106,6 +125,7 @@ function show_part_wheather(n) {
     $("#day_pres").text(p.day.pressure_mm + " мм рт. ст.");
     $("#day_wind").text(human_wind(p.day.wind_dir, p.day.wind_speed));
 	
+    // Прогноз на вечер
 	$("#evening_icon img").attr("src", make_icon(p.evening.icon));
 	$("#evening_temp").text(human_temp_grad(p.evening.temp_avg));
     $("#evening_feel").text(human_temp_grad(p.evening.feels_like));
@@ -113,6 +133,7 @@ function show_part_wheather(n) {
     $("#evening_pres").text(p.evening.pressure_mm + " мм рт. ст.");
     $("#evening_wind").text(human_wind(p.evening.wind_dir, p.evening.wind_speed));
 	
+    // Прогноз на ночь
 	$("#night_icon img").attr("src", make_icon(p.night.icon));
 	$("#night_temp").text(human_temp_grad(p.night.temp_avg));
     $("#night_feel").text(human_temp_grad(p.night.feels_like));
@@ -121,10 +142,10 @@ function show_part_wheather(n) {
     $("#night_wind").text(human_wind(p.night.wind_dir, p.night.wind_speed));
 }
 
+// Функция формирования ссылки на иконку погодных условий
 function make_icon(code) {
     return "https://yastatic.net/weather/i/icons/blueye/color/svg/" + code + ".svg";
 }
-
 
 // Подпрограмма определения места работы сервера (тестовый или продуктивный)
 function where_am_i() {
