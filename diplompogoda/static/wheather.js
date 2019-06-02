@@ -78,7 +78,7 @@ function view(wheather_data) {
         j++;
     }
     // Отображение краткой сводки погоды на сегодня и 5 дней вперёд
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 11; i++) {
         var date = new Date(wheather_data[city].forecasts[i].date);
         var date_str = make_human_date(wheather_data[city].forecasts[i].date)
         // Формирование дня недели
@@ -100,7 +100,7 @@ function view(wheather_data) {
 function make_human_date(date) {
     var date = new Date(date);
     // Число месяца + название месяца
-    return date.getDate() + " " + date.toLocaleString('ru-ru', { month: 'long' });
+    return date.getDate() + " " + month_name(date.getMonth());
 }
 
 // Подпрограмма отображения погоды на день по времени суток
@@ -114,32 +114,46 @@ function show_part_wheather(n) {
 	$("#morning_temp").text(human_temp_grad(p.morning.temp_avg));
     $("#morning_feel").text(human_temp_grad(p.morning.feels_like));
     $("#morning_hum").text(p.morning.humidity + "%");
-    $("#morning_pres").text(p.morning.pressure_mm + " мм рт. ст.");
+    $("#morning_pres").text(human_pressure(p.morning.pressure_mm));
     $("#morning_wind").text(human_wind(p.morning.wind_dir, p.morning.wind_speed));
+	$("#morning_perc").text(human_prec(p.morning.prec_mm));
 	
     // Прогноз на день
 	$("#day_icon img").attr("src", make_icon(p.day.icon));
 	$("#day_temp").text(human_temp_grad(p.day.temp_avg));
     $("#day_feel").text(human_temp_grad(p.day.feels_like));
     $("#day_hum").text(p.day.humidity + "%");
-    $("#day_pres").text(p.day.pressure_mm + " мм рт. ст.");
+    $("#day_pres").text(human_pressure(p.day.pressure_mm));
     $("#day_wind").text(human_wind(p.day.wind_dir, p.day.wind_speed));
+	$("#day_perc").text(human_prec(p.day.prec_mm));
 	
     // Прогноз на вечер
 	$("#evening_icon img").attr("src", make_icon(p.evening.icon));
 	$("#evening_temp").text(human_temp_grad(p.evening.temp_avg));
     $("#evening_feel").text(human_temp_grad(p.evening.feels_like));
     $("#evening_hum").text(p.evening.humidity + "%");
-    $("#evening_pres").text(p.evening.pressure_mm + " мм рт. ст.");
+    $("#evening_pres").text(human_pressure(p.evening.pressure_mm));
     $("#evening_wind").text(human_wind(p.evening.wind_dir, p.evening.wind_speed));
+	$("#evening_perc").text(human_prec(p.evening.prec_mm));
 	
     // Прогноз на ночь
 	$("#night_icon img").attr("src", make_icon(p.night.icon));
 	$("#night_temp").text(human_temp_grad(p.night.temp_avg));
     $("#night_feel").text(human_temp_grad(p.night.feels_like));
     $("#night_hum").text(p.night.humidity + "%");
-    $("#night_pres").text(p.night.pressure_mm + " мм рт. ст.");
+    $("#night_pres").text(human_pressure(p.night.pressure_mm));
     $("#night_wind").text(human_wind(p.night.wind_dir, p.night.wind_speed));
+	$("#night_perc").text(human_prec(p.night.prec_mm));
+}
+
+function human_pressure(p) {
+	return p;
+	return p + " мм рт. ст.";
+}
+
+function human_prec(p) {
+	if (!p) return "-";
+	return p + " мм";
 }
 
 // Функция формирования ссылки на иконку погодных условий
@@ -213,13 +227,17 @@ function upper_first(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function month_name(m) {
+	  //var months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+	  var months = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+	  return months[m];
+}
 
 // Функция преобразования времени из формата UNIXTIME в строку
 function timeConverter(UNIX_timestamp){
   var a = new Date(UNIX_timestamp * 1000);
-  var months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
   var year = a.getFullYear();
-  var month = months[a.getMonth()];
+  var month = month_name(a.getMonth());
   var date = a.getDate();
   var hour = a.getHours();
   var min = prec_null(a.getMinutes());

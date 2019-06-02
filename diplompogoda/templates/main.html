@@ -156,7 +156,7 @@ svg {
   </li>
   <li class="headline">
 	   <table>
-		<tr><th>Прогноз</th><td>На 5 дней</td><td>На 10 дней</td></tr>
+		<tr><th>Прогноз</th><td id="five_toggle">На 5 дней</td><td id="ten_toggle">На 10 дней</td></tr>
 	   </table>
   </li>
 </ul>
@@ -209,48 +209,48 @@ svg {
 			</td>
         </tr>
 		
-        <tr>
+        <tr id="ten">
             <td>
 				<div>Сегодня</div>
-				<div id="day_0">24 мая</div>
-				<div id="day_0_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
-				<div id="day_0_cond">Дождь</div>
-				<div id="day_0_temp">+8...+20 °С</div>
+				<div id="day_6">24 мая</div>
+				<div id="day_6_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
+				<div id="day_6_cond">Дождь</div>
+				<div id="day_6_temp">+8...+20 °С</div>
 			</td>
             <td>
-				<div id="day_1_week">Сб</div>
-				<div id="day_1">24 мая</div>
-				<div id="day_1_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
-				<div id="day_1_cond">Дождь</div>
-				<div id="day_1_temp">+8...+20 °С</div>
+				<div id="day_7_week">Сб</div>
+				<div id="day_7">24 мая</div>
+				<div id="day_7_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
+				<div id="day_7_cond">Дождь</div>
+				<div id="day_7_temp">+8...+20 °С</div>
 			</td>
 			<td>
-				<div id="day_2_week">Сб</div>
-				<div id="day_2">24 мая</div>
-				<div id="day_2_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
-				<div id="day_2_cond">Дождь</div>
-				<div id="day_2_temp">+8...+20 °С</div>
+				<div id="day_8_week">Сб</div>
+				<div id="day_8">24 мая</div>
+				<div id="day_8_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
+				<div id="day_8_cond">Дождь</div>
+				<div id="day_8_temp">+8...+20 °С</div>
 			</td>
 			<td>
-				<div id="day_3_week">Сб</div>
-				<div id="day_3">24 мая</div>
-				<div id="day_3_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
-				<div id="day_3_cond">Дождь</div>
-				<div id="day_3_temp">+8...+20 °С</div>
+				<div id="day_9_week">Сб</div>
+				<div id="day_9">24 мая</div>
+				<div id="day_9_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
+				<div id="day_9_cond">Дождь</div>
+				<div id="day_9_temp">+8...+20 °С</div>
 			</td>
 			<td>
-				<div id="day_4_week">Сб</div>
-				<div id="day_4">24 мая</div>
-				<div id="day_4_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
-				<div id="day_4_cond">Дождь</div>
-				<div id="day_4_temp">+8...+20 °С</div>
+				<div id="day_10_week">Сб</div>
+				<div id="day_10">24 мая</div>
+				<div id="day_10_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
+				<div id="day_10_cond">Дождь</div>
+				<div id="day_10_temp">+8...+20 °С</div>
 			</td>
 			<td>
-				<div id="day_5_week">Сб</div>
-				<div id="day_5">24 мая</div>
-				<div id="day_5_img"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></div>
-				<div id="day_5_cond">Дождь</div>
-				<div id="day_5_temp">+8...+20 °С</div>
+				<div id="day_11_week"></div>
+				<div id="day_11"> </div>
+				<div id="day_11_img"></div>
+				<div id="day_11_cond"></div>
+				<div id="day_11_temp"></div>
 			</td>
         </tr>
       </table>
@@ -266,7 +266,6 @@ svg {
 			<th>Температура</th>
 			<th>Ощущается</th>
             <th>Условия</th>
-            <th></th>
             <th>Осадки</th>
             <th>Влажность</th>
             <th>Давление</th>
@@ -278,7 +277,6 @@ svg {
             <td id="morning_feel"></td>
 			<td id="morning_icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
             <td id="morning_perc"></td>
-            <td id="morning_cond"></td>
             <td id="morning_hum"></td>
             <td id="morning_pres"></td>
             <td id="morning_wind"></td>
@@ -288,7 +286,6 @@ svg {
 			<td id="day_temp">+15 °С</td>
             <td id="day_feel"></td>
 			<td id="day_icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
-            <td id="day_cond"></td>
             <td id="day_perc"></td>
             <td id="day_hum"></td>
             <td id="day_pres"></td>
@@ -299,7 +296,6 @@ svg {
 			<td id="evening_temp">+15 °С</td>
             <td id="evening_feel"></td>
 			<td id="evening_icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
-            <td id="evening_cond"></td>
             <td id="evening_perc"></td>
             <td id="evening_hum"></td>
             <td id="evening_pres"></td>
@@ -310,7 +306,6 @@ svg {
 			<td id="night_temp">+15 °С</td>
             <td id="night_feel"></td>
 			<td id="night_icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></td>
-            <td id="night_cond"></td>
             <td id="night_perc"></td>
             <td id="night_hum"></td>
             <td id="night_pres"></td>

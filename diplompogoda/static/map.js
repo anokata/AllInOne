@@ -2,7 +2,6 @@
 window.onload = function () {
 // Константы
 const WIDTH = 800;
-const CITY_MIN_DIST = 0.04;
 const MOUSE_PAUSE = 200;
 const SCALE_VAL = 50;
 const ROTATE_EPSILON = 5;
@@ -21,6 +20,7 @@ const RIVER_COLOR = '#0e67a4';
 const EDGE_COLOR = '#111';
 var width, height, projection;
 var sens = 0.25;
+var city_min_dist = 0.04;
 var colors = ["#dda6ce", "#aebce1", "#fbbb74", "#b9d888", "#fffac2", "#b4cbb7", "#e4c9ae", "#f7a98e", "#ffe17e"];
 // Элемент всплывающей подсказки
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -168,8 +168,11 @@ function scale_projection(value) {
 
     if (scale < 500) {
         sens = 0.25;
+		city_min_dist = 0.04;
     } else {
         sens = 0.25 - scale/8000;
+		//city_min_dist = 0.04 - scale/500000;
+		//console.log(city_min_dist, scale/500000)
     }
     if (sens < 0.05) sens = 0.05;
 }
@@ -229,6 +232,10 @@ function setMap() {
 function set_font_size(s) {
     let scale = projection.scale();
     let x = s + (scale / 400)**1.07;
+	if (scale > 3000) {
+		x = s + (scale / 400)**0.7;
+	}
+	//console.log(scale, x);
     context.font = x + "px Arial,Helvetica,sans-serif";
 }
 
@@ -421,7 +428,7 @@ function loadData() {
       .defer(d3.json, "static/geo/topolakes.json")  
       .defer(d3.json, "static/geo/toporivers.json")  
       .defer(d3.json, "static/towns.json")  
-      .defer(d3.json, "static/geo/topocitymid.json")  
+      .defer(d3.json, "static/geo/topocitybig.json")  
       .defer(d3.json, "static/geo/topocoastlines.json")  
       .await(processData);  // обработка загруженных данных
 }
@@ -432,7 +439,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     world = topojson.feature(worldMap, worldMap.objects.world);
     window.coast = topojson.feature(coast, coast.objects.coastlines).features;
 
-    tw = topojson.feature(t, t.objects.citymid).features;
+    tw = topojson.feature(t, t.objects.citybig).features;
     for (let i = 0; i < tw.length; i++) {
         let name = tw[i].properties.name_ru;
         if (name) {
@@ -529,11 +536,16 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
       })
 
     // Привязка обработчика клика на каждый из дней краткой сводки погоды
-    for (let i = 0; i < 6; i++)
+    for (let i = 0; i <= 10; i++)
         $("#day_" + i).parent()
             .on("click", function () {
                 // Отобразить подробные данные по частям дня
                 show_part_wheather(i);
+				// Установка стиля выбранного дня
+				for (let k = 0; k <= 10; k++) {
+					$("#day_" + k).parent().removeClass("forecast_focused");
+				}
+				$("#day_" + i).parent().addClass("forecast_focused");
             });
 
     render_city(city_by_name("Рыбинск"), false);
@@ -546,6 +558,12 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     //console.log("By color ", country_by_color);
     //console.log(worldMap);
     //console.log(cityMap);
+	$("#ten_toggle").on("click", function () {
+		$("#ten").css("display", "table-row");
+	});
+	$("#five_toggle").on("click", function () {
+		$("#ten").css("display", "none");
+	});
 }
 
 // Подпрограмма форматирования координат
@@ -606,7 +624,7 @@ function nearest_city(p) {
     }
     }
     //console.log(min_distance, nearest);
-    if (min_distance < CITY_MIN_DIST) {
+    if (min_distance < city_min_dist) {
         return nearest;
     } else return false;
 }
@@ -648,7 +666,7 @@ function make_wheather_text(city) {
     var lat = city.geometry.coordinates[1];
     var city_name = city.properties.name_ru;
     // Подставить имя города в поле ввода
-    $("#cities").val(city_name);
+    //$("#cities").val(city_name);
     // Вызов подпрограммы отображения погдных данных
     show_wheather_data(city_name, lon, lat);
 }

@@ -164,11 +164,11 @@ span {
     background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12); /* Цвет фона при наведении */
  /*   color: #fff; /* Цвет текста при наведении */ 
 }
-/*
-.forecast  td:focus {
-	background: #f3bd48;
+
+.forecast_focused {
+	background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12);
 }
-*/
+
 .icon_table img {
 	width: 20px;
 }
@@ -256,4 +256,12 @@ td {
 
 .tooltip_img {
 	width: 25px;
+}
+
+#ten {
+	display: none;
+}
+.ui-menu-item {
+	height: 10px;
+	/* Выпадашка */
 }
