@@ -5,6 +5,10 @@ body {
  /* background: linear-gradient(360deg, #EECFBA, #C5DDE8);*/
 }
 
+.ui-widget {
+	padding-left: 40px;
+}
+
 .one_section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -118,7 +122,8 @@ span {
 .one_section div:nth-child(2)  {
 	padding-bottom: 10px;
     padding-top: 20px;
-    font-size: 16px;
+    font-size: 14px;
+	font-weight: bold;
 }
 
 .main {
@@ -130,8 +135,13 @@ span {
 	color: gray;
 }
 
-.forecast, .main, .second_1 {
+.forecast, .main, .second_1, .forecast_detail {
 	border-collapse: collapse;
+}
+
+.headline td:hover {
+  /*  background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12); */
+	color: #ff940c;	
 }
 
 .forecast td {
@@ -150,8 +160,35 @@ span {
 	width: 50px;
 }
 
+.forecast td:hover {
+    background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12); /* Цвет фона при наведении */
+ /*   color: #fff; /* Цвет текста при наведении */ 
+}
+/*
+.forecast  td:focus {
+	background: #f3bd48;
+}
+*/
 .icon_table img {
 	width: 20px;
+}
+
+.forecast_detail img {
+	width: 40px;
+}
+
+.forecast_detail {
+    text-align: center;
+}
+
+.forecast_detail th {
+    padding-bottom: 10px;
+	padding-top: 10px;
+}
+
+.forecast_detail td:nth-child(1), th:nth-child(1) {
+	font-weight: bold;
+	text-align: left;
 }
 
 .icon_table {
@@ -189,6 +226,10 @@ span {
 	display:  table-cell;
     height:  50px;
     vertical-align:  middle;
+}
+
+#part_date {
+	font-size: 18px;
 }
 
 /*
