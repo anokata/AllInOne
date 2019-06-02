@@ -71,9 +71,11 @@ function view(wheather_data) {
 	$("#icon img").attr("src", make_icon(wheather_data[city]["icon"]));
 	$("#uv_index").text(human_uv(wheather_data[city].forecasts[0].parts.day.uv_index));
 
-    // TODO С текущего часа 12 часов, с учётом пересечения дня
-    // Учитывать часовой пояс
-    var hour = (new Date()).getHours();
+    // С текущего часа 12 часов, с учётом пересечения дня, учитывая часовой пояс
+    var datetz = moment.tz(new Date(), wheather_data[city].zone);
+    var hour = Number(datetz.format("H"));
+    console.log("ZONE", wheather_data[city].zone, datetz.format("H"));
+	
     var j = 1;
     for (var i = hour; i < hour + 13; i++) {
         var h = i % 24;
@@ -90,13 +92,10 @@ function view(wheather_data) {
         $("#day_" + i + "_week").text(weekday);
         // TODO с какой части дня брать условия
         var part = wheather_data[city].forecasts[i].parts.day;
-        var evn = wheather_data[city].forecasts[i].parts.evening;
         $("#day_" + i + "_img" + " img").attr("src", make_icon(part.icon));
         $("#day_" + i + "_cond").text(human_condition(part.condition));
         $("#day_" + i + "_temp").text(human_temp_grad(part.temp_min) + "..." + human_temp_grad(part.temp_max));
     }
-	
-    console.log("ZONE", wheather_data[city].zone);
 	
 	show_part_wheather(0);
 }

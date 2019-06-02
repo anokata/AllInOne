@@ -64,8 +64,8 @@
 Зум плавнее 
 https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requestanimationframe/
 
-Учёт часового пояса
-    Для координатной точки искать ближайший город и брать его регион. CONTINENT у страны. TIMEZONE у города
++Учёт часового пояса
++Для координатной точки искать ближайший город и брать его регион. CONTINENT у страны. TIMEZONE у города
 Удалить дубликаты
 
 dadata in city, +страна
@@ -78,30 +78,10 @@ dadata in city, +страна
 
 Рефакторинг
 Комментарии, объяснения
-Сред детализации границы
-Побережья
+-Сред детализации границы
+?Побережья
 Сверстать подсказку
 
 Сделать elenalobanova.pythonanywhere.com
 
 Переключение на растровую плоскую http://bl.ocks.org/mbostock/4132797
-
-
-  <input id="city">
-
-<link href="static/suggestions.css" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="static/jquery.suggestions.min.js"></script>
-<script type="text/javascript">
-    $("#city").suggestions({
-        //serviceUrl: "http://127.0.0.1:5000/suggestions/",
-        token: "89f7cd1f9b756423ad625117394ade24c5f44bee",
-        "locations": [ { "country": "*" } ],
-        type: "ADDRESS",
-        count: 5,
-        /* Вызывается, когда пользователь выбирает одну из подсказок */
-        onSelect: function(suggestion) {
-            console.log(suggestion);
-            console.log(suggestion.data.geo_lon, suggestion.data.geo_lat);
-        },
-    });
-</script>

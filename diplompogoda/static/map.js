@@ -43,8 +43,12 @@ function render_city(city, is_rotate) {
         cname = country_name.properties.NAME_RU;
     }
     var timezone = city.properties.TIMEZONE;
-    console.log("T1", city, timezone);
-    // TODO если null то искать ближайшую
+    // Если null то взять зону ближайшего города
+    if (!timezone) {
+        var nearest = nearest_city_timezone([city.geometry.coordinates[0], city.geometry.coordinates[1]]);
+        timezone = nearest.properties.TIMEZONE;
+    }
+    //console.log("T1", city, timezone);
     render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone, cname);
 }
 
@@ -470,6 +474,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
 
     d3.selectAll("canvas")
       .on("mousedown", function() {
+          mouse_xy = d3.mouse(this);
           clearTimeout(tooltip_timer);
           clearTimeout(rotate_timer);
       })
@@ -494,8 +499,10 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
                   render_city(nearest);
               } else {
                     show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
-                  // TODO ближайший город - регион
-                    render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false);
+                    // Берём часовой пояс ближайшегого города 
+                    var nearest = nearest_city_timezone(mouse_point);
+                    var timezone = nearest.properties.TIMEZONE;
+                    render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false, undefined, timezone);
               }
           }
           isDragging = false;
@@ -517,8 +524,8 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     //console.log("Реки", rivers);
     //console.log("By rank", city_level);
     //console.log("All ", tw);
-    console.log("By color ", country_by_color);
-    // console.log(worldMap);
+    //console.log("By color ", country_by_color);
+    //console.log(worldMap);
     //console.log(cityMap);
 }
 
@@ -581,6 +588,22 @@ function nearest_city(p) {
     if (min_distance < CITY_MIN_DIST) {
         return nearest;
     } else return false;
+}
+
+function nearest_city_timezone(p) {
+    var nearest;
+    var min_distance = 10000000;
+
+    for (i = 0; i < cities.length; i++) {
+        var city = cities[i];
+        var city_point = [city.geometry.coordinates[0], city.geometry.coordinates[1]]
+        var dist = d3.geo.distance(p, city_point);
+        if (min_distance > dist && city.properties.TIMEZONE) {
+            min_distance = dist;
+            nearest = city;
+        }
+    }
+    return nearest;
 }
 
 // Подпрограмма обработки остановки указателя
