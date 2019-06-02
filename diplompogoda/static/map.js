@@ -528,15 +528,15 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
           startingPos = [];
       })
 
+    // Привязка обработчика клика на каждый из дней краткой сводки погоды
     for (let i = 0; i < 6; i++)
         $("#day_" + i).parent()
             .on("click", function () {
+                // Отобразить подробные данные по частям дня
                 show_part_wheather(i);
             });
 
     render_city(city_by_name("Рыбинск"), false);
-    //var t1 = performance.now();
-    //console.log("processData " + (t1 - t0) + " ms")
     //console.log("Мир", world);
     //console.log("Города", cities);
     //console.log("Озёра", lakes);
@@ -574,7 +574,7 @@ function human_coord(p) {
     return coord_text;
 }
    
-// Подпрограмма извлечения координат указателся мыши
+// Функция извлечения координат указателся мыши
 function get_mouse_geopoint(self) {
           var lon, lat;
           lon = projection.invert(d3.mouse(self))[0];
@@ -589,7 +589,9 @@ function nearest_city(p) {
     var nearest;
     var min_distance = 10000000;
 
+    // Вычисление максимального ранга города с учётом масштаба
     var max_rank = Math.floor(projection.scale() / 14);
+    // Перебор городов по рангу
     for (var l = 0; l < max_rank; l++) {
         var cities = city_level[l];
     if (cities)
@@ -609,6 +611,7 @@ function nearest_city(p) {
     } else return false;
 }
 
+// Функция поиска ближайшего города с часовым поясом
 function nearest_city_timezone(p) {
     var nearest;
     var min_distance = 10000000;
@@ -627,25 +630,30 @@ function nearest_city_timezone(p) {
 
 // Подпрограмма обработки остановки указателя
 function mouse_stopped() {
-    //console.log('stop', mouse_point);
+    // Поиск ближайшего города
     var nearest = nearest_city(mouse_point);
+    // Если есть рядом город
     if (nearest) {
-        //console.log(nearest, nearest.properties.name_ru);
         near_city = nearest;
         update();
+        // Отобразить погодные данные по ближайшему городу в подсказке
         make_wheather_text(nearest);
     }
 }
 
 // Подпрограмма отображения погоды города
 function make_wheather_text(city) {
+    // Извлечение координат и имени города
     var lon = city.geometry.coordinates[0]; 
     var lat = city.geometry.coordinates[1];
     var city_name = city.properties.name_ru;
+    // Подставить имя города в поле ввода
     $("#cities").val(city_name);
+    // Вызов подпрограммы отображения погдных данных
     show_wheather_data(city_name, lon, lat);
 }
 
+// TODO сверстать подсказку и заполнять
 // Подпрограмма формирования всплывающей подсказки
 function show_wheather_data(city_name, lon, lat) {
 	if (!city_name) return;
@@ -689,17 +697,21 @@ function tooltip_hide(){
 
 // конфигурации поля ввода городов с автодополнением
 function autocomplete_init() {
+    // При выборе города из подсказки
     $("#cities").autocomplete({
           source: cities_names,
           select: function(event, ui) {
-            //console.log(ui.item.value);
+            // Отобразить погоду по городу
             render_city(city_by_name(ui.item.value));
           }
     });
+    // При нажатии Enter
     $("#cities").keypress(function(e){
         if(e.keyCode==13) {
             var city = upper_first($("#cities").val());
+            // Подставить имя города в поле ввода
             $("#cities").val(city);
+            // Отобразить погоду по городу
             render_city(city_by_name(city));
         }
     });
