@@ -168,16 +168,11 @@ function send(wheather_data, city, lat, lon, f) {
     } else {
         query = 'http://127.0.0.1:5000/pogoda/'
     }
-    // Формирование параметров запроса
-    //query += lat;
-    //query += "/" + lon;
     // Создание объекта для AJAX запроса
     var xhr = new XMLHttpRequest();
     // Конфигурация объекта запроса
     var params = "lat=" + lat + "&lon=" + lon;
     xhr.open('POST', query, true);
-    //xhr.open('POST', query, false);
-    //xhr.open('GET', query, false);
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     
     // Установка функции обработки результата запроса
@@ -206,7 +201,6 @@ function send(wheather_data, city, lat, lon, f) {
         };
         // Вызов функции обработки результата
         if (f) f(wheather_data);
-        //console.log(wheather_data);
         return data;
     }
   
@@ -214,11 +208,13 @@ function send(wheather_data, city, lat, lon, f) {
     xhr.send(params); 
 }
 
+// Функция преобразования строки для начала с заглавной буквы
 function upper_first(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 
+// Функция преобразования времени из формата UNIXTIME в строку
 function timeConverter(UNIX_timestamp){
   var a = new Date(UNIX_timestamp * 1000);
   var months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
@@ -232,14 +228,18 @@ function timeConverter(UNIX_timestamp){
   return time;
 }
 
+// Функция форматирования температуры
 function human_temp(t) {
 	if (t > 0) { t = "+" + t; }
 	return t;	
 }
 
+// Функция формирования температуры в градусах
 function human_temp_grad(t) {
-	return human_temp(t) + "°";}
+	return human_temp(t) + "°";
+}
 
+// Функция форматирования данных ветра
 function human_wind(w, val) {
 	table =  {
 		"nw": "СЗ",
@@ -257,6 +257,7 @@ function human_wind(w, val) {
 		return table[w];
 }
 
+// Функция расшифровки погодных условий
 function human_condition(c) {
 	table = {
 		"clear": "Ясно",
@@ -281,6 +282,7 @@ function human_condition(c) {
 		return table[c];
 }
 
+// Функция форматирования числа из двух цифр с ведущим нулём
 function prec_null(n) {
 	if (n < 10) {
 		return "0" + n;
@@ -288,6 +290,7 @@ function prec_null(n) {
 	else return String(n);
 }
 
+// Функция вычисления долготы дня
 function daylong(d1, d2) {
 	var d1_m = Number(d1.split(":")[0]) * 60  + Number(d1.split(":")[1]);
 	var d2_m = Number(d2.split(":")[0]) * 60  + Number(d2.split(":")[1]);
@@ -300,6 +303,7 @@ function daylong(d1, d2) {
 	return diff;
 }
 
+// Функция расшифровки фазы луны
 function human_moon(m) {
 	moon_phase = {
 		"full-moon": "полнолуние",
@@ -312,6 +316,7 @@ function human_moon(m) {
 	return moon_phase[m];
 }
 
+// Функция шкалы уф-индекса
 function human_uv(uv) {
     uv_table = {
         "0":" (низкий)",
