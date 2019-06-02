@@ -331,8 +331,22 @@ function draw_country_names() {
         let countries = country_by_color[c];
     for (let i = 0; i < countries.length; i++) {
         let country = countries[i];
-        if (country.properties.NAME_RU == "Франция") continue;
         let geo_center = geoGenerator.centroid(country);
+        // Для Франции центр по европейской части без учёта островов
+        if (country.properties.ADM0_A3 == "FRA") {
+            var obj = {
+                type: "Feature",
+                geometry: {
+                    coordinates: [],
+                    type: "MultiPolygon"
+                }
+            };
+            obj.geometry.coordinates = [country.geometry.coordinates[1]];
+            obj.properties = country.properties;
+            geo_center = geoGenerator.centroid(obj);
+            //console.log(obj, geo_center, country);
+            //continue;
+        }
         let max_zoom = Math.floor(projection.scale() / 120);
         if (is_visible_dotp(projection.invert(geo_center))) {
             if (country.properties.LABELRANK < max_zoom) {
@@ -434,7 +448,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     // Список дополнительных городов
     cities_names_add = Object.keys(towns);
     cities_names = Array.concat(cities_names, cities_names_add);
-    // TODO Удалить дубликаты function additional_city()
+    // TODO ?Удалить дубликаты function additional_city()
     // Совмещение с городами карты
     // Координаты дополнительных городов
     cities_coords = Object.assign({}, cities_coords, cityMap);
@@ -447,6 +461,11 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
         let color_index = get_color_index(country);
         if (!country_by_color[color_index]) country_by_color[color_index] = [];
         country_by_color[color_index].push(country);
+
+
+        if (country.properties.ADM0_A3 == "FRA") {
+            // FIX  разделить на 3
+        }
     }
 
     update();
