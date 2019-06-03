@@ -18,6 +18,7 @@ const CITY_COLOR = "#333";
 const COUNTRY_TEXT_COLOR = "#333";
 const RIVER_COLOR = '#0e67a4';
 const EDGE_COLOR = '#111';
+const FONT_STYLE = "px Arial,Helvetica,sans-serif";
 const COUNTRY_ABBREV = {
     "Корейская Народно-Демократическая Республика": "КНДР",
     "Республика Корея": "Корея",
@@ -132,24 +133,33 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     update();
 }
 
+// Подпрограмма поворота карты до выбранного города
 function city_rotate(lon, lat, dn, dt) {
+    // Получение текущего значения поворота
     var rotate = projection.rotate();
     var n = rotate[0];
     var t = rotate[1];
+
+    // Вычисление шага смещений по широте и долготе
     if (!dn || !dt) {
         dn = (lon - n) / ROTATE_STEPS;
         dt = (lat - t) / ROTATE_STEPS;
     }
+    // Добавление одного смещения
     n += dn;
     t += dt;
     projection.rotate([n, t, rotate[2]]);
     //projection.rotate([-lon, -lat, rotate[2]]); // сразу
+
+    // Отрисовка карты
     update();
     if (Math.abs(n - lon) > ROTATE_EPSILON)
         rotate_timer = setTimeout(city_rotate, ROTATE_TIME, lon, lat, dn, dt);
 }
 
+// Функция создания объекта описывающего город
 function make_feature(name, lon ,lat) {
+    // Заполнение объекта
     var town = {
         "type":"Feature",
         "properties":{
@@ -163,22 +173,29 @@ function make_feature(name, lon ,lat) {
     return town;
 }
 
+// Функция добавления выбранного города в список городов
 function add_selected_city(city, lat, lon) {
     let city_feature = make_feature(city, lon, lat);
     cities = cities.concat([city_feature]);
     return city_feature;
 }
 
+// Подпрограмма изменения масштаба
 function scale_projection(value) {
+    // Получение текущего значения масштаба
     let scale = projection.scale();
-    //projection.scale(scale + Math.sign(value)*Math.abs(scale)**0.7);
+    // Изменение масштаба проекции
     projection.scale(scale**(1 + value/700));
+    // Ограничение минимального масштаба
     if (projection.scale() < MIN_ZOOM) projection.scale(MIN_ZOOM);
-    //console.log(projection.scale());
+
+    // Отрисовка карты в новом масштабе
     update();
 
+    // Установка размера точек с учётом нового масштаба
     geoGenerator.pointRadius(point_radius(scale));
 
+    // Установка чувствительности перетаскивания с учётом нового масштаба
     if (scale < 500) {
         sens = 0.25;
 		city_min_dist = 0.04;
@@ -190,25 +207,35 @@ function scale_projection(value) {
     if (sens < 0.05) sens = 0.05;
 }
 
+// Функция вычисления размер точек для разного масштаба
 function point_radius(s) {
     if (s > 1500) return 3;
     if (s < 1000) return 2;
     return s/500
 }
 
+// Подпрограмма инициализации
 function init() {
-        if (!Array.concat) { Array.concat = Array.prototype.concat; }
-        setMap();
-        $("#scaleup").on("click", function() { scale_projection(SCALE_VAL) });
-        $("#scaledown").on("click", function() { scale_projection(-SCALE_VAL) });
-        $("#map").bind('mousewheel DOMMouseScroll', function(event){
-            if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-                scale_projection(SCALE_VAL/2);
-            }
-            else {
-                scale_projection(-SCALE_VAL/2);
-            }
-        });
+    // Копирование функции concat из прототипа
+    if (!Array.concat) { Array.concat = Array.prototype.concat; }
+    // Настойка карты
+    setMap();
+
+    // Установка обработчиков кнопок масштабирования
+    $("#scaleup").on("click", function() { scale_projection(SCALE_VAL) });
+    $("#scaledown").on("click", function() { scale_projection(-SCALE_VAL) });
+
+    // Установка обработчиков масштабирования на колесо мышки
+    $("#map").bind('mousewheel DOMMouseScroll', function(event){
+        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+            // Увеличить масштаб
+            scale_projection(SCALE_VAL/2);
+        }
+        else {
+            // Уменьшить масштаб
+            scale_projection(-SCALE_VAL/2);
+        }
+    });
 }
 
 // Подпрограмма настройки карты
@@ -216,21 +243,24 @@ function setMap() {
     // Высота и ширина карты
     width = WIDTH, height = WIDTH;
      
-    // Создание объекта отрогональной проекции
+    // Создание и настройка объекта отрогональной проекции
     projection = d3.geo.orthographic()
         .scale(380)
         .rotate([0, 0])
         .translate([width / 2, height / 2])
         .clipAngle(90);
 
+    // Создание контекста холста для отображения
     context = d3.select('#map canvas')
       .node()
       .getContext('2d', { alpha: false });
 
+    // Настойка холста - задание ширины и высоты
     d3.select('#map canvas')
         .attr('width', width)
         .attr('height', height);
 
+    // Создание функции генератора линий для выбранной проекции
     geoGenerator = d3.geoPath()
       .projection(projection)
       .context(context);
@@ -242,138 +272,176 @@ function setMap() {
     loadData();
 }
 
+// Подпрограмма установки размера шрифта с учётом масштаба
 function set_font_size(s) {
+    // Получение текущего значение масштаба
     let scale = projection.scale();
+    // Вычисление размер шрифта с поправкой на масштаб
     let x = s + (scale / 400)**1.07;
 	if (scale > 3000) {
 		x = s + (scale / 400)**0.65;
 	}
-	//console.log(scale, x);
-    context.font = x + "px Arial,Helvetica,sans-serif";
+    // Установка размера шрифта 
+    context.font = x + FONT_STYLE;
 }
 
 // Подпрограмма отрисовки глобуса со всем содержимым
 function update() {
-    set_font_size(12);
+    // Очистка холста
     context.fillStyle = SPACE_COLOR;
     context.fillRect(0, 0, width, height);
-    context.lineWidth = 2.0;
-    context.strokeStyle = EDGE_COLOR;
 
-    // Сфера воды
+    // Отображение сфера воды
     context.fillStyle = WATER_COLOR;
     context.beginPath();
     geoGenerator({type: 'Sphere'});
     context.fill();
 
     // Отображение границ стран
+    draw_countries();
+    // Отображение линий рек
+    draw_rivers();
+    // Отображение озёр
+    draw_lakes();
+    // Отображение названий стран
+	draw_country_names();
+    // Отображение городов
+    draw_cities_by_rank();
+    // Отображение ближайшего города
+    draw_city(near_city, NEAR_CITY_COLOR);
+    // Отображение выбранного города
+    draw_city(selected_city, SELECTED_CITY_COLOR);
+
+    //draw_coastlines();
+}
+
+// Подпрограмма отображения границ стран по цветам
+function draw_countries() {
+    // Настройка цвета и толщины линий
+    context.strokeStyle = EDGE_COLOR;
+    context.lineWidth = 2.0;
+    // Для каждого цвета
     for (let c = 0; c < Object.keys(country_by_color).length; c++) {
+        // Выбрать список стран этого цвета
         let countries = country_by_color[c];
+            // Установка цвета заливки в текущий цвет стран
             context.fillStyle = colors[c];
             context.beginPath();
-        for (let i = 0; i < countries.length; i++) {
-            let country = countries[i];
-            geoGenerator({type: 'FeatureCollection', features: [country]})
-        }
+            for (let i = 0; i < countries.length; i++) {
+                // Отобразить страну
+                geoGenerator({type: 'FeatureCollection', features: [countries[i]]})
+            }
+            // Прочертить границы всех стран
             context.stroke();
+            // Залить все страны данного цвета
             context.fill();
     }
+}
 
-    // Отображение линий рек
-    var geojson = rivers;
+// Подпрограмма отображения рек
+function draw_rivers() {
+    // Настройка цвета и толщины линий
     context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 0.5;
     context.beginPath();
-    for (var i = 0; i < geojson.length; i++) {
-        var river = geojson[i];
-        geoGenerator({type: 'FeatureCollection', features: [river]})
+    for (var i = 0; i < rivers.length; i++) {
+        // Отобразить реку
+        geoGenerator({type: 'FeatureCollection', features: [rivers[i]]})
     }
+    // Начертить границы
     context.stroke();
+}
 
-    // Отображение озёр
-    var geojson = lakes;
+// Подпрограмма отображения озёр
+function draw_lakes() {
+    // Настройка цвета и толщины линий
     context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 0.5;
     context.fillStyle = WATER_COLOR;
     context.beginPath();
-    for (var i = 0; i < geojson.length; i++) {
-        var lake = geojson[i];
-        geoGenerator({type: 'FeatureCollection', features: [lake]})
+    for (var i = 0; i < lakes.length; i++) {
+        // Отобразить границу озера
+        geoGenerator({type: 'FeatureCollection', features: [lakes[i]]})
     }
+    // Залить цветом
     context.fill();
+    // Начертить границы
 	context.stroke();
-    
-    // coastlines TODO WIP
-    /*
+}
+
+// Подпрограмма отображения линии побережий
+function draw_coastlines() {
     var geojson = coast;
     context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 1.5;
     context.beginPath();
     for (var i = 0; i < geojson.length; i++) {
-        var lake = geojson[i];
-        geoGenerator({type: 'FeatureCollection', features: [lake]})
+        var line = geojson[i];
+        geoGenerator({type: 'FeatureCollection', features: [line]})
     }
 	context.stroke();
-    */
-	
-	draw_country_names();
-    draw_cities_by_rank();
+}
 
-    // Отображение выбранного и ближайшего города
-    if (near_city) {
-        context.strokeStyle = NEAR_CITY_COLOR;
+// Подпрограмма отображения города
+function draw_city(city, color) {
+    if (city) {
+        // Настройка цвета и толщины линий
+        context.strokeStyle = color;
         context.lineWidth = 5;
         context.beginPath();
-        geoGenerator({type: 'FeatureCollection', features: [near_city]})
+        // Отобразить точку города
+        geoGenerator({type: 'FeatureCollection', features: [city]})
+        // Начертить текст
         context.stroke();
-        // Вывод названия у города
-        show_town_text(near_city);
-    }
-    if (selected_city) {
-        context.strokeStyle = SELECTED_CITY_COLOR;
-        context.lineWidth = 5;
-        context.beginPath();
-        geoGenerator({type: 'FeatureCollection', features: [selected_city]})
-        context.stroke();
-        // Вывод названия у города
-        show_town_text(selected_city);
+        // Вывести название у города
+        show_town_text(city);
     }
 }
 
 // Отображение названий стран
 function draw_country_names() {
+    // Настройка размера шрифта
+    set_font_size(12);
     var geojson = world.features;
+    // Выравнивание текста по центру
     context.textAlign = 'center';
+    // Настройка цвета текста
     context.fillStyle = COUNTRY_TEXT_COLOR;
     context.beginPath();
     for (let c = 0; c < Object.keys(country_by_color).length; c++) {
         let countries = country_by_color[c];
-    for (let i = 0; i < countries.length; i++) {
-        let country = countries[i];
-        let geo_center = geoGenerator.centroid(country);
-        // Для Франции центр по европейской части без учёта островов
-        if (country.properties.ADM0_A3 == "FRA") {
-            var obj = {
-                type: "Feature",
-                geometry: {
-                    coordinates: [],
-                    type: "MultiPolygon"
+        for (let i = 0; i < countries.length; i++) {
+            let country = countries[i];
+            // Вычисление центральной точки страны
+            let geo_center = geoGenerator.centroid(country);
+            // Для Франции центр по европейской части без учёта островов
+            if (country.properties.ADM0_A3 == "FRA") {
+                var obj = {
+                    type: "Feature",
+                    geometry: {
+                        coordinates: [],
+                        type: "MultiPolygon"
+                    }
+                };
+                // Извлечение основной части страны
+                obj.geometry.coordinates = [country.geometry.coordinates[1]];
+                obj.properties = country.properties;
+                // Вычисление центральной точки страны
+                geo_center = geoGenerator.centroid(obj);
+            }
+            // Вычисление максимального ранга страны с учётом мастштаба
+            let max_zoom = Math.floor(projection.scale() / 120);
+            // Если центральная точка страны видима
+            if (is_visible_dotp(projection.invert(geo_center))) {
+                // И если ранг страны меньше максимального ранга
+                if (country.properties.LABELRANK < max_zoom) {
+                    // Отобразить текст с названием страны в центральной точке
+                    context.fillText(get_country_name(country), geo_center[0], geo_center[1]); 
                 }
-            };
-            obj.geometry.coordinates = [country.geometry.coordinates[1]];
-            obj.properties = country.properties;
-            geo_center = geoGenerator.centroid(obj);
-            //console.log(obj, geo_center, country);
-            //continue;
-        }
-        let max_zoom = Math.floor(projection.scale() / 120);
-        if (is_visible_dotp(projection.invert(geo_center))) {
-            if (country.properties.LABELRANK < max_zoom) {
-                context.fillText(get_country_name(country), geo_center[0], geo_center[1]); 
             }
         }
-    }
 	}
+    // Начертить весь текст
     context.stroke();
 }
 
