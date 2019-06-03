@@ -2,13 +2,19 @@
 window.onload = function () {
 // Константы
 const WIDTH = 800;
+// Время(мс) определния остановки указателя
 const MOUSE_PAUSE = 200;
+// Величина изменения масштаба за один шаг
 const SCALE_VAL = 50;
 const ROTATE_EPSILON = 5;
-const ROTATE_STEPS = 12;
+// Максимальная дистанция видимости
 const MAX_DISTANCE = 1;
+// Минимальный масштаб
 const MIN_ZOOM = 300;
+// Задержка между кадрами поворота
 const ROTATE_TIME = 10;
+// Количество кадров при повороте
+const ROTATE_STEPS = 12;
 // Цвета
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
@@ -19,6 +25,7 @@ const COUNTRY_TEXT_COLOR = "#333";
 const RIVER_COLOR = '#0e67a4';
 const EDGE_COLOR = '#111';
 const FONT_STYLE = "px Arial,Helvetica,sans-serif";
+// Словарь аббревиатур стран
 const COUNTRY_ABBREV = {
     "Корейская Народно-Демократическая Республика": "КНДР",
     "Республика Корея": "Корея",
@@ -27,13 +34,20 @@ const COUNTRY_ABBREV = {
     "Южно-Африканская Республика": "ЮАР",
     "Китайская Народная Республика": "КНР",
 };
-var width, height, projection;
+var width, height;
+// Объект проекции
+var projection;
+// Чувствительность перетаскивания
 var sens = 0.25;
+// Минимальная дистанция для попадания в город
 var city_min_dist = 0.04;
+// Цвета стран
 var colors = ["#dda6ce", "#aebce1", "#fbbb74", "#b9d888", "#fffac2", "#b4cbb7", "#e4c9ae", "#f7a98e", "#ffe17e"];
-// Элемент всплывающей подсказки
-var tooltip = d3.select("body").append("div").attr("class", "tooltip");
-var context, geoGenerator;
+// Контекст холста
+var context;
+// Функция генератора линий
+var geoGenerator;
+// Объекты карты
 var world, cities, lakes, rivers;
 // Таймер мыши для отслеживания остановки указателя
 var mouse_timer;
@@ -41,40 +55,48 @@ var mouse_timer;
 var tooltip_timer; 
 // Таймер для поворота к выбранному городу
 var rotate_timer;
+// Точка мыши
 var mouse_point, mouse_xy;
 var isDragging = false;
 var startingPos = [];
+// Ближаший город, выбранный город
 var near_city, selected_city;
+// Города по уровням
 var city_level = {};
+// Страны по цветам
 var country_by_color = {};
-var wheather_data = {};
 
+// Подпрограмма отображения погоды города по имени
 function render_city(city, is_rotate) {
-    // Поиск страны по городу
+    // Получение страны по городу
     var country_name = country_for_city(city);
+    // Извлечение названия страны
     var name = city.properties.name_ru;
 	var cname = "";
     if (country_name) {
         cname = country_name.properties.NAME_RU;
     }
+    // Получение временного пояса из данных города
     var timezone = city.properties.TIMEZONE;
-    // Если null то взять зону ближайшего города
+    // Если не указан часовой пояс в данных города
     if (!timezone) {
+        // Поиск ближайшего города с данными о часовом поясе
         var nearest = nearest_city_timezone([city.geometry.coordinates[0], city.geometry.coordinates[1]]);
+        // Взять зону ближайшего города
         timezone = nearest.properties.TIMEZONE;
     }
-    //console.log("T1", city, timezone);
+    // Вызов подпрограммы отображения погоды в выбранном городе
     render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone, cname);
 }
 
+// Функция поиска страны для города
 function country_for_city(city) {
+    // Получение административного имени страны из данных города
     var country_name_eng = city.properties.ADM0NAME;
-    //console.log(country_name_eng);
+    // Поиск страны с таким именем
     for (let i = 0; i < world.features.length; i++) {
         var country = world.features[i];
-        //console.log(country.NAME);
         if (country.properties.NAME == country_name_eng) {
-            //console.log(country);
             return country;
         }
     }
@@ -82,48 +104,51 @@ function country_for_city(city) {
 
 // Поиск города по имени
 function city_by_name(city_name) {
+    // Поиск города по имени в списке объектов городов
     for (i = 0; i < cities.length; i++) {
         var city = cities[i];
         if (city.properties.name_ru == city_name) {
-            //console.log(city);
+            // Если нашёлся - возвратить его
             return city;
         }
     }
 
-    // TODO Если и тут нет
+    // Иначе поиск в списке городов с координатами
     city_data = cities_coords[city_name];
+    // Извлечение координат города
     lat = city_data[0];
     lon = city_data[1];
-    // TODO если нет но есть в допе
+    // Добавление города к общему списку
     return add_selected_city(city_name, lat, lon);
 }
 
 // Подпрограмма показывающая данные для выбранного города
 function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
+    // Установка значений параметров по умолчанию
+    // Выполнять ли поворот до города
     if (is_rotate == undefined) is_rotate = true;
+    // Полное название города
     if (city_name == undefined) city_name = city;
 
-    wheather_data = {}; // Global
-    // DEL?
+    wheather_data = {};
     if (!lon || !lat) { return; }
+
+    // Если поворачивть
     if (is_rotate) {
         // Повернуть до этого города
         rotate_timer = setTimeout(city_rotate, ROTATE_TIME, -lon, -lat);
     }
 
+    // Создаём объект выделенного города
     selected_city = make_feature(city_name, lon, lat);
     near_city = undefined;
 
-    if (timezone == undefined) {
-        // TODO найти ближайшую по координатам
-        timezone = "";
-    }
-            
-    //console.log(city, lon, lat, city_name);
-    //TODO moment.js timezone to wheather_data
     wheather_data[city] = {};
+    // Добавление в объект погодных данных часового пояса
     wheather_data[city]['zone'] = timezone;
+    // Добавление в объект погодных данных названия города
 	wheather_data[city]['cname'] = cname || "";
+    // Вызов подпрограммы получения и отображения погодных данных
     send(wheather_data, city, lat, lon, view);
     // Отрисовка карты
     update();
@@ -676,7 +701,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
           // Сбросим флаг перетаскивания
           isDragging = false;
           startingPos = [];
-      })
+      });
 
     // Привязка обработчика клика на каждый из дней краткой сводки погоды
     for (let i = 0; i <= 10; i++)
@@ -846,32 +871,12 @@ function show_wheather_data(city_name, lon, lat) {
               .css("top", (mouse_xy[1] + 47) + "px")
               .css("display", "block");
 
-          //text += "<img class='tooltip_img' src='" + "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city_name]["icon"] + ".svg" + "'/>";
-          //text += human_condition(wheather_data[city_name]["condition"]);
-          //text += "<br/>";
-          //text += "Температура: ";
-          ////text += human_temp(wheather_data[city_name]["temp"]) + "°";
-          //text += "<br/>";
-          //text += "Влажность: ";
-          //text += wheather_data[city_name]["humidity"] + "%";
-          ////text += "<br/>";
-          //text += "Ветер: ";
-          //text += human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]);
-          //text += "<br/>";
-          // Настройка всплывающей подсказки
-          //tooltip.html(text)
-              //.style("left", (mouse_xy[0] + 33) + "px")
-              //.style("top", (mouse_xy[1] + 47) + "px")
-              //.style("display", "block")
-              //.style("opacity", 1);
           tooltip_timer = setTimeout(tooltip_hide, 5000);
     });
 }
 
 // Обработчик скрытия подсказки
 function tooltip_hide(){
-    //tooltip.style("opacity", 0)
-        //.style("display", "none");
     $("#tooltip")
         .css("display", "none");
 }
