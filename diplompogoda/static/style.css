@@ -3,6 +3,7 @@ body {
   font-family: Helvetica;
   background: #7397a4;
  /* background: linear-gradient(360deg, #EECFBA, #C5DDE8);*/
+  cursor: default;
 }
 
 .ui-widget {
@@ -21,7 +22,7 @@ body {
   grid-gap: 10px;
 }
 
-li {
+.one_section li {
   padding: 20px;
   font-size: 14px;  
   background-color: white;
@@ -31,7 +32,7 @@ li {
   list-style-type: none; 
 }
 
-.headline {
+.one_section li:last-child {
 	padding: 10px;
 	padding-left: 20px;
 	font-size: 14px;
@@ -46,16 +47,25 @@ li {
 	text-align: -webkit-left;
 }
 
-/*
-span {
+.two_section li {
+  padding: 20px;
+  font-size: 14px;  
   background-color: white;
   border-radius: 10px;
-  padding: 20px;
-  font-size: 14px;
   border: 1px solid #dadada;
   box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
+  list-style-type: none; 
 }
-*/
+
+.three_section li {
+  padding: 20px;
+  font-size: 14px;  
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #dadada;
+  box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
+  list-style-type: none; 
+}
 
 .info {
   text-align: center;
@@ -142,6 +152,7 @@ span {
 .headline td:hover {
   /*  background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12); */
 	color: #ff940c;	
+	cursor: pointer;
 }
 
 .forecast td {
@@ -150,6 +161,7 @@ span {
 	width: 100px;
 	padding-right: 5px;
 	padding-left: 5px;
+	cursor: pointer;
 }
 
 .forecast th:last-child, td:last-child {
@@ -161,7 +173,8 @@ span {
 }
 
 .forecast td:hover {
-    background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12); /* Цвет фона при наведении */
+	background: linear-gradient(180deg, #c2dcff12, #cadef9, #c2dcff12);
+ /*    background: linear-gradient(180deg, #ffebcd12, #ffe6c2, #ffebcd12); /* Цвет фона при наведении */
  /*   color: #fff; /* Цвет текста при наведении */ 
 }
 
@@ -191,8 +204,34 @@ span {
 	text-align: left;
 }
 
+.forecast_detai tr:hover {
+	background: #ffe6c2; 
+}
+
 .icon_table {
 	width: 25px;
+}
+
+.ui-autocomplete-input {
+	border-radius: 10px;
+    border: 5px;
+    height: 25px;
+    padding-left: 10px;
+    width: 280px;
+}
+
+#scaleup, #scaledown {
+	border-radius: 10px;
+    border: 0px;
+    background: white;
+    height: 25px;
+    width: 25px;
+/*	font-weight: bold;  */
+}
+
+#ten td {
+	padding-top: 15px;
+/*	border-top: 1px solid #c3bfbf;  */
 }
 
 #city_name {
@@ -262,15 +301,35 @@ td {
 	display: none;
 }
 .ui-menu-item {
-	height: 10px;
+	height: 25px;
 	/* Выпадашка */
 }
 
 #tooltip {
-    width: 200px;
+	display: none;
+    width: 150px;
     position: absolute;
     background-color: #fff;
+	font-size: 12px;
+	padding: 10px;
+	border-radius: 10px;
 }
+
 #tooltip_icon {
-    width: 20px;
+	height: 25px;
+    padding-right: 5px;
+}
+
+#tooltip_icon img {
+    width: 30px;
+}
+
+#tooltip_cityname {
+	font-size: 18px;
+}
+
+#tooltip_icon, #tooltip_condition {
+	display:  table-cell;
+    height:  30px;
+    vertical-align:  middle;
 }
