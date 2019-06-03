@@ -377,8 +377,11 @@ function draw_country_names() {
     context.stroke();
 }
 
+// Извлечение названия страны с учётом сокращений
 function get_country_name(country) {
+    // Получение названия страны
     let name = country.properties.NAME_RU;
+    // Если имеется аббревиатура для неё
     if (Object.keys(COUNTRY_ABBREV).indexOf(name) >= 0) {
         name = COUNTRY_ABBREV[name];
     }
@@ -387,48 +390,65 @@ function get_country_name(country) {
 
 // Вывод названия у города
 function show_town_text(town) {
+    // Если данный город виден при текущем повороте глобуса
     if (is_visible_dotp(town.geometry.coordinates)) {
+        // Получим экранные координаты точки спроецировав координаты города
         var xy = projection(town.geometry.coordinates);
+        // Вывод текста с именем города в полученных координатах
         context.fillText(town.properties.name_ru || "", xy[0], xy[1] - 5); 
     }
 }
 
+// Функция определения видимости точки на глобусе по отдельным координатам
 function is_visible_dot(lat, lon) {
     var rlon = projection.rotate()[0];
     var rlat = projection.rotate()[1];
+    // Вычисление расстояни между точками и сравнение с максимально допустимой дистанцией
     return d3.geoDistance([lon, lat], [-rlon, -rlat]) < MAX_DISTANCE;
 }
+
+// Функция определения видимости точки на глобусе
 function is_visible_dotp(geopoint) {
+    // Получение координат поворота
     var rlon = projection.rotate()[0];
     var rlat = projection.rotate()[1];
+    // Извлечение координат
     var lon = geopoint[0];
     var lat = geopoint[1];
+    // Вычисление расстояни между точками и сравнение с максимально допустимой дистанцией
     return d3.geoDistance([lon, lat], [-rlon, -rlat]) < MAX_DISTANCE;
 }
 
 // Подпрограмма отображения точек городов
 function draw_cities_by_rank() {
+    // Настройка размера шрифта
 	set_font_size(10);
-    context.strokeStyle = CITY_COLOR;
     context.lineWidth = 0.5;
+    context.strokeStyle = CITY_COLOR;
+    // Установка цвета заливки
     context.fillStyle = CITY_COLOR;
     context.beginPath();
+    // Вычисление максимального уровня города на текущем масштабе
     var max_rank = Math.floor(Math.sqrt(projection.scale()*1.5));
-    //console.log(projection.scale(), max_rank);
+    // Обход городов по уровням
     for (var l = 0; l < max_rank; l++) {
+        // Города данного уровня
         var geojson = city_level[l];
         if (geojson)
+            // Для каждого города данног уровня
             for (var i = 0; i < geojson.length; i++) {
                 var city = geojson[i];
+                // Отобразить точку города
                 geoGenerator({type: 'FeatureCollection', features: [city]})
-
-                // Вывод названия у города
+                // Вывести название города
                 show_town_text(city);
             }
     }
+    // Заливка цветом
     context.fill();
 }
 
+// Функция вычисления индекса цвета в списке цветов colors
 function get_color_index(d) { 
     var c = d.properties.MAPCOLOR9 || 0;
     var n = Math.abs(c % colors.length);
