@@ -860,9 +860,6 @@ function make_wheather_text(city) {
 function show_wheather_data(city_name, lon, lat) {
 	if (!city_name) return;
     // Формирование текста с данными
-    //var text = "";
-    //text += city_name;
-    //text += "<br/>";
     var wheather_data = {};
     // Получение погодных данных в выбранной точке
     send(wheather_data, city_name, lat, lon, function (wheather_data) {

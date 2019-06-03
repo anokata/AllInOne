@@ -1,3 +1,58 @@
+
+// Подпрограмма отправки API запроса получения данных погоды и обработки результата
+function send(wheather_data, city, lat, lon, f) {
+    var zone = "";
+    if (wheather_data[city]) {
+        zone = wheather_data[city]['zone'];
+		cname = wheather_data[city]['cname'];
+    }
+    var query = '';
+    // Определение базового URL сервера (тестовый или продуктивный)
+    if (where_am_i()) {
+        query = 'http://ksilenomen.pythonanywhere.com/pogoda/'
+    } else {
+        query = 'http://127.0.0.1:5000/pogoda/'
+    }
+    // Создание объекта для AJAX запроса
+    var xhr = new XMLHttpRequest();
+    // Конфигурация объекта запроса
+    var params = "lat=" + lat + "&lon=" + lon;
+    xhr.open('POST', query, true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    
+    // Установка функции обработки результата запроса
+    xhr.onload = function() {
+        // Парсинг ответа в JSON формате
+        data = JSON.parse(this.responseText);
+		//console.log(data);
+        // Формирование результирующих данных на основе ответа
+        wheather_data[city] = {
+			"time": data['fact']['obs_time'],
+			"wind_dir": data['fact']['wind_dir'],
+            "temp": data['fact']['temp'],
+            "condition": data['fact']['condition'],
+            "humidity": data['fact']['humidity'],
+            "info": data['info']['url'],
+            "feels_like": data['fact']['feels_like'],
+            "temp_water": data['fact']['temp_water'],
+            "wind_speed": data['fact']['wind_speed'],
+            "pressure_mm": data['fact']['pressure_mm'],
+            "season": data['fact']['season'],
+            "forecasts": data['forecasts'],
+			"icon": data['fact']['icon'],
+			"zone": zone,
+			"cname": cname,
+
+        };
+        // Вызов функции обработки результата
+        if (f) f(wheather_data);
+        return data;
+    }
+  
+    // Выполение AJAX запроса к серверу предоставляющему данные Яндекс.Погоды
+    xhr.send(params); 
+}
+
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
     console.log(wheather_data);
@@ -86,7 +141,7 @@ function view(wheather_data) {
         $("#day_" + i + "_temp").text(human_temp_grad(part.temp_min) + "..." + human_temp_grad(part.temp_max));
     }
 	
-    // Вывести погоды по времени суток на сегодня
+    // Вывести погоду по времени суток на сегодня
 	show_part_wheather(0);
 }
 
@@ -160,60 +215,6 @@ function where_am_i() {
     if (location.host == "ksilenomen.pythonanywhere.com") return 1;
     if (location.host == "127.0.0.1:5000") return 0;
     return 0;
-}
-
-// Подпрограмма отправки API запроса Яндекс.Погоды и обработки результата
-function send(wheather_data, city, lat, lon, f) {
-    var zone = "";
-    if (wheather_data[city]) {
-        zone = wheather_data[city]['zone'];
-		cname = wheather_data[city]['cname'];
-    }
-    var query = '';
-    // Определение базового URL сервера (тестовый или продуктивный)
-    if (where_am_i()) {
-        query = 'http://ksilenomen.pythonanywhere.com/pogoda/'
-    } else {
-        query = 'http://127.0.0.1:5000/pogoda/'
-    }
-    // Создание объекта для AJAX запроса
-    var xhr = new XMLHttpRequest();
-    // Конфигурация объекта запроса
-    var params = "lat=" + lat + "&lon=" + lon;
-    xhr.open('POST', query, true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    
-    // Установка функции обработки результата запроса
-    xhr.onload = function() {
-        // Парсинг ответа в JSON формате
-        data = JSON.parse(this.responseText);
-		//console.log(data);
-        // Формирование результирующих данных на основе ответа
-        wheather_data[city] = {
-			"time": data['fact']['obs_time'],
-			"wind_dir": data['fact']['wind_dir'],
-            "temp": data['fact']['temp'],
-            "condition": data['fact']['condition'],
-            "humidity": data['fact']['humidity'],
-            "info": data['info']['url'],
-            "feels_like": data['fact']['feels_like'],
-            "temp_water": data['fact']['temp_water'],
-            "wind_speed": data['fact']['wind_speed'],
-            "pressure_mm": data['fact']['pressure_mm'],
-            "season": data['fact']['season'],
-            "forecasts": data['forecasts'],
-			"icon": data['fact']['icon'],
-			"zone": zone,
-			"cname": cname,
-
-        };
-        // Вызов функции обработки результата
-        if (f) f(wheather_data);
-        return data;
-    }
-  
-    // Выполение AJAX запроса к Яндекс.Погоде
-    xhr.send(params); 
 }
 
 // Функция преобразования строки для начала с заглавной буквы
