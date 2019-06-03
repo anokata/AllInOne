@@ -685,6 +685,19 @@ function show_wheather_data(city_name, lon, lat) {
           // Обработка погодных данных и формирование текста для сводки
           wheather_data["city"] = city_name;
           // Формирование текста с погодной сводкой
+        
+          $("#tooltip_cityname").text(city_name);
+          $("#tooltip_icon img").attr("src", make_icon(wheather_data[city_name]["icon"]));
+          $("#tooltip_condition").text(human_condition(wheather_data[city_name]["condition"]));
+          $("#tooltip_temp").text("Температура: " + human_temp_grad(wheather_data[city_name]["temp"]));
+          $("#tooltip_hum").text("Влажность: " + wheather_data[city_name]["humidity"] + "%");
+          $("#tooltip_wind").text("Ветер: " + human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]));
+
+          $("#tooltip")
+              .css("left", (mouse_xy[0] + 33) + "px")
+              .css("top", (mouse_xy[1] + 47) + "px")
+              .css("display", "block");
+
           text += "<img class='tooltip_img' src='" + "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city_name]["icon"] + ".svg" + "'/>";
           text += human_condition(wheather_data[city_name]["condition"]);
           text += "<br/>";
@@ -701,7 +714,7 @@ function show_wheather_data(city_name, lon, lat) {
           tooltip.html(text)
               .style("left", (mouse_xy[0] + 33) + "px")
               .style("top", (mouse_xy[1] + 47) + "px")
-              .style("display", "block")
+              //.style("display", "block")
               .style("opacity", 1);
           tooltip_timer = setTimeout(tooltip_hide, 5000);
     });
@@ -711,6 +724,8 @@ function show_wheather_data(city_name, lon, lat) {
 function tooltip_hide(){
     tooltip.style("opacity", 0)
         .style("display", "none");
+    $("#tooltip")
+        .css("display", "none");
 }
 
 // конфигурации поля ввода городов с автодополнением

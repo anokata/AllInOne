@@ -265,3 +265,12 @@ td {
 	height: 10px;
 	/* Выпадашка */
 }
+
+#tooltip {
+    width: 200px;
+    position: absolute;
+    background-color: #fff;
+}
+#tooltip_icon {
+    width: 20px;
+}
