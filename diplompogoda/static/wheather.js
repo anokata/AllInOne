@@ -148,7 +148,7 @@ function show_part_wheather(n) {
 
 function human_pressure(p) {
 	return p;
-	return p + " мм рт. ст.";
+	//return p + " мм рт. ст.";
 }
 
 function human_prec(p) {

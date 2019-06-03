@@ -18,6 +18,14 @@ const CITY_COLOR = "#333";
 const COUNTRY_TEXT_COLOR = "#333";
 const RIVER_COLOR = '#0e67a4';
 const EDGE_COLOR = '#111';
+const COUNTRY_ABBREV = {
+    "Корейская Народно-Демократическая Республика": "КНДР",
+    "Республика Корея": "Корея",
+    "Демократическая Республика Конго": "Конго",
+    "Соединённые Штаты Америки": "США",
+    "Южно-Африканская Республика": "ЮАР",
+    "Китайская Народная Республика": "КНР",
+};
 var width, height, projection;
 var sens = 0.25;
 var city_min_dist = 0.04;
@@ -26,8 +34,13 @@ var colors = ["#dda6ce", "#aebce1", "#fbbb74", "#b9d888", "#fffac2", "#b4cbb7", 
 var tooltip = d3.select("body").append("div").attr("class", "tooltip");
 var context, geoGenerator;
 var world, cities, lakes, rivers;
-var mouse_timer, mouse_point, mouse_xy;
-var tooltip_timer, rotate_timer;
+// Таймер мыши для отслеживания остановки указателя
+var mouse_timer;
+// Таймер всплывающей подсказки для скрытия через N сек
+var tooltip_timer; 
+// Таймер для поворота к выбранному городу
+var rotate_timer;
+var mouse_point, mouse_xy;
 var isDragging = false;
 var startingPos = [];
 var near_city, selected_city;
@@ -233,7 +246,7 @@ function set_font_size(s) {
     let scale = projection.scale();
     let x = s + (scale / 400)**1.07;
 	if (scale > 3000) {
-		x = s + (scale / 400)**0.7;
+		x = s + (scale / 400)**0.65;
 	}
 	//console.log(scale, x);
     context.font = x + "px Arial,Helvetica,sans-serif";
@@ -243,7 +256,6 @@ function set_font_size(s) {
 function update() {
     set_font_size(12);
     context.fillStyle = SPACE_COLOR;
-    //context.clearRect(0, 0, width, height);
     context.fillRect(0, 0, width, height);
     context.lineWidth = 2.0;
     context.strokeStyle = EDGE_COLOR;
@@ -267,6 +279,7 @@ function update() {
             context.fill();
     }
 
+    // Отображение линий рек
     var geojson = rivers;
     context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 0.5;
@@ -277,6 +290,7 @@ function update() {
     }
     context.stroke();
 
+    // Отображение озёр
     var geojson = lakes;
     context.strokeStyle = RIVER_COLOR;
     context.lineWidth = 0.5;
@@ -303,8 +317,6 @@ function update() {
     */
 	
 	draw_country_names();
-	
-	set_font_size(10);
     draw_cities_by_rank();
 
     // Отображение выбранного и ближайшего города
@@ -357,12 +369,20 @@ function draw_country_names() {
         let max_zoom = Math.floor(projection.scale() / 120);
         if (is_visible_dotp(projection.invert(geo_center))) {
             if (country.properties.LABELRANK < max_zoom) {
-                context.fillText(country.properties.NAME_RU, geo_center[0], geo_center[1]); 
+                context.fillText(get_country_name(country), geo_center[0], geo_center[1]); 
             }
         }
     }
 	}
     context.stroke();
+}
+
+function get_country_name(country) {
+    let name = country.properties.NAME_RU;
+    if (Object.keys(COUNTRY_ABBREV).indexOf(name) >= 0) {
+        name = COUNTRY_ABBREV[name];
+    }
+    return name;
 }
 
 // Вывод названия у города
@@ -388,6 +408,7 @@ function is_visible_dotp(geopoint) {
 
 // Подпрограмма отображения точек городов
 function draw_cities_by_rank() {
+	set_font_size(10);
     context.strokeStyle = CITY_COLOR;
     context.lineWidth = 0.5;
     context.fillStyle = CITY_COLOR;
@@ -436,101 +457,137 @@ function loadData() {
 // Подпрограмма обработки загруженных геоданных
 function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, coast) {
     if (error) return console.error(error);
+    // Извлечение TopoJson данных и сохранение границ стран
     world = topojson.feature(worldMap, worldMap.objects.world);
+    countries = world.features;
+    // Извлечение TopoJson данных и сохранение береговых линий
     window.coast = topojson.feature(coast, coast.objects.coastlines).features;
+    // Извлечение TopoJson данных и сохранение озёр
+    lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
+    // Извлечение TopoJson данных и сохранение рек
+    rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
 
+    // Извлечение TopoJson данных и сохранение городов
     tw = topojson.feature(t, t.objects.citybig).features;
+    cities = tw; 
+
+    // Распределение городов по уровням детализации
     for (let i = 0; i < tw.length; i++) {
+        // Извлечение имени города
         let name = tw[i].properties.name_ru;
         if (name) {
+            // Вычисление уровня детализации
             let lvl = Math.floor(tw[i].properties.min_zoom*10);
+            // Сохранение в массиве городов с таким же уровнем
             if (!city_level[lvl]) city_level[lvl] = [];
             city_level[lvl].push(tw[i]);
+            // Заполнение списка имён городов (для поиска)
             cities_names.push(name);
+            // Заполнение списка городов и их координат
             cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
         }
     }
+    cities_coords = Object.assign({}, cities_coords, cityMap);
 
-    cities = tw; 
     // Список дополнительных городов
-    cities_names_add = Object.keys(towns);
-    cities_names = Array.concat(cities_names, cities_names_add);
-    // TODO ?Удалить дубликаты function additional_city()
+    //cities_names_add = Object.keys(towns);
+    //cities_names = Array.concat(cities_names, cities_names_add);
     // Совмещение с городами карты
     // Координаты дополнительных городов
-    cities_coords = Object.assign({}, cities_coords, cityMap);
+    // DEL cityMap, towns
+
+    // Настройка автодополнения имён городов
     autocomplete_init();
-    lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
-    rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
-    countries = world.features;
+
+    // Распределение стран в по цвету. В словарь Цвет->список стран. (Для оптимизации отрисовки)
     for (let i = 0; i < countries.length; i++) {
         let country = countries[i];
+        // Вычисление индекса цвета
         let color_index = get_color_index(country);
+        // Сохранение в массиве стран с таким же цветом
         if (!country_by_color[color_index]) country_by_color[color_index] = [];
         country_by_color[color_index].push(country);
-
-
-        if (country.properties.ADM0_A3 == "FRA") {
-            // FIX  разделить на 3
-        }
     }
 
+    // Отрисовать глобус
     update();
-      // Обработчик поворода шара
+
+    // Обработчик поворода шара
     d3.selectAll("canvas")
         .call(d3.behavior.drag()
         .origin(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
         .on("drag", function() {
+            // Возьмём текущие углы поворота
             var rotate = projection.rotate();
+            // Изменим поворот на значение зависящее от перемещения мыши
             projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
+            // Обновим карту
             update();
       }));
 
 
+    // Обработчики событий мыши для различения клика на одном месте и перетаскивания
     $("canvas")
         .mousedown(function (evt) {
+            // Сбросим флаг перетаскивания
             isDragging = false;
+            // Запомним точку
             startingPos = [evt.pageX, evt.pageY];
         })
         .mousemove(function (evt) {
+            // Если точка сменилась - значит перетаскивание
             if (!(evt.pageX === startingPos[0] && evt.pageY === startingPos[1])) {
                 isDragging = true;
             }
         });
 
+    // Обработчик нажатия кнопки мыши
     d3.selectAll("canvas")
       .on("mousedown", function() {
+          // Запомнить координаты мыши
           mouse_xy = d3.mouse(this);
+          // Сбросить таймеры подсказки и поворота
           clearTimeout(tooltip_timer);
           clearTimeout(rotate_timer);
       })
+    // Обработчик перемещения мыши
       .on("mousemove", function() {
-          //? Если совпадёт с городом
+          // Сбросить таймер остановки мыши
           clearTimeout(mouse_timer);
           // Запуск таймера остановки мыши для вывода краткой сводки погоды в ближайшем городе
-          mouse_timer = setTimeout(mouse_stopped, MOUSE_PAUSE); //TODO
+          mouse_timer = setTimeout(mouse_stopped, MOUSE_PAUSE);
+          // Сохранить точку на которую указывает мышь
           mouse_point = get_mouse_geopoint(this);
           mouse_xy = d3.mouse(this);
+          // Скрыть подсказку
           tooltip_hide();
           clearTimeout(tooltip_timer);
-      })
+      });
+
+    // Обработчик отпускания кнопки мыши
     d3.selectAll("canvas")
       .on("mouseup", function () {
+          // В случае если это был клик, а не перетаскивание
           if (!isDragging) {
+              // Взять точку на которую указывает мышь
               var mouse_point = get_mouse_geopoint(this);
-              // Если совпадёт с городом c определённой точностью
+              // Найти ближайший город
               var nearest = nearest_city(mouse_point);
+              // Если точка совпадёт с городом c определённой точностью
               if (nearest) {
-                  //selected_city = nearest;
+                  // Показать погоду в этом городе
                   render_city(nearest);
               } else {
-                    show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
-                    // Берём часовой пояс ближайшегого города 
-                    var nearest = nearest_city_timezone(mouse_point);
-                    var timezone = nearest.properties.TIMEZONE;
-                    render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false, undefined, timezone);
+                  // Показать подсказку в этой точке
+                  show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
+                  // Берём часовой пояс ближайшегого города 
+                  var nearest = nearest_city_timezone(mouse_point);
+                  var timezone = nearest.properties.TIMEZONE;
+                  // Показать погоду по этим координатам
+                  render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false, undefined, timezone);
               }
           }
+          // Сбросим флаг перетаскивания
           isDragging = false;
           startingPos = [];
       })
@@ -558,6 +615,8 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     //console.log("By color ", country_by_color);
     //console.log(worldMap);
     //console.log(cityMap);
+
+    // Привязка обработчиков клика на кнопки переключения подробного прогноза на 5/10 дней
 	$("#ten_toggle").on("click", function () {
 		$("#ten").css("display", "table-row");
 	});
@@ -597,7 +656,6 @@ function get_mouse_geopoint(self) {
           var lon, lat;
           lon = projection.invert(d3.mouse(self))[0];
           lat = projection.invert(d3.mouse(self))[1];
-          //console.log(lon, lat);
           return [lon, lat];
 }
 
@@ -635,14 +693,18 @@ function nearest_city_timezone(p) {
     var min_distance = 10000000;
 
     for (i = 0; i < cities.length; i++) {
+        // Берём координаты очередного города
         var city = cities[i];
         var city_point = [city.geometry.coordinates[0], city.geometry.coordinates[1]]
+        // Вычислим дистанцию между городом и точкой указателя
         var dist = d3.geo.distance(p, city_point);
+        // В случае если этот город ближе и имеет данные о часовом поясе - запомним его
         if (min_distance > dist && city.properties.TIMEZONE) {
             min_distance = dist;
             nearest = city;
         }
     }
+    // Возвращение самого ближайшего подходящего города
     return nearest;
 }
 
@@ -671,14 +733,13 @@ function make_wheather_text(city) {
     show_wheather_data(city_name, lon, lat);
 }
 
-// TODO сверстать подсказку и заполнять
 // Подпрограмма формирования всплывающей подсказки
 function show_wheather_data(city_name, lon, lat) {
 	if (!city_name) return;
     // Формирование текста с данными
-    var text = "";
-    text += city_name;
-    text += "<br/>";
+    //var text = "";
+    //text += city_name;
+    //text += "<br/>";
     var wheather_data = {};
     // Получение погодных данных в выбранной точке
     send(wheather_data, city_name, lat, lon, function (wheather_data) {
@@ -698,32 +759,32 @@ function show_wheather_data(city_name, lon, lat) {
               .css("top", (mouse_xy[1] + 47) + "px")
               .css("display", "block");
 
-          text += "<img class='tooltip_img' src='" + "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city_name]["icon"] + ".svg" + "'/>";
-          text += human_condition(wheather_data[city_name]["condition"]);
-          text += "<br/>";
-          text += "Температура: ";
-          text += human_temp(wheather_data[city_name]["temp"]) + "°";
-          text += "<br/>";
-          text += "Влажность: ";
-          text += wheather_data[city_name]["humidity"] + "%";
-          text += "<br/>";
-          text += "Ветер: ";
-          text += human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]);
-          text += "<br/>";
+          //text += "<img class='tooltip_img' src='" + "https://yastatic.net/weather/i/icons/blueye/color/svg/" + wheather_data[city_name]["icon"] + ".svg" + "'/>";
+          //text += human_condition(wheather_data[city_name]["condition"]);
+          //text += "<br/>";
+          //text += "Температура: ";
+          ////text += human_temp(wheather_data[city_name]["temp"]) + "°";
+          //text += "<br/>";
+          //text += "Влажность: ";
+          //text += wheather_data[city_name]["humidity"] + "%";
+          ////text += "<br/>";
+          //text += "Ветер: ";
+          //text += human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]);
+          //text += "<br/>";
           // Настройка всплывающей подсказки
-          tooltip.html(text)
-              .style("left", (mouse_xy[0] + 33) + "px")
-              .style("top", (mouse_xy[1] + 47) + "px")
+          //tooltip.html(text)
+              //.style("left", (mouse_xy[0] + 33) + "px")
+              //.style("top", (mouse_xy[1] + 47) + "px")
               //.style("display", "block")
-              .style("opacity", 1);
+              //.style("opacity", 1);
           tooltip_timer = setTimeout(tooltip_hide, 5000);
     });
 }
 
 // Обработчик скрытия подсказки
 function tooltip_hide(){
-    tooltip.style("opacity", 0)
-        .style("display", "none");
+    //tooltip.style("opacity", 0)
+        //.style("display", "none");
     $("#tooltip")
         .css("display", "none");
 }
