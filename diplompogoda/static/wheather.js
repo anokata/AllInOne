@@ -1,8 +1,3 @@
-// Список городов
-cities_names = [];
-// Список дополнительных городов
-cities_names_add = [];
-
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
     console.log(wheather_data);

@@ -1,5 +1,9 @@
 // Основной код, выполняющиейся после загрузки страницы
 window.onload = function () {
+    // Вызов главной функции
+    init();
+};
+
 // Константы
 const WIDTH = 800;
 // Время(мс) определния остановки указателя
@@ -34,6 +38,7 @@ const COUNTRY_ABBREV = {
     "Южно-Африканская Республика": "ЮАР",
     "Китайская Народная Республика": "КНР",
 };
+// Глобальные переменные
 var width, height;
 // Объект проекции
 var projection;
@@ -65,6 +70,285 @@ var near_city, selected_city;
 var city_level = {};
 // Страны по цветам
 var country_by_color = {};
+// Словарь городов c координатами
+var cities_coords = {};
+// Список городов
+cities_names = [];
+// Список дополнительных городов
+cities_names_add = [];
+
+// Подпрограмма инициализации
+function init() {
+    // Копирование функции concat из прототипа
+    if (!Array.concat) { Array.concat = Array.prototype.concat; }
+    // Настойка карты
+    setMap();
+
+    // Установка обработчиков кнопок масштабирования
+    $("#scaleup").on("click", function() { scale_projection(SCALE_VAL) });
+    $("#scaledown").on("click", function() { scale_projection(-SCALE_VAL) });
+
+    // Установка обработчиков масштабирования на колесо мышки
+    $("#map").bind('mousewheel DOMMouseScroll', function(event){
+        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+            // Увеличить масштаб
+            scale_projection(SCALE_VAL/2);
+        }
+        else {
+            // Уменьшить масштаб
+            scale_projection(-SCALE_VAL/2);
+        }
+    });
+}
+
+// Подпрограмма настройки карты
+function setMap() {
+    // Высота и ширина карты
+    width = WIDTH, height = WIDTH;
+     
+    // Создание и настройка объекта отрогональной проекции
+    projection = d3.geo.orthographic()
+        .scale(380)
+        .rotate([0, 0])
+        .translate([width / 2, height / 2])
+        .clipAngle(90);
+
+    // Создание контекста холста для отображения
+    context = d3.select('#map canvas')
+      .node()
+      .getContext('2d', { alpha: false });
+
+    // Настойка холста - задание ширины и высоты
+    d3.select('#map canvas')
+        .attr('width', width)
+        .attr('height', height);
+
+    // Создание функции генератора линий для выбранной проекции
+    geoGenerator = d3.geoPath()
+      .projection(projection)
+      .context(context);
+
+    // Настойка размера точек
+    geoGenerator.pointRadius(1.5);
+
+    // Загрузка данных
+    loadData();
+}
+
+// Подпрограмма загрузки геоданных
+function loadData() {
+    // Запрос геоданных границ в topoJSON-формате и точек городов
+    queue()
+      .defer(d3.json, "static/geo/topoworld.json")  
+      .defer(d3.json, "static/maptowns.json")  
+      .defer(d3.json, "static/geo/topolakes.json")  
+      .defer(d3.json, "static/geo/toporivers.json")  
+      .defer(d3.json, "static/towns.json")  
+      .defer(d3.json, "static/geo/topocitybig.json")  
+      .defer(d3.json, "static/geo/topocoastlines.json")  
+      .await(processData);  // обработка загруженных данных
+}
+   
+// Подпрограмма обработки загруженных геоданных
+function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, coast) {
+    if (error) return console.error(error);
+    // Извлечение TopoJson данных и сохранение границ стран
+    world = topojson.feature(worldMap, worldMap.objects.world);
+    countries = world.features;
+    // Извлечение TopoJson данных и сохранение береговых линий
+    window.coast = topojson.feature(coast, coast.objects.coastlines).features;
+    // Извлечение TopoJson данных и сохранение озёр
+    lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
+    // Извлечение TopoJson данных и сохранение рек
+    rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
+
+    // Извлечение TopoJson данных и сохранение городов
+    tw = topojson.feature(t, t.objects.citybig).features;
+    cities = tw; 
+
+    // Распределение городов по уровням детализации
+    for (let i = 0; i < tw.length; i++) {
+        // Извлечение имени города
+        let name = tw[i].properties.name_ru;
+        if (name) {
+            // Вычисление уровня детализации
+            let lvl = Math.floor(tw[i].properties.min_zoom*10);
+            // Сохранение в массиве городов с таким же уровнем
+            if (!city_level[lvl]) city_level[lvl] = [];
+            city_level[lvl].push(tw[i]);
+            // Заполнение списка имён городов (для поиска)
+            cities_names.push(name);
+            // Заполнение списка городов и их координат
+            cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
+        }
+    }
+    cities_coords = Object.assign({}, cities_coords, cityMap);
+
+    // Список дополнительных городов
+    //cities_names_add = Object.keys(towns);
+    //cities_names = Array.concat(cities_names, cities_names_add);
+    // Совмещение с городами карты
+    // Координаты дополнительных городов
+    // DEL cityMap, towns
+
+    // Настройка автодополнения имён городов
+    autocomplete_init();
+
+    // Распределение стран в по цвету. В словарь Цвет->список стран. (Для оптимизации отрисовки)
+    for (let i = 0; i < countries.length; i++) {
+        let country = countries[i];
+        // Вычисление индекса цвета
+        let color_index = get_color_index(country);
+        // Сохранение в массиве стран с таким же цветом
+        if (!country_by_color[color_index]) country_by_color[color_index] = [];
+        country_by_color[color_index].push(country);
+    }
+
+    // Отрисовать глобус
+    update();
+
+    // Обработчик поворота шара
+    d3.selectAll("canvas")
+        .call(d3.behavior.drag()
+        .origin(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
+        .on("drag", function() {
+            // Возьмём текущие углы поворота
+            var rotate = projection.rotate();
+            // Изменим поворот на значение зависящее от перемещения мыши
+            projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
+            // Обновим карту
+            update();
+      }));
+
+
+    // Обработчики событий мыши для различения клика на одном месте и перетаскивания
+    $("canvas")
+        .mousedown(function (evt) {
+            // Сбросим флаг перетаскивания
+            isDragging = false;
+            // Запомним точку
+            startingPos = [evt.pageX, evt.pageY];
+        })
+        .mousemove(function (evt) {
+            // Если точка сменилась - значит перетаскивание
+            if (!(evt.pageX === startingPos[0] && evt.pageY === startingPos[1])) {
+                isDragging = true;
+            }
+        });
+
+    // Обработчик нажатия кнопки мыши
+    d3.selectAll("canvas")
+      .on("mousedown", function() {
+          // Запомнить координаты мыши
+          mouse_xy = d3.mouse(this);
+          // Сбросить таймеры подсказки и поворота
+          clearTimeout(tooltip_timer);
+          clearTimeout(rotate_timer);
+      })
+    // Обработчик перемещения мыши
+      .on("mousemove", function() {
+          // Сбросить таймер остановки мыши
+          clearTimeout(mouse_timer);
+          // Запуск таймера остановки мыши для вывода краткой сводки погоды в ближайшем городе
+          mouse_timer = setTimeout(mouse_stopped, MOUSE_PAUSE);
+          // Сохранить точку на которую указывает мышь
+          mouse_point = get_mouse_geopoint(this);
+          mouse_xy = d3.mouse(this);
+          // Скрыть подсказку
+          tooltip_hide();
+          clearTimeout(tooltip_timer);
+      });
+
+    // Обработчик отпускания кнопки мыши
+    d3.selectAll("canvas")
+      .on("mouseup", function () {
+          // В случае если это был клик, а не перетаскивание
+          if (!isDragging) {
+              // Взять точку на которую указывает мышь
+              var mouse_point = get_mouse_geopoint(this);
+              // Найти ближайший город
+              var nearest = nearest_city(mouse_point);
+              // Если точка совпадёт с городом c определённой точностью
+              if (nearest) {
+                  // Показать погоду в этом городе
+                  render_city(nearest);
+              } else {
+                  // Показать подсказку в этой точке
+                  show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
+                  // Берём часовой пояс ближайшегого города 
+                  var nearest = nearest_city_timezone(mouse_point);
+                  var timezone = nearest.properties.TIMEZONE;
+                  // Показать погоду по этим координатам
+                  render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false, undefined, timezone);
+              }
+          }
+          // Сбросим флаг перетаскивания
+          isDragging = false;
+          startingPos = [];
+      });
+
+    // Привязка обработчика клика на каждый из дней краткой сводки погоды
+    for (let i = 0; i <= 10; i++)
+        $("#day_" + i).parent()
+            .on("click", function () {
+                // Отобразить подробные данные по частям дня
+                show_part_wheather(i);
+				// Установка стиля выбранного дня
+				for (let k = 0; k <= 10; k++) {
+					$("#day_" + k).parent().removeClass("forecast_focused");
+				}
+				$("#day_" + i).parent().addClass("forecast_focused");
+            });
+
+    render_city(city_by_name("Рыбинск"), false);
+    //console.log("Мир", world);
+    //console.log("Города", cities);
+    //console.log("Озёра", lakes);
+    //console.log("Реки", rivers);
+    //console.log("By rank", city_level);
+    //console.log("All ", tw);
+    //console.log("By color ", country_by_color);
+    //console.log(worldMap);
+    //console.log(cityMap);
+
+    // Привязка обработчиков клика на кнопки переключения подробного прогноза на 5/10 дней
+	$("#ten_toggle").on("click", function () {
+		$("#ten").css("display", "table-row");
+	});
+	$("#five_toggle").on("click", function () {
+		$("#ten").css("display", "none");
+	});
+}
+
+// Подпрограмма отрисовки глобуса со всем содержимым
+function update() {
+    // Очистка холста
+    context.fillStyle = SPACE_COLOR;
+    context.fillRect(0, 0, width, height);
+
+    // Отображение сфера воды
+    context.fillStyle = WATER_COLOR;
+    context.beginPath();
+    geoGenerator({type: 'Sphere'});
+    context.fill();
+
+    // Отображение границ стран
+    draw_countries();
+    // Отображение линий рек
+    draw_rivers();
+    // Отображение озёр
+    draw_lakes();
+    // Отображение названий стран
+	draw_country_names();
+    // Отображение городов
+    draw_cities_by_rank();
+    // Отображение ближайшего города
+    draw_city(near_city, NEAR_CITY_COLOR);
+    // Отображение выбранного города
+    draw_city(selected_city, SELECTED_CITY_COLOR);
+
+    //draw_coastlines();
+}
 
 // Подпрограмма отображения погоды города по имени
 function render_city(city, is_rotate) {
@@ -237,64 +521,6 @@ function point_radius(s) {
     return s/500
 }
 
-// Подпрограмма инициализации
-function init() {
-    // Копирование функции concat из прототипа
-    if (!Array.concat) { Array.concat = Array.prototype.concat; }
-    // Настойка карты
-    setMap();
-
-    // Установка обработчиков кнопок масштабирования
-    $("#scaleup").on("click", function() { scale_projection(SCALE_VAL) });
-    $("#scaledown").on("click", function() { scale_projection(-SCALE_VAL) });
-
-    // Установка обработчиков масштабирования на колесо мышки
-    $("#map").bind('mousewheel DOMMouseScroll', function(event){
-        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-            // Увеличить масштаб
-            scale_projection(SCALE_VAL/2);
-        }
-        else {
-            // Уменьшить масштаб
-            scale_projection(-SCALE_VAL/2);
-        }
-    });
-}
-
-// Подпрограмма настройки карты
-function setMap() {
-    // Высота и ширина карты
-    width = WIDTH, height = WIDTH;
-     
-    // Создание и настройка объекта отрогональной проекции
-    projection = d3.geo.orthographic()
-        .scale(380)
-        .rotate([0, 0])
-        .translate([width / 2, height / 2])
-        .clipAngle(90);
-
-    // Создание контекста холста для отображения
-    context = d3.select('#map canvas')
-      .node()
-      .getContext('2d', { alpha: false });
-
-    // Настойка холста - задание ширины и высоты
-    d3.select('#map canvas')
-        .attr('width', width)
-        .attr('height', height);
-
-    // Создание функции генератора линий для выбранной проекции
-    geoGenerator = d3.geoPath()
-      .projection(projection)
-      .context(context);
-
-    // Настойка размера точек
-    geoGenerator.pointRadius(1.5);
-
-    // Загрузка данных
-    loadData();
-}
-
 // Подпрограмма установки размера шрифта с учётом масштаба
 function set_font_size(s) {
     // Получение текущего значение масштаба
@@ -306,36 +532,6 @@ function set_font_size(s) {
 	}
     // Установка размера шрифта 
     context.font = x + FONT_STYLE;
-}
-
-// Подпрограмма отрисовки глобуса со всем содержимым
-function update() {
-    // Очистка холста
-    context.fillStyle = SPACE_COLOR;
-    context.fillRect(0, 0, width, height);
-
-    // Отображение сфера воды
-    context.fillStyle = WATER_COLOR;
-    context.beginPath();
-    geoGenerator({type: 'Sphere'});
-    context.fill();
-
-    // Отображение границ стран
-    draw_countries();
-    // Отображение линий рек
-    draw_rivers();
-    // Отображение озёр
-    draw_lakes();
-    // Отображение названий стран
-	draw_country_names();
-    // Отображение городов
-    draw_cities_by_rank();
-    // Отображение ближайшего города
-    draw_city(near_city, NEAR_CITY_COLOR);
-    // Отображение выбранного города
-    draw_city(selected_city, SELECTED_CITY_COLOR);
-
-    //draw_coastlines();
 }
 
 // Подпрограмма отображения границ стран по цветам
@@ -468,6 +664,35 @@ function draw_country_names() {
     context.stroke();
 }
 
+// Подпрограмма отображения точек городов
+function draw_cities_by_rank() {
+    // Настройка размера шрифта
+	set_font_size(10);
+    context.lineWidth = 0.5;
+    context.strokeStyle = CITY_COLOR;
+    // Установка цвета заливки
+    context.fillStyle = CITY_COLOR;
+    context.beginPath();
+    // Вычисление максимального уровня города на текущем масштабе
+    var max_rank = Math.floor(Math.sqrt(projection.scale()*1.5));
+    // Обход городов по уровням
+    for (var l = 0; l < max_rank; l++) {
+        // Города данного уровня
+        var geojson = city_level[l];
+        if (geojson)
+            // Для каждого города данног уровня
+            for (var i = 0; i < geojson.length; i++) {
+                var city = geojson[i];
+                // Отобразить точку города
+                geoGenerator({type: 'FeatureCollection', features: [city]})
+                // Вывести название города
+                show_town_text(city);
+            }
+    }
+    // Заливка цветом
+    context.fill();
+}
+
 // Извлечение названия страны с учётом сокращений
 function get_country_name(country) {
     // Получение названия страны
@@ -510,35 +735,6 @@ function is_visible_dotp(geopoint) {
     return d3.geoDistance([lon, lat], [-rlon, -rlat]) < MAX_DISTANCE;
 }
 
-// Подпрограмма отображения точек городов
-function draw_cities_by_rank() {
-    // Настройка размера шрифта
-	set_font_size(10);
-    context.lineWidth = 0.5;
-    context.strokeStyle = CITY_COLOR;
-    // Установка цвета заливки
-    context.fillStyle = CITY_COLOR;
-    context.beginPath();
-    // Вычисление максимального уровня города на текущем масштабе
-    var max_rank = Math.floor(Math.sqrt(projection.scale()*1.5));
-    // Обход городов по уровням
-    for (var l = 0; l < max_rank; l++) {
-        // Города данного уровня
-        var geojson = city_level[l];
-        if (geojson)
-            // Для каждого города данног уровня
-            for (var i = 0; i < geojson.length; i++) {
-                var city = geojson[i];
-                // Отобразить точку города
-                geoGenerator({type: 'FeatureCollection', features: [city]})
-                // Вывести название города
-                show_town_text(city);
-            }
-    }
-    // Заливка цветом
-    context.fill();
-}
-
 // Функция вычисления индекса цвета в списке цветов colors
 function get_color_index(d) { 
     var c = d.properties.MAPCOLOR9 || 0;
@@ -549,191 +745,6 @@ function get_color_index(d) {
 // Функция вычисления цвета страны
 function get_color(d) { 
     return colors[get_color_index(d)]; 
-}
-
-// Подпрограмма загрузки геоданных
-function loadData() {
-    // Запрос геоданных границ в topoJSON-формате и точек городов
-    queue()
-      .defer(d3.json, "static/geo/topoworld.json")  
-      .defer(d3.json, "static/maptowns.json")  
-      .defer(d3.json, "static/geo/topolakes.json")  
-      .defer(d3.json, "static/geo/toporivers.json")  
-      .defer(d3.json, "static/towns.json")  
-      .defer(d3.json, "static/geo/topocitybig.json")  
-      .defer(d3.json, "static/geo/topocoastlines.json")  
-      .await(processData);  // обработка загруженных данных
-}
-   
-// Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, coast) {
-    if (error) return console.error(error);
-    // Извлечение TopoJson данных и сохранение границ стран
-    world = topojson.feature(worldMap, worldMap.objects.world);
-    countries = world.features;
-    // Извлечение TopoJson данных и сохранение береговых линий
-    window.coast = topojson.feature(coast, coast.objects.coastlines).features;
-    // Извлечение TopoJson данных и сохранение озёр
-    lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
-    // Извлечение TopoJson данных и сохранение рек
-    rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
-
-    // Извлечение TopoJson данных и сохранение городов
-    tw = topojson.feature(t, t.objects.citybig).features;
-    cities = tw; 
-
-    // Распределение городов по уровням детализации
-    for (let i = 0; i < tw.length; i++) {
-        // Извлечение имени города
-        let name = tw[i].properties.name_ru;
-        if (name) {
-            // Вычисление уровня детализации
-            let lvl = Math.floor(tw[i].properties.min_zoom*10);
-            // Сохранение в массиве городов с таким же уровнем
-            if (!city_level[lvl]) city_level[lvl] = [];
-            city_level[lvl].push(tw[i]);
-            // Заполнение списка имён городов (для поиска)
-            cities_names.push(name);
-            // Заполнение списка городов и их координат
-            cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
-        }
-    }
-    cities_coords = Object.assign({}, cities_coords, cityMap);
-
-    // Список дополнительных городов
-    //cities_names_add = Object.keys(towns);
-    //cities_names = Array.concat(cities_names, cities_names_add);
-    // Совмещение с городами карты
-    // Координаты дополнительных городов
-    // DEL cityMap, towns
-
-    // Настройка автодополнения имён городов
-    autocomplete_init();
-
-    // Распределение стран в по цвету. В словарь Цвет->список стран. (Для оптимизации отрисовки)
-    for (let i = 0; i < countries.length; i++) {
-        let country = countries[i];
-        // Вычисление индекса цвета
-        let color_index = get_color_index(country);
-        // Сохранение в массиве стран с таким же цветом
-        if (!country_by_color[color_index]) country_by_color[color_index] = [];
-        country_by_color[color_index].push(country);
-    }
-
-    // Отрисовать глобус
-    update();
-
-    // Обработчик поворода шара
-    d3.selectAll("canvas")
-        .call(d3.behavior.drag()
-        .origin(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
-        .on("drag", function() {
-            // Возьмём текущие углы поворота
-            var rotate = projection.rotate();
-            // Изменим поворот на значение зависящее от перемещения мыши
-            projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
-            // Обновим карту
-            update();
-      }));
-
-
-    // Обработчики событий мыши для различения клика на одном месте и перетаскивания
-    $("canvas")
-        .mousedown(function (evt) {
-            // Сбросим флаг перетаскивания
-            isDragging = false;
-            // Запомним точку
-            startingPos = [evt.pageX, evt.pageY];
-        })
-        .mousemove(function (evt) {
-            // Если точка сменилась - значит перетаскивание
-            if (!(evt.pageX === startingPos[0] && evt.pageY === startingPos[1])) {
-                isDragging = true;
-            }
-        });
-
-    // Обработчик нажатия кнопки мыши
-    d3.selectAll("canvas")
-      .on("mousedown", function() {
-          // Запомнить координаты мыши
-          mouse_xy = d3.mouse(this);
-          // Сбросить таймеры подсказки и поворота
-          clearTimeout(tooltip_timer);
-          clearTimeout(rotate_timer);
-      })
-    // Обработчик перемещения мыши
-      .on("mousemove", function() {
-          // Сбросить таймер остановки мыши
-          clearTimeout(mouse_timer);
-          // Запуск таймера остановки мыши для вывода краткой сводки погоды в ближайшем городе
-          mouse_timer = setTimeout(mouse_stopped, MOUSE_PAUSE);
-          // Сохранить точку на которую указывает мышь
-          mouse_point = get_mouse_geopoint(this);
-          mouse_xy = d3.mouse(this);
-          // Скрыть подсказку
-          tooltip_hide();
-          clearTimeout(tooltip_timer);
-      });
-
-    // Обработчик отпускания кнопки мыши
-    d3.selectAll("canvas")
-      .on("mouseup", function () {
-          // В случае если это был клик, а не перетаскивание
-          if (!isDragging) {
-              // Взять точку на которую указывает мышь
-              var mouse_point = get_mouse_geopoint(this);
-              // Найти ближайший город
-              var nearest = nearest_city(mouse_point);
-              // Если точка совпадёт с городом c определённой точностью
-              if (nearest) {
-                  // Показать погоду в этом городе
-                  render_city(nearest);
-              } else {
-                  // Показать подсказку в этой точке
-                  show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
-                  // Берём часовой пояс ближайшегого города 
-                  var nearest = nearest_city_timezone(mouse_point);
-                  var timezone = nearest.properties.TIMEZONE;
-                  // Показать погоду по этим координатам
-                  render_town(human_coord(mouse_point), mouse_point[0], mouse_point[1], false, undefined, timezone);
-              }
-          }
-          // Сбросим флаг перетаскивания
-          isDragging = false;
-          startingPos = [];
-      });
-
-    // Привязка обработчика клика на каждый из дней краткой сводки погоды
-    for (let i = 0; i <= 10; i++)
-        $("#day_" + i).parent()
-            .on("click", function () {
-                // Отобразить подробные данные по частям дня
-                show_part_wheather(i);
-				// Установка стиля выбранного дня
-				for (let k = 0; k <= 10; k++) {
-					$("#day_" + k).parent().removeClass("forecast_focused");
-				}
-				$("#day_" + i).parent().addClass("forecast_focused");
-            });
-
-    render_city(city_by_name("Рыбинск"), false);
-    //console.log("Мир", world);
-    //console.log("Города", cities);
-    //console.log("Озёра", lakes);
-    //console.log("Реки", rivers);
-    //console.log("By rank", city_level);
-    //console.log("All ", tw);
-    //console.log("By color ", country_by_color);
-    //console.log(worldMap);
-    //console.log(cityMap);
-
-    // Привязка обработчиков клика на кнопки переключения подробного прогноза на 5/10 дней
-	$("#ten_toggle").on("click", function () {
-		$("#ten").css("display", "table-row");
-	});
-	$("#five_toggle").on("click", function () {
-		$("#ten").css("display", "none");
-	});
 }
 
 // Подпрограмма форматирования координат
@@ -903,9 +914,4 @@ function autocomplete_init() {
     });
 }
 
-
-// Вызов главной функции
-init();
-
-};
 
