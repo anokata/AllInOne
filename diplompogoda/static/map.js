@@ -47,6 +47,7 @@ var startingPos = [];
 var near_city, selected_city;
 var city_level = {};
 var country_by_color = {};
+var wheather_data = {};
 
 function render_city(city, is_rotate) {
     // Поиск страны по городу
@@ -103,14 +104,8 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     if (city_name == undefined) city_name = city;
 
     wheather_data = {}; // Global
-    // TODO DEL?
-    if (!lon || !lat) {
-        //console.log("DLE");
-        //city_data = cities_coords[city];
-        //lat = city_data[0];
-        //lon = city_data[1];
-		return;
-    }
+    // DEL?
+    if (!lon || !lat) { return; }
     if (is_rotate) {
         // Повернуть до этого города
         rotate_timer = setTimeout(city_rotate, ROTATE_TIME, -lon, -lat);
@@ -130,6 +125,7 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     wheather_data[city]['zone'] = timezone;
 	wheather_data[city]['cname'] = cname || "";
     send(wheather_data, city, lat, lon, view);
+    // Отрисовка карты
     update();
 }
 
@@ -153,7 +149,9 @@ function city_rotate(lon, lat, dn, dt) {
 
     // Отрисовка карты
     update();
+    // Если разница между точкой назначения и текущим поворотом больше заданной точности
     if (Math.abs(n - lon) > ROTATE_EPSILON)
+        // Сделать ещё один шаг через некоторое время
         rotate_timer = setTimeout(city_rotate, ROTATE_TIME, lon, lat, dn, dt);
 }
 
@@ -803,6 +801,7 @@ function mouse_stopped() {
     // Если есть рядом город
     if (nearest) {
         near_city = nearest;
+        // Отрисовка карты
         update();
         // Отобразить погодные данные по ближайшему городу в подсказке
         make_wheather_text(nearest);
