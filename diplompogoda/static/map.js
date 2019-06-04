@@ -492,7 +492,7 @@ function scale_projection(value) {
     // Получение текущего значения масштаба
     let scale = projection.scale();
     // Изменение масштаба проекции
-    projection.scale(scale**(1 + value/700));
+    projection.scale(Math.pow(scale, (1 + value/700)));
     // Ограничение минимального масштаба
     if (projection.scale() < MIN_ZOOM) projection.scale(MIN_ZOOM);
 
@@ -526,9 +526,9 @@ function set_font_size(s) {
     // Получение текущего значение масштаба
     let scale = projection.scale();
     // Вычисление размер шрифта с поправкой на масштаб
-    let x = s + (scale / 400)**1.07;
+    let x = s + Math.pow((scale / 400), 1.07);
 	if (scale > 3000) {
-		x = s + (scale / 400)**0.65;
+		x = s + Math.pow((scale / 400), 0.65);
 	}
     // Установка размера шрифта 
     context.font = x + FONT_STYLE;
