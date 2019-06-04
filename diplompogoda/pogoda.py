@@ -5,20 +5,86 @@ import json
 from datetime import datetime  
 from datetime import timedelta  
 
+# Создание объекта приложения
 app = Flask(__name__)
+# API-ключ к сервису Яндекс.Погоды
 YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
+# URL адрес API Яндекс.Погоды
 YANDEX_WHEATHER_URL = "https://api.weather.yandex.ru/v1/forecast"
 DADATA_KEY = "Token a21ae8d8246ebf44e4c99a8dd9e6786d3a56ca0a"
 DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
+# Имя кеш файла
 CACHE_FILE = "wheather.json"
+# Кеш = словарь, ключ=координаты, значение=погодные данные по этим координатам
+# Флаг использования только кеша (для отладки)
 CACHE_ONLY = False
 #"a57bd39d-59d5-47e1-9bfe-00d40e2676c8"
 #"73f1e491-d7be-40b2-8f72-d69e4cdf09cd"
 # keys:
 #fc2d8810-310e-44c7-86ce-1beb9ff466e7
 #2d001a12-9851-4254-ae73-b95e65a4170c
-# Кеш - {координаты+дата}
 
+# Обработчик запроса погодных данных
+@app.route("/pogoda/<lat>/<lon>", methods=['GET'])
+@app.route("/pogoda/", methods=['POST'])
+def pogoda(lat="", lon="", methods=['POST']):
+    # Получение широты и долготы из параметров формы POST запроса
+    if request.method == "POST":
+        lat = request.form.get("lat")
+        lon = request.form.get("lon")
+        # Получение погодных данных для данной точки и возвращение их как результата
+        return get_wheather(lat, lon)
+    else:
+        return get_wheather(lat, lon)
+
+# Обработчик запроса к главной странице
+@app.route('/')
+def root():
+    # Вернуть html страницу
+    return render_template('main.html')
+
+# Обработчик запросов к статичным ресурсам
+@app.route('/static/<path:path>')
+def send_static(path):
+    # Вернуть запрошенный файл
+    return send_from_directory('static', path)
+
+# Обработчик иконки сайта
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+# Функция получения погодных данных, из кеша или свежих
+def get_wheather(lat, lon):
+    wheather = load_cache()
+    # Если нет кеша или он устарел
+    if not wheather.get(lat+lon):
+        # Получение свежих данных
+        wheather = get_wheather_from_yandex(lat, lon)
+        # Если данные успешно получены
+        if "Forbidden" not in wheather:
+            # Сохранение в кеш новых данных
+            save_cache(lat, lon, wheather)
+    else:
+        # Иначе взять из кеша
+        wheather = wheather[lat+lon]
+
+    # Вернуть погодные данные
+    return wheather
+
+# Функция загрузки погодных данных по геоточке через сервис Яндекс.Погоды
+def get_wheather_from_yandex(lat, lon):
+    # Подготовка заголовков запроса - API-ключ
+    headers = {"X-Yandex-API-Key": YANDEX_WHEATHER_APIKEY}
+    # Подготовка параметров запроса - широта, долгота, язык
+    data = {"lat": lat, "lon": lon, "lang": "ru_RU", "limit": "1"}
+    # Выполнение запроса к API Яндекс.Погоды
+    r = requests.get(YANDEX_WHEATHER_URL, headers=headers, params=data)
+    # Возвратить результат запроса
+    return r.text
+
+# Подпрограмма сохранения json данных в файл
 def save_json(filename, data):
     try:
         with open(filename, 'w') as fout:
@@ -26,44 +92,47 @@ def save_json(filename, data):
     except:
         pass
 
-
+# Подпрограмма определяющая устаревание файла кеша на 1 час
 def is_old():
     try:
+        # Получение времени файла
         time = os.path.getmtime(CACHE_FILE)
+        # Вычисление срока устаревания
         expire = datetime.timestamp(datetime.now() - timedelta(hours=1))
+        # Если файл старее срока устаревания -> устарел
         return time < expire
     except:
         return False
 
+# Функция загрузки данных из кеша
 def load_cache():
     wheather = {}
 
     # Каждый час удалять. Смотрим на дату файла. Если старый удаляем
     if is_old() and not CACHE_ONLY:
+        # Удаление файла кеша
         os.remove(CACHE_FILE)
         # TODO запустить поток с обновлением
         return wheather
 
     try:
+        # Чтение данных из кеша
         with open(CACHE_FILE, 'r') as fin:
             wheather = json.loads(fin.read())
     except:
         pass
     return wheather
 
+# Подпрограмма записи новых данных в кеш
 def save_cache(lat, lon, wheather):
+    # Загрузка кеша
     old = load_cache()
+    # Добавление данных
     old[lat+lon] = wheather
+    # Запись обновлённых данных в кеш
     save_json(CACHE_FILE, old)
 
-def get_wheather_from_yandex(lat, lon):
-    headers = {"X-Yandex-API-Key": YANDEX_WHEATHER_APIKEY}
-    data = {"lat": lat, "lon": lon, "lang": "ru_RU", "limit": "1"}
-    r = requests.get(YANDEX_WHEATHER_URL, headers=headers, params=data)
-    return r.text
-
-# TODO При запросе если кеш старый. пройтись по списку городов и обновить кеш
-# дооолго. надо в фоне. потоком.
+# D Подпрограмма обновления данных кеша
 def refresh_cache():
     if is_old():
         wheather = {}
@@ -76,32 +145,7 @@ def refresh_cache():
                 wheather[lat+lon] = data
         save_json(CACHE_FILE, wheather)
 
-
-def get_wheather(lat, lon):
-    wheather = load_cache()
-    # TODO Если не forrbidden
-    # Если нет кеша или он устарел
-    if not wheather.get(lat+lon):
-        wheather = get_wheather_from_yandex(lat, lon)
-        if "Forbidden" not in wheather:
-            save_cache(lat, lon, wheather)
-    else:
-        wheather = wheather[lat+lon]
-
-    return wheather
-
-
-@app.route("/pogoda/<lat>/<lon>", methods=['GET'])
-@app.route("/pogoda/", methods=['POST'])
-def pogoda(lat="", lon="", methods=['POST']):
-    if request.method == "POST":
-        lat = request.form.get("lat")
-        lon = request.form.get("lon")
-        return get_wheather(lat, lon)
-    else:
-        return get_wheather(lat, lon)
-
-
+# D
 @app.route("/suggestions/", methods=['POST'])
 def suggestions(q):
     if request.method == "POST":
@@ -118,20 +162,6 @@ def suggestions(q):
     data = json.dumps(data)
     r = requests.post(DADATA_URL, data=data, params=data, headers=headers)
     return r.text
-
-
-@app.route('/')
-def root():
-    return render_template('main.html')
-
-@app.route('/static/<path:path>')
-def send_static(path):
-    return send_from_directory('static', path)
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 if __name__ == '__main__':
     app.run()
