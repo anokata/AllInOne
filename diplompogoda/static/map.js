@@ -314,9 +314,13 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     // Привязка обработчиков клика на кнопки переключения подробного прогноза на 5/10 дней
 	$("#ten_toggle").on("click", function () {
 		$("#ten").css("display", "table-row");
+		$("#ten_toggle").addClass("forecast_focused");
+		$("#five_toggle").removeClass("forecast_focused");
 	});
 	$("#five_toggle").on("click", function () {
 		$("#ten").css("display", "none");
+		$("#five_toggle").addClass("forecast_focused");
+		$("#ten_toggle").removeClass("forecast_focused");
 	});
 }
 
