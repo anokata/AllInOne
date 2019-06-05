@@ -23,7 +23,8 @@ const ROTATE_STEPS = 12;
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
 const WATER_COLOR = "#b1d5e5";
-const SPACE_COLOR = "#7397a4";
+// Цвет пространства вокруг шара
+const SPACE_COLOR = "#545859";
 const CITY_COLOR = "#333";
 const COUNTRY_TEXT_COLOR = "#333";
 const RIVER_COLOR = '#0e67a4';

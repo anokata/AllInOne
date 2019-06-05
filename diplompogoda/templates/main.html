@@ -91,7 +91,7 @@ svg {
         <tr><td id="city_name" colspan="3">Рыбинск</td></tr>
 		<tr><td id="country_name" colspan="3">Корейская Народно-Демократическая Республика</td></tr>
         <tr><td id="time" colspan="3">сейчас 15.00</td></tr>
-        <tr><td colspan="3"><span id="temp">+20 °С</span><span id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></span><span id="condition">Дождь</span></td></tr>
+        <tr><td><span>Сейчас</span><span id="temp"></span></td><td colspan="2"><span id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></span><span id="condition">Дождь</span></td></tr>
         <tr><td colspan="2" class="padding"><span>ощущается как </span><span id="feel">+18 °С</span></td></tr>
         <tr><td class='icon_table'><img src="static/icon/wind.svg" /></td><td>Ветер</td><td id="wind">1 м/с, ЮВ</td></tr>
         <tr><td class='icon_table'><img src="static/icon/pressure.svg" /></td><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
@@ -108,7 +108,7 @@ svg {
           <tr><td><img src="static/icon/moon.svg"></td><td>Фаза луны</td><td id="moon">Стареющая</td></tr>
 		  <tr><td><img src="static/icon/uv_index.svg"></td><td>УФ-индекс</td><td id="uv_index">5</td></tr>		  
       </table>
-	  <div>Почасовой прогноз</div>
+	  <div>Почасовой прогноз на ближайшие 12 часов</div>
 	  <div class="second_2">
 	  <table>
           <tr><td id="hour_1_time">16:00</td>
@@ -311,6 +311,20 @@ svg {
             <td id="night_pres"></td>
             <td id="night_wind"></td>
 		</tr>
+		<tr>
+			<td></td>
+			<td colspan="3" class="bottom">
+				<div><img src="static/icon/sunrise.svg">Восход</div>
+				<div><img src="static/icon/sunset.svg">Заход</div>
+				<div><img src="static/icon/day_long.svg">Долгота дня</div>
+			</td>	
+			<td colspan="3" class="bottom">
+				<div><img src="static/icon/moon.svg">Фаза луны</div>
+				<div><img src="static/icon/uv_index.svg">УФ-индекс</div>
+				<div><img src="static/icon/temp_water.svg" />Температура воды</div>
+			</td>
+			<td></td>
+		</tr>
 	  </table>
   </li>  
 </ul>
@@ -318,20 +332,18 @@ svg {
 </div>
 <div id="tooltip">
 	<div id="tooltip_cityname"></div>
+	<div>Сейчас</div>
 	<table>
 		<tr>
 			<td><span id="tooltip_icon"><img /></span><span id="tooltip_condition"></span></td>
 		</tr>
 		<tr>
-		<!--	<td><span>Температура</span></td> -->
 			<td><span id="tooltip_temp"></span></td>
 		</tr>
 		<tr>
-		<!--	<td><span>Влажность</span></td> -->
 			<td><span id="tooltip_hum"></span></td>
 		</tr>
 		<tr>
-		<!--	<td><span>Ветер</span></td> -->
 			<td><span id="tooltip_wind"></span></td>
 		</tr>
 	</table>
