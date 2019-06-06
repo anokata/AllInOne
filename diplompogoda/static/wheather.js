@@ -166,11 +166,17 @@ function show_part_wheather(n) {
         // Вывести долготу дня
         $("#part_daylong").text(daylong(f.sunrise, f.sunset));
         $("#daylong_text").text("Долгота дня");
-        $("#part_rise").parent().show();
+        $("#part_rise").show();
+        $("#part_set").show();
+        $("#part_rise_t").show();
+        $("#part_set_t").show();
     } else {
         // В случае полядного дня/ночи прячем элементы с восходом и закатом
         $("#part_daylong").text("");
-        $("#part_rise").parent().hide();
+        $("#part_rise").hide();
+        $("#part_set").hide();
+        $("#part_rise_t").hide();
+        $("#part_set_t").hide();
         if (p.day.daytime == "n") {
             $("#daylong_text").text("Полярная ночь");
         } else {

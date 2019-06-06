@@ -74,13 +74,16 @@ svg {
 <body>
 <div id="map">
 <canvas width="800" height="400"></canvas>
+<div class="ui-widget">
+<input type=button value="+" id="scaleup" onclick="" />
+<input type=button value="-" id="scaledown" onclick="" />
+</div>
 </div>
 <div id="info">
 <div class="ui-widget">
  <!-- <label for="cities">Город: </label> -->
-  <input id="cities" placeholder="Населенный пункт">
-<input type=button value="+" id="scaleup" onclick="" />
-<input type=button value="-" id="scaledown" onclick="" />
+  <input id="cities" placeholder="Город">
+  <button type="button"><img src="static/icon/search_icon.svg" /></button>
 </div>
 
     <div id="wheather"></div>
@@ -93,6 +96,8 @@ svg {
         <tr><td id="time" colspan="3">сейчас 15.00</td></tr>
         <tr><td><span>Сейчас</span><span id="temp"></span></td><td colspan="2"><span id="icon"><img src="https://yastatic.net/weather/i/icons/blueye/color/svg/bkn_d.svg" /></span><span id="condition">Дождь</span></td></tr>
         <tr><td colspan="2" class="padding"><span>ощущается как </span><span id="feel">+18 °С</span></td></tr>
+	  </table>
+	  <table  class="main_2">
         <tr><td class='icon_table'><img src="static/icon/wind.svg" /></td><td>Ветер</td><td id="wind">1 м/с, ЮВ</td></tr>
         <tr><td class='icon_table'><img src="static/icon/pressure.svg" /></td><td>Давление</td><td id="pressure">753 мм рт. ст.</td></tr>
         <tr><td class='icon_table'><img src="static/icon/humidity.svg" /></td><td>Влажность</td><td id="humidity">80%</td></tr>
@@ -311,31 +316,33 @@ svg {
             <td id="night_pres"></td>
             <td id="night_wind"></td>
 		</tr>
-		<tr  class="bottom-top">
+	</table>
+	<table class="bottom-top" >
+		<tr>
 			<td></td>
 			<td id="part_rise_t" class="bottom" ><span><img src="static/icon/sunrise.svg"></span><span>Восход</span></td>
-			<td id="part_rise" colspan="2" class="bottom_value" >8:00</td>
+			<td id="part_rise" class="bottom_value" >8:00</td>
+			<td class="bottom" ><span><img src="static/icon/moon.svg"></span><span>Фаза луны</span></td>
+			<td id="part_moon" class="bottom_value" >новолуние</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
 			<td id="part_set_t" class="bottom"><span><img src="static/icon/sunset.svg"></span><span>Заход</span></td>
-			<td id="part_set" colspan="2" class="bottom_value">22:00</td>
+			<td id="part_set" class="bottom_value">22:00</td>
+			<td class="bottom"><span><img src="static/icon/uv_index.svg"></span><span>УФ-индекс</span></td>
+			<td id="part_uv" class="bottom_value">8</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td></td>
-			<td colspan="1" class="bottom" ><span><img src="static/icon/moon.svg"></span><span>Фаза луны</span></td>
-			<td id="part_moon" class="bottom_value" colspan="2">новолуние</td>
 			<td class="bottom"><span><img src="static/icon/day_long.svg"></span><span id="daylong_text">Долгота дня</span></td>
-			<td id="part_daylong" colspan="2" class="bottom_value">19:13</td>
+			<td id="part_daylong" class="bottom_value">19:13</td>
+			<td class="bottom"></td>
+			<td class="bottom_value"></td>
 			<td></td>
 		</tr>
-		<tr>
-			<td></td>
-			<td colspan="1" class="bottom"><span><img src="static/icon/uv_index.svg"></span><span>УФ-индекс</span></td>
-			<td id="part_uv" class="bottom_value" colspan="2">8</td>
-			<!-- <td colspan="2" class="bottom"><span><img src="static/icon/temp_water.svg" /></span><span>Температура воды</span></td> -->
-			<!-- <td id="part_water" class="bottom_value">+15°</td> -->
-			<td></td>
-		</tr>
-	  </table>
+	</table>
   </li>  
 </ul>
 

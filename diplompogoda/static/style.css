@@ -19,7 +19,8 @@ body {
 .two_section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
-  grid-gap: 10px;
+  grid-gap: 10px; 
+  margin-bottom: 2px;
 }
 
 .one_section li {
@@ -59,6 +60,10 @@ body {
   border: 1px solid #dadada;
   box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
   list-style-type: none; 
+}
+
+.three_section {
+	margin-top: 2px;
 }
 
 .three_section li {
@@ -140,7 +145,7 @@ body {
 	font-weight: bold;
 }
 
-.main {
+.main, .main_2 {
 	border: none;
 }
 
@@ -149,8 +154,12 @@ body {
 	color: gray;
 }
 
-.forecast, .main, .second_1, .forecast_detail {
+.forecast, .main, .main_2, .second_1, .forecast_detail, .bottom-top {
 	border-collapse: collapse;
+}
+
+.main td:nth-child(1), tr:nth-child(1) {
+	width: 60px;
 }
 
 .headline td:hover {
@@ -196,6 +205,7 @@ body {
 
 .forecast_detail {
     text-align: center;
+	margin-bottom: 10px;
 }
 
 .forecast_detail th {
@@ -217,29 +227,59 @@ body {
 }
 
 .ui-autocomplete-input {
-	border-radius: 10px;
+	border-radius: 10px 0px 0px 10px;
     border: 5px;
     height: 25px;
-    padding-left: 10px;
-    width: 280px;
+    padding-left: 20px;
+    width: 288px;
 }
 
-.bottom-top td {
+.ui-widget button {
+    background: white;
+    border: 0px;
+    height: 27px;
+    width: 40px;
+    border-radius: 0px 10px 10px 0px;
+	position: absolute;
+}
+
+.ui-widget button:active, button:focus {
+    outline: none;
+}
+.ui-widget button::-moz-focus-inner {
+    border: 0;
+}
+
+.ui-widget input:active, input:focus {
+    outline: none;
+}
+.ui-widget input::-moz-focus-inner {
+    border: 0;
+}
+
+.bottom-top {
 	border-top: 1px solid #c3bfbf;
-	padding-top: 7px;
+	padding-top: 10px;
 }
 
 .bottom {
 	text-align: left;
+	width: 150px;
 }
 
 .bottom_value {
-	text-align: center;
+	text-align: left;
+	width: 100px;
 }
 
 .bottom img {
 	width: 20px;
 	padding-right: 5px;
+}
+
+.bottom span {
+	display:  table-cell;
+    vertical-align:  middle;
 }
 
 #scaleup, #scaledown {
