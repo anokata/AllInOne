@@ -224,10 +224,17 @@ body {
     width: 280px;
 }
 
-.bottom {
+.bottom-top td {
 	border-top: 1px solid #c3bfbf;
 	padding-top: 7px;
+}
+
+.bottom {
 	text-align: left;
+}
+
+.bottom_value {
+	text-align: center;
 }
 
 .bottom img {

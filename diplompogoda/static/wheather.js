@@ -155,8 +155,34 @@ function make_human_date(date) {
 // Подпрограмма отображения погоды на день по времени суток
 function show_part_wheather(n) {
     var p = wheather_data[city].forecasts[n].parts;
+    var f = wheather_data[city].forecasts[n];
     // Вывод даты
     $("#part_date").text(make_human_date(wheather_data[city].forecasts[n].date));
+
+    if (!p.day.polar) {
+        // Вывести время восхода и заката
+        $("#part_rise").text(f.sunrise);
+        $("#part_set").text(f.sunset);
+        // Вывести долготу дня
+        $("#part_daylong").text(daylong(f.sunrise, f.sunset));
+        $("#part_rise_t").css("visibility", "visible");
+        $("#part_set_t").css("visibility", "visible");
+        $("#daylong_text").text("Долгота дня");
+    } else {
+        // В случае полядного дня/ночи прячем элементы с восходом и закатом
+        $("#part_rise").text("");
+        $("#part_set").text("");
+        $("#part_daylong").text("");
+        $("#part_rise_t").css("visibility", "hidden");
+        $("#part_set_t").css("visibility", "hidden");
+        if (p.day.daytime == "n") {
+            $("#daylong_text").text("Полярная ночь");
+        } else {
+            $("#daylong_text").text("Полярный день");
+        }
+    }
+    $("#part_moon").text(human_moon(f.moon_text));
+    $("#part_uv").text(human_uv(p.day.uv_index));
     
     // Прогноз на утро
 	$("#morning_icon img").attr("src", make_icon(p.morning.icon));

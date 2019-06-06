@@ -311,18 +311,28 @@ svg {
             <td id="night_pres"></td>
             <td id="night_wind"></td>
 		</tr>
+		<tr  class="bottom-top">
+			<td></td>
+			<td id="part_rise_t" class="bottom" ><span><img src="static/icon/sunrise.svg"></span><span>Восход</span></td>
+			<td id="part_rise" colspan="2" class="bottom_value" >8:00</td>
+			<td colspan="2" class="bottom" ><span><img src="static/icon/moon.svg"></span><span>Фаза луны</span></td>
+			<td id="part_moon" class="bottom_value" >новолуние</td>
+			<td></td>
+		</tr>
 		<tr>
 			<td></td>
-			<td colspan="3" class="bottom">
-				<div><img src="static/icon/sunrise.svg">Восход</div>
-				<div><img src="static/icon/sunset.svg">Заход</div>
-				<div><img src="static/icon/day_long.svg">Долгота дня</div>
-			</td>	
-			<td colspan="3" class="bottom">
-				<div><img src="static/icon/moon.svg">Фаза луны</div>
-				<div><img src="static/icon/uv_index.svg">УФ-индекс</div>
-				<div><img src="static/icon/temp_water.svg" />Температура воды</div>
-			</td>
+			<td id="part_set_t" class="bottom"><span><img src="static/icon/sunset.svg"></span><span>Заход</span></td>
+			<td id="part_set" colspan="2" class="bottom_value">22:00</td>
+			<td colspan="2" class="bottom"><span><img src="static/icon/uv_index.svg"></span><span>УФ-индекс</span></td>
+			<td id="part_uv" class="bottom_value">8</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class="bottom"><span><img src="static/icon/day_long.svg"></span><span id="daylong_text">Долгота дня</span></td>
+			<td id="part_daylong" colspan="2" class="bottom_value">19:13</td>
+			<td colspan="2" class="bottom"><span><img src="static/icon/temp_water.svg" /></span><span>Температура воды</span></td>
+			<td id="part_water" class="bottom_value">+15°</td>
 			<td></td>
 		</tr>
 	  </table>
