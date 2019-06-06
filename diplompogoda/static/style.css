@@ -6,6 +6,11 @@ body {
   cursor: default;
 }
 
+#map > div {
+	padding-bottom: 30px;
+    padding-top: 10px;
+}
+
 .ui-widget {
 	padding-left: 40px;
 }
