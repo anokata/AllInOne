@@ -92,7 +92,7 @@ function view(wheather_data) {
             $("#day_long").text(daylong(wheather_data[city]["forecasts"][0]["sunrise"], wheather_data[city]["forecasts"][0]["sunset"]));
         $("#rise").parent().show();
         $("#sunset").parent().show();
-        $("#day_long").siblings().first().next().text("Долгота дня");
+        //$("#day_long").siblings().first().next().text("Долгота дня");
         }
     } else {
         // В случае полядного дня/ночи прячем элементы с восходом и закатом
@@ -100,9 +100,10 @@ function view(wheather_data) {
         $("#sunset").parent().hide();
         $("#day_long").text("");
         if (wheather_data[city].forecasts[0].parts.day.daytime == "n") {
-            $("#day_long").siblings().first().next().text("Полярная ночь");
+            //$("#day_long").siblings().first().next().text("Полярная ночь");
+            $("#day_long").text("Полярная ночь");
         } else {
-            $("#day_long").siblings().first().next().text("Полярный день");
+            $("#day_long").text("Полярный день");
         }
     }
 
@@ -165,22 +166,23 @@ function show_part_wheather(n) {
         $("#part_set").text(f.sunset);
         // Вывести долготу дня
         $("#part_daylong").text(daylong(f.sunrise, f.sunset));
-        $("#daylong_text").text("Долгота дня");
+        //$("#daylong_text").text("Долгота дня");
         $("#part_rise").show();
         $("#part_set").show();
         $("#part_rise_t").show();
         $("#part_set_t").show();
     } else {
         // В случае полядного дня/ночи прячем элементы с восходом и закатом
-        $("#part_daylong").text("");
+        //$("#part_daylong").text("");
         $("#part_rise").hide();
         $("#part_set").hide();
         $("#part_rise_t").hide();
         $("#part_set_t").hide();
         if (p.day.daytime == "n") {
-            $("#daylong_text").text("Полярная ночь");
+            //$("#daylong_text").text("Полярная ночь");
+            $("#part_daylong").text("Полярная ночь");
         } else {
-            $("#daylong_text").text("Полярный день");
+            $("#part_daylong").text("Полярный день");
         }
     }
     $("#part_moon").text(human_moon(f.moon_text));
