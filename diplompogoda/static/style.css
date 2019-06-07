@@ -20,6 +20,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   grid-gap: 10px;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .two_section {
@@ -47,9 +48,10 @@ body {
 }
 
 .headline {
-	width: 337px;
-	padding-bottom: 20px;
+	width: 100%;
+	margin-bottom: 20px;
 	font-size: 16px;
+/*	border-bottom: 1px solid #c3bfbf;   */
 }
 
 .headline td {
@@ -180,10 +182,6 @@ body {
 	border-collapse: collapse;
 }
 
-.fiveten_selected {
-	color: #ff940c;	
-}
-
 .main td:nth-child(1), tr:nth-child(1) {
 	width: 60px;
 }
@@ -226,7 +224,7 @@ body {
 }
 
 .forecast_detail img {
-	width: 40px;
+	width: 35px;
 }
 
 .forecast_detail {
@@ -307,6 +305,10 @@ body {
 .bottom span {
 	display:  table-cell;
     vertical-align:  middle;
+}
+
+.fiveten_selected {
+  color: #ff940c;  
 }
 
 #scaleup, #scaledown {
