@@ -914,6 +914,10 @@ function autocomplete_init() {
             render_city(city_by_name(city));
         }
     });
+    $('button').on("click", function() {
+            var city = upper_first($("#cities").val());
+            render_city(city_by_name(city));
+    });
 }
 
 
