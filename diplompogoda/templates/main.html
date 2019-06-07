@@ -159,16 +159,21 @@ svg {
       </table>
 	  </div>
   </li>
+<!--  
   <li class="headline">
 	   <table>
 		<tr><th>Прогноз</th><td id="five_toggle" class="forecast_focused">На 5 дней</td><td id="ten_toggle">На 10 дней</td></tr>
 	   </table>
   </li>
+-->  
 </ul>
 
-<ul class="two_section">  
-<li>
-      <table class="forecast">
+<ul class="two_section">
+	<li>
+	<table class="headline">
+		<tr><th>Прогноз</th><td id="five_toggle" class="fiveten_selected">На 5 дней</td><td id="ten_toggle">На 10 дней</td></tr>
+	 </table>  
+     <table class="forecast">
         <tr>
             <td class="forecast_focused">
 				<div>Сегодня</div>
@@ -264,7 +269,7 @@ svg {
 
 <ul class="three_section">  
   <li>
-	  <span id="part_date">25 Мая</span>
+	  <span class="detail">Детальный прогноз на </span><span id="part_date">25 Мая</span>
       <table class="forecast_detail">
 		<tr>
 			<th></th>
@@ -352,16 +357,16 @@ svg {
 	<div>Сейчас</div>
 	<table>
 		<tr>
-			<td><span id="tooltip_icon"><img /></span><span id="tooltip_condition"></span></td>
+			<td colspan="2" ><span id="tooltip_icon"><img /></span><span id="tooltip_condition"></span></td>
 		</tr>
 		<tr>
-			<td><span id="tooltip_temp"></span></td>
+			<td><span>Температура:</span></td><td><span id="tooltip_temp"></span></td>
 		</tr>
 		<tr>
-			<td><span id="tooltip_hum"></span></td>
+			<td><span>Влажность:</span></td><td><span id="tooltip_hum"></span></td>
 		</tr>
 		<tr>
-			<td><span id="tooltip_wind"></span></td>
+			<td><span>Ветер:</span></td><td><span id="tooltip_wind"></span></td>
 		</tr>
 	</table>
 </div>

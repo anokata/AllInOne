@@ -315,13 +315,13 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     // Привязка обработчиков клика на кнопки переключения подробного прогноза на 5/10 дней
 	$("#ten_toggle").on("click", function () {
 		$("#ten").css("display", "table-row");
-		$("#ten_toggle").addClass("forecast_focused");
-		$("#five_toggle").removeClass("forecast_focused");
+		$("#ten_toggle").addClass("fiveten_selected");
+		$("#five_toggle").removeClass("fiveten_selected");
 	});
 	$("#five_toggle").on("click", function () {
 		$("#ten").css("display", "none");
-		$("#five_toggle").addClass("forecast_focused");
-		$("#ten_toggle").removeClass("forecast_focused");
+		$("#five_toggle").addClass("fiveten_selected");
+		$("#ten_toggle").removeClass("fiveten_selected");
 	});
 }
 
@@ -875,9 +875,9 @@ function show_wheather_data(city_name, lon, lat) {
           $("#tooltip_cityname").text(city_name);
           $("#tooltip_icon img").attr("src", make_icon(wheather_data[city_name]["icon"]));
           $("#tooltip_condition").text(human_condition(wheather_data[city_name]["condition"]));
-          $("#tooltip_temp").text("Температура: " + human_temp_grad(wheather_data[city_name]["temp"]));
-          $("#tooltip_hum").text("Влажность: " + wheather_data[city_name]["humidity"] + "%");
-          $("#tooltip_wind").text("Ветер: " + human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]));
+          $("#tooltip_temp").text(human_temp_grad(wheather_data[city_name]["temp"]));
+          $("#tooltip_hum").text(wheather_data[city_name]["humidity"] + "%");
+          $("#tooltip_wind").text(human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]));
 
           $("#tooltip")
               .css("left", (mouse_xy[0] + 33) + "px")
