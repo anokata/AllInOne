@@ -27,7 +27,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
   grid-gap: 10px; 
-  margin-bottom: 2px;
+  margin-bottom: 1px;
   margin-top: 10px;
 }
 
@@ -87,7 +87,7 @@ body {
 }
 
 .three_section {
-	margin-top: 2px;
+	margin-top: 1px;
 }
 
 .three_section li {
@@ -289,12 +289,12 @@ body {
 
 .bottom {
 	text-align: left;
-	width: 150px;
+	width: 140px;
 }
 
 .bottom_value {
 	text-align: left;
-	width: 100px;
+	width: 120px;
 }
 
 .bottom img {
