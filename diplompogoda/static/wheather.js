@@ -112,7 +112,13 @@ function view(wheather_data) {
     // Отображение иконки соответствующей погодным условиям
 	$("#icon img").attr("src", make_icon(wheather_data[city]["icon"]));
     // Отображение УФ индекса
-	$("#uv_index").text(human_uv(wheather_data[city].forecasts[0].parts.day.uv_index));
+    let uv = wheather_data[city].forecasts[0].parts.day.uv_index;
+    if (uv != null && uv != undefined) {
+        $("#uv_index").text(human_uv(uv));
+        $("#uv_index").parent().show();
+    } else {
+        $("#uv_index").parent().hide();
+    }
 
     // Вычисление текущего часа с учётом часового пояса
     var datetz = moment.tz(new Date(), wheather_data[city].zone);
@@ -186,7 +192,12 @@ function show_part_wheather(n) {
         }
     }
     $("#part_moon").text(human_moon(f.moon_text));
-    $("#part_uv").text(human_uv(p.day.uv_index));
+
+    let uv = p.day.uv_index;
+    if (uv != null && uv != undefined) {
+        $("#part_uv").text(human_uv(uv));
+    } else {
+    }
     
     // Прогноз на утро
 	$("#morning_icon img").attr("src", make_icon(p.morning.icon));
@@ -373,7 +384,12 @@ function human_uv(uv) {
         "8":" (очень высокий)",
         "9":" (очень высокий)",
         "10":" (очень высокий)",
-        "11":" (экстремальный)"
+        "11":" (экстремальный)",
+        "12":" (экстремальный)"
     }
-    return uv + uv_table[uv] || " (экстремальный)";
+    if (uv != null && uv != undefined) {
+        return uv + uv_table[uv] || " (экстремальный)";
+    } else {
+        return "";
+    }
 }
