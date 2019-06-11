@@ -5,6 +5,7 @@ window.onload = function () {
 };
 
 // Константы
+const CITY_DELIMETER = ", ";
 const WIDTH = 800;
 // Время(мс) определния остановки указателя
 const MOUSE_PAUSE = 200;
@@ -77,6 +78,10 @@ var cities_coords = {};
 cities_names = [];
 // Список дополнительных городов
 cities_names_add = [];
+// Таблица кодов стран
+countries_codes = {};
+// Обратная таблица кодов стран
+countries_codes_rev = {};
 
 // Подпрограмма инициализации
 function init() {
@@ -167,6 +172,19 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
     tw = topojson.feature(t, t.objects.citybig).features;
     cities = tw; 
 
+    // Распределение стран в по цвету. В словарь Цвет->список стран. (Для оптимизации отрисовки)
+    for (let i = 0; i < countries.length; i++) {
+        let country = countries[i];
+        // Вычисление индекса цвета
+        let color_index = get_color_index(country);
+        // Сохранение в массиве стран с таким же цветом
+        if (!country_by_color[color_index]) country_by_color[color_index] = [];
+        country_by_color[color_index].push(country);
+        // Таблица кодов стран и имён
+        countries_codes[country.properties.NAME] = country.properties.NAME_RU;
+        countries_codes_rev[country.properties.NAME_RU] = country.properties.NAME;
+    }
+
     // Распределение городов по уровням детализации
     for (let i = 0; i < tw.length; i++) {
         // Извлечение имени города
@@ -178,7 +196,9 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
             if (!city_level[lvl]) city_level[lvl] = [];
             city_level[lvl].push(tw[i]);
             // Заполнение списка имён городов (для поиска)
-            cities_names.push(name);
+            //cities_names.push({"label": name, "value": name});
+            //cities_names.push({"label": name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME], "value": name});
+            cities_names.push(name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME]);
             // Заполнение списка городов и их координат
             cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
         }
@@ -194,16 +214,6 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
 
     // Настройка автодополнения имён городов
     autocomplete_init();
-
-    // Распределение стран в по цвету. В словарь Цвет->список стран. (Для оптимизации отрисовки)
-    for (let i = 0; i < countries.length; i++) {
-        let country = countries[i];
-        // Вычисление индекса цвета
-        let color_index = get_color_index(country);
-        // Сохранение в массиве стран с таким же цветом
-        if (!country_by_color[color_index]) country_by_color[color_index] = [];
-        country_by_color[color_index].push(country);
-    }
 
     // Отрисовать глобус
     update();
@@ -302,6 +312,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
             });
 
     render_city(city_by_name("Рыбинск"), false);
+    //console.log(countries_codes);
     //console.log("Мир", world);
     //console.log("Города", cities);
     //console.log("Озёра", lakes);
@@ -393,12 +404,22 @@ function country_for_city(city) {
 
 // Поиск города по имени
 function city_by_name(city_name) {
+    // Извлечь название города
+    let country_name = "";
+    let country_code = "";
+    if (city_name.indexOf(CITY_DELIMETER) > 0) {
+        country_name = city_name.substr(city_name.indexOf(CITY_DELIMETER) + CITY_DELIMETER.length);
+        country_code = countries_codes_rev[country_name];
+        city_name = city_name.substr(0, city_name.indexOf(CITY_DELIMETER));
+    }
     // Поиск города по имени в списке объектов городов
     for (i = 0; i < cities.length; i++) {
         var city = cities[i];
         if (city.properties.name_ru == city_name) {
-            // Если нашёлся - возвратить его
-            return city;
+            if (country_code && city.properties.ADM0NAME == country_code)
+                // Если нашёлся - возвратить его
+                return city;
+            if (!country_code) return city;
         }
     }
 
@@ -899,6 +920,7 @@ function autocomplete_init() {
     // При выборе города из подсказки
     $("#cities").autocomplete({
           source: cities_names,
+          minLength: 3,
           select: function(event, ui) {
             // Отобразить погоду по городу
             render_city(city_by_name(ui.item.value));
