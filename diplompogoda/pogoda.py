@@ -11,8 +11,6 @@ app = Flask(__name__)
 YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
 # URL адрес API Яндекс.Погоды
 YANDEX_WHEATHER_URL = "https://api.weather.yandex.ru/v1/forecast"
-DADATA_KEY = "Token a21ae8d8246ebf44e4c99a8dd9e6786d3a56ca0a"
-DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
 # Имя кеш файла
 CACHE_FILE = "wheather.json"
 # Кеш = словарь, ключ=координаты, значение=погодные данные по этим координатам
@@ -95,10 +93,17 @@ def save_json(filename, data):
 # Подпрограмма определяющая устаревание файла кеша на 1 час
 def is_old():
     try:
-        # Получение времени файла
-        time = os.path.getmtime(CACHE_FILE)
+        # Получение времени кэша
+        try:
+            # Чтение данных из кеша
+            with open(CACHE_FILE, 'r') as fin:
+                c = json.loads(fin.read())
+                time = float(c['timestamp'])
+        except:
+            return False
         # Вычисление срока устаревания
         expire = datetime.timestamp(datetime.now() - timedelta(hours=1))
+        print("Delete cache" if time < expire else "Actual cache")
         # Если файл старее срока устаревания -> устарел
         return time < expire
     except:
@@ -106,13 +111,15 @@ def is_old():
 
 # Функция загрузки данных из кеша
 def load_cache():
-    wheather = {}
+    ts = datetime.now().timestamp()
+    wheather = {'timestamp': str(ts)}
 
-    # Каждый час удалять. Смотрим на дату файла. Если старый удаляем
+    # Каждый час удалять. Если старый удаляем
     if is_old() and not CACHE_ONLY:
         # Удаление файла кеша
         os.remove(CACHE_FILE)
-        # TODO запустить поток с обновлением
+        # Записать новую дату
+        save_cache(str(ts), "", ts)
         return wheather
 
     try:
@@ -132,36 +139,6 @@ def save_cache(lat, lon, wheather):
     # Запись обновлённых данных в кеш
     save_json(CACHE_FILE, old)
 
-# D Подпрограмма обновления данных кеша
-def refresh_cache():
-    if is_old():
-        wheather = {}
-        with open('static/towns.json') as fin:
-            towns = json.loads(fin.read())
-            for town in towns:
-                lat = town[0]
-                lon = town[1]
-                data = get_wheather_from_yandex(lat, lon)
-                wheather[lat+lon] = data
-        save_json(CACHE_FILE, wheather)
-
-# D
-@app.route("/suggestions/", methods=['POST'])
-def suggestions(q):
-    if request.method == "POST":
-        q = request.form.get("q")
-    headers = {
-            "Content-Type": "application/json", 
-            "Accept": "application/json", 
-            "Authorization": DADATA_KEY}
-    data = {
-            "query": q, 
-            "count":"10",
-            "locations": [ { "country": "*" }]
-            }
-    data = json.dumps(data)
-    r = requests.post(DADATA_URL, data=data, params=data, headers=headers)
-    return r.text
 
 if __name__ == '__main__':
     app.run()

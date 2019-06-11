@@ -96,6 +96,39 @@ https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requ
 
 Подписывать страну у города в автодополнении
 +Текущее время с учётом часового пояса
-created time linux python сохранять время создания кеша в нём
++created time linux python сохранять время создания кеша в нём
+
 https://www.d3-graph-gallery.com/graph/line_basic.html
 https://www.d3-graph-gallery.com/graph/connectedscatter_basic.html
+DADATA_KEY = "Token a21ae8d8246ebf44e4c99a8dd9e6786d3a56ca0a"
+# D Подпрограмма обновления данных кеша
+def refresh_cache():
+    if is_old():
+        wheather = {}
+        with open('static/towns.json') as fin:
+            towns = json.loads(fin.read())
+            for town in towns:
+                lat = town[0]
+                lon = town[1]
+                data = get_wheather_from_yandex(lat, lon)
+                wheather[lat+lon] = data
+        save_json(CACHE_FILE, wheather)
+
+# D
+@app.route("/suggestions/", methods=['POST'])
+def suggestions(q):
+    if request.method == "POST":
+        q = request.form.get("q")
+    headers = {
+            "Content-Type": "application/json", 
+            "Accept": "application/json", 
+            "Authorization": DADATA_KEY}
+    data = {
+            "query": q, 
+            "count":"10",
+            "locations": [ { "country": "*" }]
+            }
+    data = json.dumps(data)
+    r = requests.post(DADATA_URL, data=data, params=data, headers=headers)
+    return r.text
+DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
