@@ -5,7 +5,7 @@ window.onload = function () {
 };
 
 // Константы
-const CITY_DELIMETER = ", ";
+const CITY_DELIMETER = " (";
 const WIDTH = 800;
 // Время(мс) определния остановки указателя
 const MOUSE_PAUSE = 200;
@@ -198,7 +198,7 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
             // Заполнение списка имён городов (для поиска)
             //cities_names.push({"label": name, "value": name});
             //cities_names.push({"label": name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME], "value": name});
-            cities_names.push(name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME]);
+            cities_names.push(name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME] + ")");
             // Заполнение списка городов и их координат
             cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
         }
@@ -369,13 +369,14 @@ function update() {
 // Подпрограмма отображения погоды города по имени
 function render_city(city, is_rotate) {
     // Получение страны по городу
-    var country_name = country_for_city(city);
+    //var country_name = country_for_city(city);
+    var cname = countries_codes[city.properties.ADM0NAME];
     // Извлечение названия страны
     var name = city.properties.name_ru;
-	var cname = "";
-    if (country_name) {
-        cname = country_name.properties.NAME_RU;
-    }
+	//var cname = "";
+    //if (country_name) {
+        //cname = country_name.properties.NAME_RU;
+    //}
     // Получение временного пояса из данных города
     var timezone = city.properties.TIMEZONE;
     // Если не указан часовой пояс в данных города
@@ -389,18 +390,19 @@ function render_city(city, is_rotate) {
     render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone, cname);
 }
 
+// DEL
 // Функция поиска страны для города
-function country_for_city(city) {
-    // Получение административного имени страны из данных города
-    var country_name_eng = city.properties.ADM0NAME;
-    // Поиск страны с таким именем
-    for (let i = 0; i < world.features.length; i++) {
-        var country = world.features[i];
-        if (country.properties.NAME == country_name_eng) {
-            return country;
-        }
-    }
-}
+// function country_for_city(city) {
+//     // Получение административного имени страны из данных города
+//     var country_name_eng = city.properties.ADM0NAME;
+//     // Поиск страны с таким именем
+//     for (let i = 0; i < world.features.length; i++) {
+//         var country = world.features[i];
+//         if (country.properties.NAME == country_name_eng) {
+//             return country;
+//         }
+//     }
+// }
 
 // Поиск города по имени
 function city_by_name(city_name) {
@@ -408,9 +410,10 @@ function city_by_name(city_name) {
     let country_name = "";
     let country_code = "";
     if (city_name.indexOf(CITY_DELIMETER) > 0) {
-        country_name = city_name.substr(city_name.indexOf(CITY_DELIMETER) + CITY_DELIMETER.length);
+        country_name = city_name.substr(city_name.indexOf(CITY_DELIMETER) + CITY_DELIMETER.length).replace(")","");
         country_code = countries_codes_rev[country_name];
         city_name = city_name.substr(0, city_name.indexOf(CITY_DELIMETER));
+        console.log(country_name, country_code, city_name);
     }
     // Поиск города по имени в списке объектов городов
     for (i = 0; i < cities.length; i++) {

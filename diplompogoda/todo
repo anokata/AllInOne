@@ -94,15 +94,13 @@ https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requ
 
 # При запросе если кеш старый. пройтись по списку городов и обновить кеш # дооолго. надо в фоне. потоком.
 
-Подписывать страну у города в автодополнении
++Подписывать страну у города в автодополнении
     https://api.jqueryui.com/autocomplete/#option-source
     Хранить label:value = Город(стран)
     При выборе парсить value и искать город с учётом страны(страну в код страны)
 +Текущее время с учётом часового пояса
 +created time linux python сохранять время создания кеша в нём
-
-
-unction country_for_city(city) { По словарику 
++unction country_for_city(city) { По словарику 
 
 https://api.jqueryui.com/autocomplete/#option-minLength
 https://www.d3-graph-gallery.com/graph/line_basic.html
