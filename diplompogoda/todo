@@ -93,3 +93,9 @@ https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requ
 + ** Math.pow
 
 # При запросе если кеш старый. пройтись по списку городов и обновить кеш # дооолго. надо в фоне. потоком.
+
+Подписывать страну у города в автодополнении
++Текущее время с учётом часового пояса
+created time linux python сохранять время создания кеша в нём
+https://www.d3-graph-gallery.com/graph/line_basic.html
+https://www.d3-graph-gallery.com/graph/connectedscatter_basic.html

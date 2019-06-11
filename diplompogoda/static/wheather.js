@@ -63,7 +63,8 @@ function view(wheather_data) {
     // В элемент странци с id city_name вставить название города в качестве текста
 	$("#city_name").text(city);
 	$("#country_name").text(wheather_data[city].cname);
-	$("#time").text(timeConverter(wheather_data[city]["time"]));
+	//$("#time").text(timeConverter(wheather_data[city]["time"]));
+	$("#time").text(timetzConverter(moment.tz(time_unix2date(wheather_data[city]["time"]), wheather_data[city].zone)));
 	$("#temp").text(human_temp(wheather_data[city]["temp"]) + "°C");
 	$("#feel").text(human_temp(wheather_data[city]["feels_like"]) + "°C");
 	$("#wind").text(human_wind(wheather_data[city]["wind_dir"], wheather_data[city]["wind_speed"]));
@@ -269,15 +270,31 @@ function month_name(m) {
 	  return months[m];
 }
 
+// Функция преобразования времени из формата UNIXTIME в дату
+function time_unix2date(UNIX_timestamp){
+  return new Date(UNIX_timestamp * 1000);
+}
+
 // Функция преобразования времени из формата UNIXTIME в строку
-function timeConverter(UNIX_timestamp){
-  var a = new Date(UNIX_timestamp * 1000);
+function timeConverter(a){
   var year = a.getFullYear();
   var month = month_name(a.getMonth());
   var date = a.getDate();
   var hour = a.getHours();
   var min = prec_null(a.getMinutes());
   var sec = prec_null(a.getSeconds());
+  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
+
+// Функция преобразования времени в строку
+function timetzConverter(a){
+  var year = a.year();
+  var month = month_name(a.month());
+  var date = a.date();
+  var hour = a.hours();
+  var min = prec_null(a.minutes());
+  var sec = prec_null(a.seconds());
   var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
   return time;
 }
