@@ -102,6 +102,11 @@ https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requ
 +created time linux python сохранять время создания кеша в нём
 +unction country_for_city(city) { По словарику 
 
++хинт скрыв вне карты
++вс и сб
++очищать город если выбран
+Очистить от лишнего. удалить коментированое
+
 https://api.jqueryui.com/autocomplete/#option-minLength
 https://www.d3-graph-gallery.com/graph/line_basic.html
 https://www.d3-graph-gallery.com/graph/connectedscatter_basic.html

@@ -298,6 +298,12 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
           startingPos = [];
       });
 
+    // Скрывать подсказку вне карты
+    $("body").on("mousemove", function() {
+          tooltip_hide();
+          clearTimeout(tooltip_timer);
+    });
+
     // Привязка обработчика клика на каждый из дней краткой сводки погоды
     for (let i = 0; i <= 10; i++)
         $("#day_" + i).parent()
@@ -368,6 +374,8 @@ function update() {
 
 // Подпрограмма отображения погоды города по имени
 function render_city(city, is_rotate) {
+    // Очистить поле ввода
+    $("#cities").val("");
     // Получение страны по городу
     //var country_name = country_for_city(city);
     var cname = countries_codes[city.properties.ADM0NAME];

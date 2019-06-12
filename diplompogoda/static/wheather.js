@@ -143,6 +143,11 @@ function view(wheather_data) {
         var weekday = upper_first(date.toLocaleString('ru-ru', { weekday: 'short' }));
         $("#day_" + i).text(date_str);
         $("#day_" + i + "_week").text(weekday);
+        if (date.getDay() % 6 == 0) {
+            $("#day_" + i + "_week").addClass("weekends");
+        } else {
+            $("#day_" + i + "_week").removeClass("weekends");
+        }
         var part = wheather_data[city].forecasts[i].parts.day;
         $("#day_" + i + "_img" + " img").attr("src", make_icon(part.icon));
         $("#day_" + i + "_cond").text(human_condition(part.condition));
