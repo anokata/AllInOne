@@ -55,7 +55,7 @@ var context;
 // Функция генератора линий
 var geoGenerator;
 // Объекты карты
-var world, cities, lakes, rivers;
+var countries, cities, lakes, rivers;
 // Таймер мыши для отслеживания остановки указателя
 var mouse_timer;
 // Таймер всплывающей подсказки для скрытия через N сек
@@ -153,19 +153,17 @@ function loadData() {
 }
    
 // Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, lakesMap, riversMap, t) {
+function processData(error, worldMap, lakesMap, riversMap, townsMap) {
     if (error) return console.error(error);
     // Извлечение TopoJson данных и сохранение границ стран
-    world = topojson.feature(worldMap, worldMap.objects.world);
-    countries = world.features;
+    countries = topojson.feature(worldMap, worldMap.objects.world).features;
     // Извлечение TopoJson данных и сохранение озёр
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     // Извлечение TopoJson данных и сохранение рек
     rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
 
     // Извлечение TopoJson данных и сохранение городов
-    tw = topojson.feature(t, t.objects.citybig).features;
-    cities = tw; 
+    cities = topojson.feature(townsMap, townsMap.objects.citybig).features;
 
     // Распределение стран в по цвету. В словарь Цвет->список стран. (Для оптимизации отрисовки)
     for (let i = 0; i < countries.length; i++) {
@@ -182,22 +180,22 @@ function processData(error, worldMap, lakesMap, riversMap, t) {
     }
 
     // Распределение городов по уровням детализации
-    for (let i = 0; i < tw.length; i++) {
+    for (let i = 0; i < cities.length; i++) {
         // Извлечение имени города
-        let name = tw[i].properties.name_ru;
+        let name = cities[i].properties.name_ru;
         if (name) {
             // Вычисление уровня детализации
-            let lvl = Math.floor(tw[i].properties.min_zoom*10);
+            let lvl = Math.floor(cities[i].properties.min_zoom*10);
             // Сохранение в массиве городов с таким же уровнем
             if (!city_level[lvl]) city_level[lvl] = [];
-            city_level[lvl].push(tw[i]);
+            city_level[lvl].push(cities[i]);
             // Заполнение списка имён городов (для поиска)
-            let cname = countries_codes[tw[i].properties.ADM0_A3];
+            let cname = countries_codes[cities[i].properties.ADM0_A3];
             if (cname) {
                 cities_names.push(name + CITY_DELIMETER + cname + ")");
             }
             // Заполнение списка городов и их координат
-            cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
+            cities_coords[name] = [cities[i].geometry.coordinates[1], cities[i].geometry.coordinates[0]];
         }
     }
 
@@ -599,7 +597,7 @@ function draw_city(city, color) {
 function draw_country_names() {
     // Настройка размера шрифта
     set_font_size(13);
-    var geojson = world.features;
+    var geojson = countries;
     // Выравнивание текста по центру
     context.textAlign = 'center';
     // Настройка цвета текста
