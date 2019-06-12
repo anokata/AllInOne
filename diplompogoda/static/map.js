@@ -604,6 +604,8 @@ function draw_country_names() {
     context.textAlign = 'center';
     // Настройка цвета текста
     context.fillStyle = COUNTRY_TEXT_COLOR;
+    context.strokeStyle = "#000";
+    context.lineWidth = 1.5;
     context.beginPath();
     for (let c = 0; c < Object.keys(country_by_color).length; c++) {
         let countries = country_by_color[c];
@@ -633,6 +635,7 @@ function draw_country_names() {
                 // И если ранг страны меньше максимального ранга
                 if (country.properties.LABELRANK < max_zoom) {
                     // Отобразить текст с названием страны в центральной точке
+                    context.strokeText(get_country_name(country), geo_center[0], geo_center[1]); 
                     context.fillText(get_country_name(country), geo_center[0], geo_center[1]); 
                 }
             }
