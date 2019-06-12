@@ -149,18 +149,15 @@ function loadData() {
       .defer(d3.json, "static/geo/topolakes.json")  
       .defer(d3.json, "static/geo/toporivers.json")  
       .defer(d3.json, "static/geo/topocitybig.json")  
-      .defer(d3.json, "static/geo/topocoastlines.json")  
       .await(processData);  // обработка загруженных данных
 }
    
 // Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, lakesMap, riversMap, t, coast) {
+function processData(error, worldMap, lakesMap, riversMap, t) {
     if (error) return console.error(error);
     // Извлечение TopoJson данных и сохранение границ стран
     world = topojson.feature(worldMap, worldMap.objects.world);
     countries = world.features;
-    // Извлечение TopoJson данных и сохранение береговых линий
-    window.coast = topojson.feature(coast, coast.objects.coastlines).features;
     // Извлечение TopoJson данных и сохранение озёр
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     // Извлечение TopoJson данных и сохранение рек
