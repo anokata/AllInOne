@@ -161,7 +161,6 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
     lakes = topojson.feature(lakesMap, lakesMap.objects.lakes).features;
     // Извлечение TopoJson данных и сохранение рек
     rivers = topojson.feature(riversMap, riversMap.objects.rivers).features;
-
     // Извлечение TopoJson данных и сохранение городов
     cities = topojson.feature(townsMap, townsMap.objects.citybig).features;
 
