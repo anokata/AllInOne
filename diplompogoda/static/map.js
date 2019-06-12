@@ -11,7 +11,7 @@ const WIDTH = 800;
 const MOUSE_PAUSE = 200;
 // Величина изменения масштаба за один шаг
 const SCALE_VAL = 50;
-const ROTATE_EPSILON = 5;
+const ROTATE_EPSILON = 4;
 // Максимальная дистанция видимости
 const MAX_DISTANCE = 1;
 // Минимальный масштаб
@@ -19,7 +19,7 @@ const MIN_ZOOM = 300;
 // Задержка между кадрами поворота
 const ROTATE_TIME = 10;
 // Количество кадров при повороте
-const ROTATE_STEPS = 12;
+const ROTATE_STEPS = 14;
 // Цвета
 const NEAR_CITY_COLOR = '#d33';
 const SELECTED_CITY_COLOR = '#3d3';
@@ -27,7 +27,7 @@ const WATER_COLOR = "#b1d5e5";
 // Цвет пространства вокруг шара
 const SPACE_COLOR = "#545859";
 const CITY_COLOR = "#333";
-const COUNTRY_TEXT_COLOR = "#333";
+const COUNTRY_TEXT_COLOR = "#ffffff";
 const RIVER_COLOR = '#0e67a4';
 const EDGE_COLOR = '#111';
 const FONT_STYLE = "px Arial,Helvetica,sans-serif";
@@ -146,17 +146,15 @@ function loadData() {
     // Запрос геоданных границ в topoJSON-формате и точек городов
     queue()
       .defer(d3.json, "static/geo/topoworld.json")  
-      .defer(d3.json, "static/maptowns.json")  
       .defer(d3.json, "static/geo/topolakes.json")  
       .defer(d3.json, "static/geo/toporivers.json")  
-      .defer(d3.json, "static/towns.json")  
       .defer(d3.json, "static/geo/topocitybig.json")  
       .defer(d3.json, "static/geo/topocoastlines.json")  
       .await(processData);  // обработка загруженных данных
 }
    
 // Подпрограмма обработки загруженных геоданных
-function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, coast) {
+function processData(error, worldMap, lakesMap, riversMap, t, coast) {
     if (error) return console.error(error);
     // Извлечение TopoJson данных и сохранение границ стран
     world = topojson.feature(worldMap, worldMap.objects.world);
@@ -181,8 +179,9 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
         if (!country_by_color[color_index]) country_by_color[color_index] = [];
         country_by_color[color_index].push(country);
         // Таблица кодов стран и имён
-        countries_codes[country.properties.NAME] = country.properties.NAME_RU;
-        countries_codes_rev[country.properties.NAME_RU] = country.properties.NAME;
+        let cname = country.properties.ADM0_A3;
+        countries_codes[cname] = country.properties.NAME_RU;
+        countries_codes_rev[country.properties.NAME_RU] = cname;
     }
 
     // Распределение городов по уровням детализации
@@ -196,21 +195,14 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
             if (!city_level[lvl]) city_level[lvl] = [];
             city_level[lvl].push(tw[i]);
             // Заполнение списка имён городов (для поиска)
-            //cities_names.push({"label": name, "value": name});
-            //cities_names.push({"label": name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME], "value": name});
-            cities_names.push(name + CITY_DELIMETER + countries_codes[tw[i].properties.ADM0NAME] + ")");
+            let cname = countries_codes[tw[i].properties.ADM0_A3];
+            if (cname) {
+                cities_names.push(name + CITY_DELIMETER + cname + ")");
+            }
             // Заполнение списка городов и их координат
             cities_coords[name] = [tw[i].geometry.coordinates[1], tw[i].geometry.coordinates[0]];
         }
     }
-    cities_coords = Object.assign({}, cities_coords, cityMap);
-
-    // Список дополнительных городов
-    //cities_names_add = Object.keys(towns);
-    //cities_names = Array.concat(cities_names, cities_names_add);
-    // Совмещение с городами карты
-    // Координаты дополнительных городов
-    // DEL cityMap, towns
 
     // Настройка автодополнения имён городов
     autocomplete_init();
@@ -318,16 +310,6 @@ function processData(error, worldMap, cityMap, lakesMap, riversMap, towns, t, co
             });
 
     render_city(city_by_name("Рыбинск"), false);
-    //console.log(countries_codes);
-    //console.log("Мир", world);
-    //console.log("Города", cities);
-    //console.log("Озёра", lakes);
-    //console.log("Реки", rivers);
-    //console.log("By rank", city_level);
-    //console.log("All ", tw);
-    //console.log("By color ", country_by_color);
-    //console.log(worldMap);
-    //console.log(cityMap);
 
     // Привязка обработчиков клика на кнопки переключения подробного прогноза на 5/10 дней
 	$("#ten_toggle").on("click", function () {
@@ -368,8 +350,6 @@ function update() {
     draw_city(near_city, NEAR_CITY_COLOR);
     // Отображение выбранного города
     draw_city(selected_city, SELECTED_CITY_COLOR);
-
-    //draw_coastlines();
 }
 
 // Подпрограмма отображения погоды города по имени
@@ -377,14 +357,9 @@ function render_city(city, is_rotate) {
     // Очистить поле ввода
     $("#cities").val("");
     // Получение страны по городу
-    //var country_name = country_for_city(city);
-    var cname = countries_codes[city.properties.ADM0NAME];
+    var cname = countries_codes[city.properties.ADM0_A3];
     // Извлечение названия страны
     var name = city.properties.name_ru;
-	//var cname = "";
-    //if (country_name) {
-        //cname = country_name.properties.NAME_RU;
-    //}
     // Получение временного пояса из данных города
     var timezone = city.properties.TIMEZONE;
     // Если не указан часовой пояс в данных города
@@ -398,20 +373,6 @@ function render_city(city, is_rotate) {
     render_town(name, city.geometry.coordinates[0], city.geometry.coordinates[1], is_rotate, city.properties.name_ru, timezone, cname);
 }
 
-// DEL
-// Функция поиска страны для города
-// function country_for_city(city) {
-//     // Получение административного имени страны из данных города
-//     var country_name_eng = city.properties.ADM0NAME;
-//     // Поиск страны с таким именем
-//     for (let i = 0; i < world.features.length; i++) {
-//         var country = world.features[i];
-//         if (country.properties.NAME == country_name_eng) {
-//             return country;
-//         }
-//     }
-// }
-
 // Поиск города по имени
 function city_by_name(city_name) {
     // Извлечь название города
@@ -421,13 +382,12 @@ function city_by_name(city_name) {
         country_name = city_name.substr(city_name.indexOf(CITY_DELIMETER) + CITY_DELIMETER.length).replace(")","");
         country_code = countries_codes_rev[country_name];
         city_name = city_name.substr(0, city_name.indexOf(CITY_DELIMETER));
-        console.log(country_name, country_code, city_name);
     }
     // Поиск города по имени в списке объектов городов
     for (i = 0; i < cities.length; i++) {
         var city = cities[i];
         if (city.properties.name_ru == city_name) {
-            if (country_code && city.properties.ADM0NAME == country_code)
+            if (country_code && city.properties.ADM0_A3 == country_code)
                 // Если нашёлся - возвратить его
                 return city;
             if (!country_code) return city;
@@ -491,7 +451,6 @@ function city_rotate(lon, lat, dn, dt) {
     n += dn;
     t += dt;
     projection.rotate([n, t, rotate[2]]);
-    //projection.rotate([-lon, -lat, rotate[2]]); // сразу
 
     // Отрисовка карты
     update();
@@ -545,8 +504,6 @@ function scale_projection(value) {
 		city_min_dist = 0.04;
     } else {
         sens = 0.25 - scale/8000;
-		//city_min_dist = 0.04 - scale/500000;
-		//console.log(city_min_dist, scale/500000)
     }
     if (sens < 0.05) sens = 0.05;
 }
@@ -564,8 +521,8 @@ function set_font_size(s) {
     let scale = projection.scale();
     // Вычисление размер шрифта с поправкой на масштаб
     let x = s + Math.pow((scale / 400), 1.07);
-	if (scale > 3000) {
-		x = s + Math.pow((scale / 400), 0.65);
+	if (scale > 2600) {
+		x = s + Math.pow((scale / 400), 0.60);
 	}
     // Установка размера шрифта 
     context.font = x + FONT_STYLE;
@@ -625,19 +582,6 @@ function draw_lakes() {
 	context.stroke();
 }
 
-// Подпрограмма отображения линии побережий
-function draw_coastlines() {
-    var geojson = coast;
-    context.strokeStyle = RIVER_COLOR;
-    context.lineWidth = 1.5;
-    context.beginPath();
-    for (var i = 0; i < geojson.length; i++) {
-        var line = geojson[i];
-        geoGenerator({type: 'FeatureCollection', features: [line]})
-    }
-	context.stroke();
-}
-
 // Подпрограмма отображения города
 function draw_city(city, color) {
     if (city) {
@@ -657,7 +601,7 @@ function draw_city(city, color) {
 // Отображение названий стран
 function draw_country_names() {
     // Настройка размера шрифта
-    set_font_size(12);
+    set_font_size(13);
     var geojson = world.features;
     // Выравнивание текста по центру
     context.textAlign = 'center';
@@ -786,14 +730,15 @@ function get_color(d) {
 
 // Подпрограмма форматирования координат
 function human_coord(p) {
-    // Широта latitude сев/юж
-    // Долгода longitude вост/зап
-    // 55°45′21″ с. ш. 37°37′04″ в. д.
+    // Широта latitude сев/юж  Долгота longitude вост/зап
+    // Например 55°45′21″ с. ш. 37°37′04″ в. д.
+    // Извлечение значений долготы и широты
     var lon = p[0];
     var lat = p[1];
 	if (!lon || !lat) return null;
     var coord_text = "";
 
+    // Формирование текста для широты
     coord_text += Math.abs(Math.floor(lat));
     if (lat > 0) {
         coord_text += "° c.ш. ";
@@ -801,6 +746,7 @@ function human_coord(p) {
         coord_text += "° ю.ш. ";
     }
 
+    // Формирование текста для долготы
     coord_text += Math.abs(Math.floor(lon));
     if (lon > 0) {
         coord_text += "° в.д.";
@@ -840,7 +786,6 @@ function nearest_city(p) {
         }
     }
     }
-    //console.log(min_distance, nearest);
     if (min_distance < city_min_dist) {
         return nearest;
     } else return false;
@@ -887,8 +832,6 @@ function make_wheather_text(city) {
     var lon = city.geometry.coordinates[0]; 
     var lat = city.geometry.coordinates[1];
     var city_name = city.properties.name_ru;
-    // Подставить имя города в поле ввода
-    //$("#cities").val(city_name);
     // Вызов подпрограммы отображения погдных данных
     show_wheather_data(city_name, lon, lat);
 }

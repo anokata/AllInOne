@@ -105,7 +105,11 @@ https://humanwhocodes.com/blog/2011/05/03/better-javascript-animations-with-requ
 +хинт скрыв вне карты
 +вс и сб
 +очищать город если выбран
-Очистить от лишнего. удалить коментированое
++удалить коментированое
++Чехия Конго
++а сделай города помельче
++и названия стран покрупнее и беленьким
+Очистить от лишнего. 
 
 https://api.jqueryui.com/autocomplete/#option-minLength
 https://www.d3-graph-gallery.com/graph/line_basic.html
@@ -143,3 +147,31 @@ def suggestions(q):
     return r.text
 DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
 
+	  //var months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+// Подпрограмма отображения линии побережий
+function draw_coastlines() {
+    var geojson = coast;
+    context.strokeStyle = RIVER_COLOR;
+    context.lineWidth = 1.5;
+    context.beginPath();
+    for (var i = 0; i < geojson.length; i++) {
+        var line = geojson[i];
+        geoGenerator({type: 'FeatureCollection', features: [line]})
+    }
+	context.stroke();
+}
+
+    //projection.rotate([-lon, -lat, rotate[2]]); // сразу
+// DEL
+// Функция поиска страны для города
+// function country_for_city(city) {
+//     // Получение административного имени страны из данных города
+//     var country_name_eng = city.properties.ADM0NAME;
+//     // Поиск страны с таким именем
+//     for (let i = 0; i < world.features.length; i++) {
+//         var country = world.features[i];
+//         if (country.properties.NAME == country_name_eng) {
+//             return country;
+//         }
+//     }
+// }

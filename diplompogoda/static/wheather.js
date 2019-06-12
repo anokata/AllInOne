@@ -24,7 +24,6 @@ function send(wheather_data, city, lat, lon, f) {
     xhr.onload = function() {
         // Парсинг ответа в JSON формате
         data = JSON.parse(this.responseText);
-		//console.log(data);
         // Формирование результирующих данных на основе ответа
         wheather_data[city] = {
 			"time": data['fact']['obs_time'],
@@ -55,7 +54,6 @@ function send(wheather_data, city, lat, lon, f) {
 
 // Подпрограмма отображения погодных данных 
 function view(wheather_data) {
-    console.log(wheather_data);
     // Получение названия города
     city = wheather_data["city"] || Object.keys(wheather_data)[0];
 
@@ -63,7 +61,6 @@ function view(wheather_data) {
     // В элемент странци с id city_name вставить название города в качестве текста
 	$("#city_name").text(city);
 	$("#country_name").text(wheather_data[city].cname);
-	//$("#time").text(timeConverter(wheather_data[city]["time"]));
 	$("#time").text(timetzConverter(moment.tz(time_unix2date(wheather_data[city]["time"]), wheather_data[city].zone)));
 	$("#temp").text(human_temp(wheather_data[city]["temp"]) + "°C");
 	$("#feel").text(human_temp(wheather_data[city]["feels_like"]) + "°C");
@@ -93,7 +90,6 @@ function view(wheather_data) {
             $("#day_long").text(daylong(wheather_data[city]["forecasts"][0]["sunrise"], wheather_data[city]["forecasts"][0]["sunset"]));
         $("#rise").parent().show();
         $("#sunset").parent().show();
-        //$("#day_long").siblings().first().next().text("Долгота дня");
         }
     } else {
         // В случае полядного дня/ночи прячем элементы с восходом и закатом
@@ -101,7 +97,6 @@ function view(wheather_data) {
         $("#sunset").parent().hide();
         $("#day_long").text("");
         if (wheather_data[city].forecasts[0].parts.day.daytime == "n") {
-            //$("#day_long").siblings().first().next().text("Полярная ночь");
             $("#day_long").text("Полярная ночь");
         } else {
             $("#day_long").text("Полярный день");
@@ -124,7 +119,6 @@ function view(wheather_data) {
     // Вычисление текущего часа с учётом часового пояса
     var datetz = moment.tz(new Date(), wheather_data[city].zone);
     var hour = Number(datetz.format("H"));
-    console.log("ZONE", wheather_data[city].zone, datetz.format("H"));
 	
     var j = 1;
     // Вывод почасового прогноза с текущего часа, 12 часов
@@ -178,20 +172,17 @@ function show_part_wheather(n) {
         $("#part_set").text(f.sunset);
         // Вывести долготу дня
         $("#part_daylong").text(daylong(f.sunrise, f.sunset));
-        //$("#daylong_text").text("Долгота дня");
         $("#part_rise").show();
         $("#part_set").show();
         $("#part_rise_t").show();
         $("#part_set_t").show();
     } else {
         // В случае полядного дня/ночи прячем элементы с восходом и закатом
-        //$("#part_daylong").text("");
         $("#part_rise").hide();
         $("#part_set").hide();
         $("#part_rise_t").hide();
         $("#part_set_t").hide();
         if (p.day.daytime == "n") {
-            //$("#daylong_text").text("Полярная ночь");
             $("#part_daylong").text("Полярная ночь");
         } else {
             $("#part_daylong").text("Полярный день");
@@ -270,7 +261,6 @@ function upper_first(string) {
 }
 
 function month_name(m) {
-	  //var months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
 	  var months = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
 	  return months[m];
 }
