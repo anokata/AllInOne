@@ -596,7 +596,6 @@ function draw_city(city, color) {
 function draw_country_names() {
     // Настройка размера шрифта
     set_font_size(13);
-    var geojson = countries;
     // Выравнивание текста по центру
     context.textAlign = 'center';
     // Настройка цвета текста
@@ -604,40 +603,37 @@ function draw_country_names() {
     context.strokeStyle = "#000";
     context.lineWidth = 1.5;
     context.beginPath();
-    for (let c = 0; c < Object.keys(country_by_color).length; c++) {
-        let countries = country_by_color[c];
-        for (let i = 0; i < countries.length; i++) {
-            let country = countries[i];
-            // Вычисление центральной точки страны
-            let geo_center = geoGenerator.centroid(country);
-            // Для Франции центр по европейской части без учёта островов
-            if (country.properties.ADM0_A3 == "FRA") {
-                var obj = {
-                    type: "Feature",
-                    geometry: {
-                        coordinates: [],
-                        type: "MultiPolygon"
-                    }
-                };
-                // Извлечение основной части страны
-                obj.geometry.coordinates = [country.geometry.coordinates[1]];
-                obj.properties = country.properties;
-                // Вычисление центральной точки страны
-                geo_center = geoGenerator.centroid(obj);
-            }
-            // Вычисление максимального ранга страны с учётом мастштаба
-            let max_zoom = Math.floor(projection.scale() / 120);
-            // Если центральная точка страны видима
-            if (is_visible_dotp(projection.invert(geo_center))) {
-                // И если ранг страны меньше максимального ранга
-                if (country.properties.LABELRANK < max_zoom) {
-                    // Отобразить текст с названием страны в центральной точке
-                    context.strokeText(get_country_name(country), geo_center[0], geo_center[1]); 
-                    context.fillText(get_country_name(country), geo_center[0], geo_center[1]); 
+    for (let i = 0; i < countries.length; i++) {
+        let country = countries[i];
+        // Вычисление центральной точки страны
+        let geo_center = geoGenerator.centroid(country);
+        // Для Франции центр по европейской части без учёта островов
+        if (country.properties.ADM0_A3 == "FRA") {
+            var obj = {
+                type: "Feature",
+                geometry: {
+                    coordinates: [],
+                    type: "MultiPolygon"
                 }
+            };
+            // Извлечение основной части страны
+            obj.geometry.coordinates = [country.geometry.coordinates[1]];
+            obj.properties = country.properties;
+            // Вычисление центральной точки страны
+            geo_center = geoGenerator.centroid(obj);
+        }
+        // Вычисление максимального ранга страны с учётом мастштаба
+        let max_zoom = Math.floor(projection.scale() / 120);
+        // Если центральная точка страны видима
+        if (is_visible_dotp(projection.invert(geo_center))) {
+            // И если ранг страны меньше максимального ранга
+            if (country.properties.LABELRANK < max_zoom) {
+                // Отобразить текст с названием страны в центральной точке
+                context.strokeText(get_country_name(country), geo_center[0], geo_center[1]); 
+                context.fillText(get_country_name(country), geo_center[0], geo_center[1]); 
             }
         }
-	}
+    }
     // Начертить весь текст
     context.stroke();
 }
