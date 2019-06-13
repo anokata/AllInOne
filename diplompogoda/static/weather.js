@@ -150,6 +150,10 @@ function view(weather_data) {
 	
     // Вывести погоду по времени суток на сегодня
 	show_part_weather(0);
+    // ---------- TODO chart
+    let temp_data = [];
+    //$("#temp_chart");
+
 }
 
 // Функция формирования даты в человекочитаемом формате
