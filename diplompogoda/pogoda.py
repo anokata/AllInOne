@@ -12,7 +12,7 @@ YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
 # URL адрес API Яндекс.Погоды
 YANDEX_WHEATHER_URL = "https://api.weather.yandex.ru/v1/forecast"
 # Имя кеш файла
-CACHE_FILE = "wheather.json"
+CACHE_FILE = "weather.json"
 # Кеш = словарь, ключ=координаты, значение=погодные данные по этим координатам
 # Флаг использования только кеша (для отладки)
 CACHE_ONLY = False
