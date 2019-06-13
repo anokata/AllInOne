@@ -271,7 +271,7 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
                   render_city(nearest);
               } else {
                   // Показать подсказку в этой точке
-                  show_wheather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
+                  show_weather_data(human_coord(mouse_point), mouse_point[0], mouse_point[1]);
                   // Берём часовой пояс ближайшегого города 
                   var nearest = nearest_city_timezone(mouse_point);
                   var timezone = nearest.properties.TIMEZONE;
@@ -295,7 +295,7 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
         $("#day_" + i).parent()
             .on("click", function () {
                 // Отобразить подробные данные по частям дня
-                show_part_wheather(i);
+                show_part_weather(i);
 				// Установка стиля выбранного дня
 				for (let k = 0; k <= 10; k++) {
 					$("#day_" + k).parent().removeClass("forecast_focused");
@@ -405,7 +405,7 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     // Полное название города
     if (city_name == undefined) city_name = city;
 
-    wheather_data = {};
+    weather_data = {};
     if (!lon || !lat) { return; }
 
     // Если поворачивть
@@ -418,13 +418,13 @@ function render_town(city, lon, lat, is_rotate, city_name, timezone, cname) {
     selected_city = make_feature(city_name, lon, lat);
     near_city = undefined;
 
-    wheather_data[city] = {};
+    weather_data[city] = {};
     // Добавление в объект погодных данных часового пояса
-    wheather_data[city]['zone'] = timezone;
+    weather_data[city]['zone'] = timezone;
     // Добавление в объект погодных данных названия города
-	wheather_data[city]['cname'] = cname || "";
+	weather_data[city]['cname'] = cname || "";
     // Вызов подпрограммы получения и отображения погодных данных
-    send(wheather_data, city, lat, lon, view);
+    send(weather_data, city, lat, lon, view);
     // Отрисовка карты
     update();
 }
@@ -819,37 +819,37 @@ function mouse_stopped() {
         // Отрисовка карты
         update();
         // Отобразить погодные данные по ближайшему городу в подсказке
-        make_wheather_text(nearest);
+        make_weather_text(nearest);
     }
 }
 
 // Подпрограмма отображения погоды города
-function make_wheather_text(city) {
+function make_weather_text(city) {
     // Извлечение координат и имени города
     var lon = city.geometry.coordinates[0]; 
     var lat = city.geometry.coordinates[1];
     var city_name = city.properties.name_ru;
     // Вызов подпрограммы отображения погдных данных
-    show_wheather_data(city_name, lon, lat);
+    show_weather_data(city_name, lon, lat);
 }
 
 // Подпрограмма формирования всплывающей подсказки
-function show_wheather_data(city_name, lon, lat) {
+function show_weather_data(city_name, lon, lat) {
 	if (!city_name) return;
     // Формирование текста с данными
-    var wheather_data = {};
+    var weather_data = {};
     // Получение погодных данных в выбранной точке
-    send(wheather_data, city_name, lat, lon, function (wheather_data) {
+    send(weather_data, city_name, lat, lon, function (weather_data) {
           // Обработка погодных данных и формирование текста для сводки
-          wheather_data["city"] = city_name;
+          weather_data["city"] = city_name;
           // Формирование текста с погодной сводкой
         
           $("#tooltip_cityname").text(city_name);
-          $("#tooltip_icon img").attr("src", make_icon(wheather_data[city_name]["icon"]));
-          $("#tooltip_condition").text(human_condition(wheather_data[city_name]["condition"]));
-          $("#tooltip_temp").text(human_temp_grad(wheather_data[city_name]["temp"]));
-          $("#tooltip_hum").text(wheather_data[city_name]["humidity"] + "%");
-          $("#tooltip_wind").text(human_wind(wheather_data[city_name]["wind_dir"], wheather_data[city_name]["wind_speed"]));
+          $("#tooltip_icon img").attr("src", make_icon(weather_data[city_name]["icon"]));
+          $("#tooltip_condition").text(human_condition(weather_data[city_name]["condition"]));
+          $("#tooltip_temp").text(human_temp_grad(weather_data[city_name]["temp"]));
+          $("#tooltip_hum").text(weather_data[city_name]["humidity"] + "%");
+          $("#tooltip_wind").text(human_wind(weather_data[city_name]["wind_dir"], weather_data[city_name]["wind_speed"]));
 
           $("#tooltip")
               .css("left", (mouse_xy[0] + 33) + "px")

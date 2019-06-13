@@ -31,9 +31,9 @@ def pogoda(lat="", lon="", methods=['POST']):
         lat = request.form.get("lat")
         lon = request.form.get("lon")
         # Получение погодных данных для данной точки и возвращение их как результата
-        return get_wheather(lat, lon)
+        return get_weather(lat, lon)
     else:
-        return get_wheather(lat, lon)
+        return get_weather(lat, lon)
 
 # Обработчик запроса к главной странице
 @app.route('/')
@@ -54,25 +54,25 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Функция получения погодных данных, из кеша или свежих
-def get_wheather(lat, lon):
-    wheather = load_cache()
+def get_weather(lat, lon):
+    weather = load_cache()
     # Если нет кеша или он устарел
-    if not wheather.get(lat+lon):
+    if not weather.get(lat+lon):
         # Получение свежих данных
-        wheather = get_wheather_from_yandex(lat, lon)
+        weather = get_weather_from_yandex(lat, lon)
         # Если данные успешно получены
-        if "Forbidden" not in wheather:
+        if "Forbidden" not in weather:
             # Сохранение в кеш новых данных
-            save_cache(lat, lon, wheather)
+            save_cache(lat, lon, weather)
     else:
         # Иначе взять из кеша
-        wheather = wheather[lat+lon]
+        weather = weather[lat+lon]
 
     # Вернуть погодные данные
-    return wheather
+    return weather
 
 # Функция загрузки погодных данных по геоточке через сервис Яндекс.Погоды
-def get_wheather_from_yandex(lat, lon):
+def get_weather_from_yandex(lat, lon):
     # Подготовка заголовков запроса - API-ключ
     headers = {"X-Yandex-API-Key": YANDEX_WHEATHER_APIKEY}
     # Подготовка параметров запроса - широта, долгота, язык
@@ -112,7 +112,7 @@ def is_old():
 # Функция загрузки данных из кеша
 def load_cache():
     ts = datetime.now().timestamp()
-    wheather = {'timestamp': str(ts)}
+    weather = {'timestamp': str(ts)}
 
     # Каждый час удалять. Если старый удаляем
     if is_old() and not CACHE_ONLY:
@@ -120,22 +120,22 @@ def load_cache():
         os.remove(CACHE_FILE)
         # Записать новую дату
         save_cache(str(ts), "", ts)
-        return wheather
+        return weather
 
     try:
         # Чтение данных из кеша
         with open(CACHE_FILE, 'r') as fin:
-            wheather = json.loads(fin.read())
+            weather = json.loads(fin.read())
     except:
         pass
-    return wheather
+    return weather
 
 # Подпрограмма записи новых данных в кеш
-def save_cache(lat, lon, wheather):
+def save_cache(lat, lon, weather):
     # Загрузка кеша
     old = load_cache()
     # Добавление данных
-    old[lat+lon] = wheather
+    old[lat+lon] = weather
     # Запись обновлённых данных в кеш
     save_json(CACHE_FILE, old)
 
