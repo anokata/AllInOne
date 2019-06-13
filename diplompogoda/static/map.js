@@ -350,9 +350,9 @@ function update() {
 function render_city(city, is_rotate) {
     // Очистить поле ввода
     $("#cities").val("");
-    // Получение страны по городу
+    // Получение названия страны по городу
     var cname = countries_codes[city.properties.ADM0_A3];
-    // Извлечение названия страны
+    // Извлечение названия города
     var name = city.properties.name_ru;
     // Получение временного пояса из данных города
     var timezone = city.properties.TIMEZONE;
