@@ -1,4 +1,4 @@
-
+const FORECAST_LEN = 7;
 // Подпрограмма отправки API запроса получения данных погоды и обработки результата
 function send(weather_data, city, lat, lon, f) {
     var zone = "";
@@ -122,7 +122,7 @@ function view(weather_data) {
 	
     var j = 1;
     // Вывод почасового прогноза с текущего часа, 12 часов
-    for (var i = hour; i < hour + 13; i++) {
+    for (let i = hour; i < hour + 13; i++) {
         var h = i % 24;
         $("#hour_" + j + "_time").text(h + ":00");
         $("#hour_" + j).text(human_temp_grad(weather_data[city].forecasts[0].hours[h].temp));
@@ -130,7 +130,7 @@ function view(weather_data) {
         j++;
     }
     // Отображение краткой сводки погоды на сегодня и 5 дней вперёд
-    for (var i = 0; i < 11; i++) {
+    for (let i = 0; i < FORECAST_LEN; i++) {
         var date = new Date(weather_data[city].forecasts[i].date);
         var date_str = make_human_date(weather_data[city].forecasts[i].date)
         // Формирование дня недели
@@ -152,7 +152,55 @@ function view(weather_data) {
 	show_part_weather(0);
     // ---------- TODO chart
     let temp_data = [];
-    //$("#temp_chart");
+    for (let k = hour; k < hour + 13; k++) {
+        let h = k % 24;
+        temp_data.push({'x': k,'y': weather_data[city].forecasts[0].hours[h].temp});
+    }
+    let width = 400; let height = 150;
+    let	margin = {top: 30, right: 20, bottom: 30, left: 50};
+    //console.log(temp_data);
+    // Set the ranges
+    var	y = d3.scale.linear().range([height, 0]);
+    var	x = d3.scale.linear().range([0, width]);
+     
+    // Define the axes
+    var	xAxis = d3.svg.axis().scale(x)
+        .orient("bottom").ticks(10);
+     
+    var	yAxis = d3.svg.axis().scale(y)
+        .orient("left").ticks(10);
+     
+    // Define the line
+    var	valueline = d3.svg.line()
+        .x(function(d) { return x(d.x); })
+        .y(function(d) { return y(d.y); });
+
+	// Scale the range of the data
+	x.domain([d3.min(temp_data, function(d) { return d.x; }), d3.max(temp_data, function(d) { return d.x; })]);
+	y.domain([d3.min(temp_data, function(d) { return d.y; })-5, d3.max(temp_data, function(d) { return d.y; })]);
+
+    // Adds the svg canvas
+    var	svg = d3.select("#temp_chart")
+        .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	// Add the valueline path.
+	svg.append("path")	
+		.attr("class", "line")
+		.attr("d", valueline(temp_data));
+
+	// Add the X Axis
+	svg.append("g")		
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + (height - 20) + ")")
+		.call(xAxis);
+ 
+	// Add the Y Axis
+	svg.append("g")		
+		.attr("class", "y axis")
+		.call(yAxis);
 
 }
 

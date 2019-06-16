@@ -8,7 +8,11 @@ from datetime import timedelta
 # Создание объекта приложения
 app = Flask(__name__)
 # API-ключ к сервису Яндекс.Погоды
-YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
+#YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
+YANDEX_WHEATHER_APIKEY = "2d001a12-9851-4254-ae73-b95e65a4170c"
+# keys:
+#fc2d8810-310e-44c7-86ce-1beb9ff466e7
+#2d001a12-9851-4254-ae73-b95e65a4170c
 # URL адрес API Яндекс.Погоды
 YANDEX_WHEATHER_URL = "https://api.weather.yandex.ru/v1/forecast"
 # Имя кеш файла
@@ -18,9 +22,6 @@ CACHE_FILE = "weather.json"
 CACHE_ONLY = False
 #"a57bd39d-59d5-47e1-9bfe-00d40e2676c8"
 #"73f1e491-d7be-40b2-8f72-d69e4cdf09cd"
-# keys:
-#fc2d8810-310e-44c7-86ce-1beb9ff466e7
-#2d001a12-9851-4254-ae73-b95e65a4170c
 
 # Обработчик запроса погодных данных
 @app.route("/pogoda/<lat>/<lon>", methods=['GET'])

@@ -291,13 +291,13 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
     });
 
     // Привязка обработчика клика на каждый из дней краткой сводки погоды
-    for (let i = 0; i <= 10; i++)
+    for (let i = 0; i < FORECAST_LEN; i++)
         $("#day_" + i).parent()
             .on("click", function () {
                 // Отобразить подробные данные по частям дня
                 show_part_weather(i);
 				// Установка стиля выбранного дня
-				for (let k = 0; k <= 10; k++) {
+				for (let k = 0; k < FORECAST_LEN; k++) {
 					$("#day_" + k).parent().removeClass("forecast_focused");
 				}
 				$("#day_" + i).parent().addClass("forecast_focused");
