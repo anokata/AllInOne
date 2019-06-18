@@ -182,3 +182,12 @@ function draw_coastlines() {
  панельки по углам карты, при опр масштабе - полупрозрачные, при наведении - непрозрачные
 Давление tooltip hPa
 https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
+
+
+    /*
+    for (let k = hour; k < hour + 13; k++) {
+        let h = k % 24;
+        temp_data.push({'x': k,'y': weather_data[city].forecasts[0].hours[h].temp});
+        hours.push(k);
+    }
+    */

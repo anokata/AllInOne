@@ -150,29 +150,60 @@ function view(weather_data) {
 	
     // Вывести погоду по времени суток на сегодня
 	show_part_weather(0);
-    // ---------- TODO chart
-	/*
+    // Настройка графика температуры
     let temp_data = [];
-    for (let k = hour; k < hour + 13; k++) {
-        let h = k % 24;
-        temp_data.push({'x': k,'y': weather_data[city].forecasts[0].hours[h].temp});
+    let hours = [];
+    let max_day = 3;
+    let i = hour;
+    for (let d = 0; d < max_day; d++) {
+        let k = hour;
+        if (d) k = 0;
+        let ek = 24;
+        if (d == max_day-1) ek = hour - 2;
+        for (; k < ek; k++) {
+            temp_data.push({'x': k + d*24,'y': weather_data[city].forecasts[d].hours[k].temp});
+            hours.push(i);
+            i++;
+        }
     }
-    let width = 400; let height = 150;
+    let width = 1750; let height = 180;
     let	margin = {top: 30, right: 20, bottom: 30, left: 50};
-    //console.log(temp_data);
     // Set the ranges
     var	y = d3.scale.linear().range([height, 0]);
     var	x = d3.scale.linear().range([0, width]);
      
     // Define the axes
     var	xAxis = d3.svg.axis().scale(x)
-        .orient("bottom").ticks(10);
+        .orient("bottom");
+
+    xAxis.ticks(12)
+        .tickFormat(function(d, i){
+            let h = d % 24;
+            //return d3.format('c')(0x26C5) + h + ":00";
+            return h + ":00";
+            
+        })
+        .innerTickSize(-height)
+        .outerTickSize(0)
+        .tickValues(hours)
+        .tickPadding(10);
+
+    let ticks = d3.max(temp_data, function(d) { return d.y; }) - d3.min(temp_data, function(d) { return d.y; });
+    if (ticks < 3) ticks = 3;
+    if (ticks > 12) ticks = 12;
      
     var	yAxis = d3.svg.axis().scale(y)
-        .orient("left").ticks(10);
+        .orient("left").ticks(ticks)
+        .innerTickSize(-width)
+        .outerTickSize(0)
+        .tickPadding(5)
+        .tickFormat(function(d, i){
+            return human_temp_grad(d);
+        });
      
     // Define the line
     var	valueline = d3.svg.line()
+        .interpolate("basis")
         .x(function(d) { return x(d.x); })
         .y(function(d) { return y(d.y); });
 
@@ -181,8 +212,8 @@ function view(weather_data) {
 	y.domain([d3.min(temp_data, function(d) { return d.y; })-5, d3.max(temp_data, function(d) { return d.y; })]);
 
     // Adds the svg canvas
-    var	svg = d3.select("#temp_chart")
-        .append("svg")
+    d3.select("svg").remove();
+    var	svg = d3.select("#temp_chart").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -195,14 +226,25 @@ function view(weather_data) {
 	// Add the X Axis
 	svg.append("g")		
 		.attr("class", "x axis")
-		.attr("transform", "translate(0," + (height - 20) + ")")
+		.attr("transform", "translate(0," + (height) + ")")
 		.call(xAxis);
  
 	// Add the Y Axis
 	svg.append("g")		
 		.attr("class", "y axis")
 		.call(yAxis);
-*/
+    d3.select('.axis .tick:first-child').remove();
+    d3.select('.y.axis .tick').remove();
+
+
+    //
+    d3.select("svg").selectAll(".dot")
+        .data(temp_data)
+        .enter().append("circle")
+          .attr("class", "dot")
+          .attr("r", 3)
+          .attr("cx", function(d) { return x(d.x); })
+          .attr("cy", function(d) { return y(d.y); });
 }
 
 // Функция формирования даты в человекочитаемом формате
