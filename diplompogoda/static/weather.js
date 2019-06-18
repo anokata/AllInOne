@@ -201,7 +201,9 @@ function view(weather_data) {
         .tickValues(hours)
         .tickPadding(10);
 
-    let ticks = d3.max(temp_data, function(d) { return d.y; }) - d3.min(temp_data, function(d) { return d.y; });
+    let temp_max = d3.max(temp_data, function(d) { return d.y; }); 
+    let temp_min = d3.min(temp_data, function(d) { return d.y; });
+    let ticks = temp_max - temp_min;
     if (ticks < 3) ticks = 3;
     if (ticks > 12) ticks = 12;
      
@@ -229,9 +231,7 @@ function view(weather_data) {
 
 	// Scale the range of the data
 	x.domain([d3.min(temp_data, function(d) { return d.x; }), d3.max(temp_data, function(d) { return d.x; })]);
-	y.domain([
-        Math.floor(d3.min(temp_data, function(d) { return d.y; })) - 2, 
-        Math.ceil(d3.max(temp_data, function(d) { return d.y; }) + 4.5) ]);
+	y.domain([Math.floor(temp_min) - 2, Math.ceil(temp_max) + 4.5 ]);
 
     // Adds the svg canvas
     d3.select("svg").remove();
@@ -251,11 +251,11 @@ function view(weather_data) {
 		.attr("transform", "translate(0," + (height) + ")")
 		.call(xAxis);
 
-	// svg.append("g")		
-	// 	.attr("class", "xt axis")
-	// 	.attr("transform", "translate(0," + 0 + ")")
-	// 	.call(xAxisTop)
-        // .attr("opacity", "0.2");
+	svg.append("g")		
+		.attr("class", "xt axis")
+		.attr("transform", "translate(0," + 0 + ")")
+		.call(xAxisTop)
+        .attr("opacity", "0.2");
  
 	// Add the Y Axis
 	svg.append("g")		
@@ -293,6 +293,20 @@ function view(weather_data) {
       .select('line')
       .style('opacity', "0.3")
       .style('stroke-width', 2);
+
+    svg.append("linearGradient")				
+        .attr("id", "line-gradient")			
+        .attr("gradientUnits", "userSpaceOnUse")	
+        .attr("x1", 0).attr("y1", y(temp_min))			
+        .attr("x2", 0).attr("y2", y(temp_max))		
+    .selectAll("stop")						
+        .data([								
+            {offset: "0%", color: "blue"},		
+            {offset: "70%", color: "red"},	
+        ])					
+    .enter().append("stop")			
+        .attr("offset", function(d) { return d.offset; })
+        .attr("stop-color", function(d) { return d.color; });
 }
 
 // Функция формирования даты в человекочитаемом формате
