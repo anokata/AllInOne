@@ -1,0 +1,7 @@
+cd allInOne
+git pull
+mv -f diplompogoda/static/* ../mysite/static/
+mv -f diplompogoda/static/icon/* ../mysite/static/icon/
+mv -f diplompogoda/static/geo/* ../mysite/static/geo/
+mv -f diplompogoda/templates/* ../mysite/templates/
+mv -f diplompogoda/* ../mysite
