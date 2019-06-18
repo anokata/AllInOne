@@ -9,10 +9,6 @@
 body {
     background: #FFF;
 }
-svg {
-    background: #232323;
-    border:solid black 1px;
-}
 .country {
     stroke: black;
     stroke-width: 0.1;
@@ -167,10 +163,13 @@ svg {
 -->  
 </ul>
 
-<ul id="temp_chart">
-<div class="">
-    <svg></svg>
-</div>
+<ul class="temp_chart" >
+	<li>
+		<span>График почасового прогноза</span>
+		<div id="temp_chart">
+			<svg></svg>
+		</div>
+	</li>
 </ul>
 
 <ul class="two_section">

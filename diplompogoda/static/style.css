@@ -84,7 +84,7 @@ body {
 
 .two_section li {
   padding: 20px;
-  font-size: 14px;  
+  font-size: 12px;  
   background-color: white;
   border-radius: 10px;
   border: 1px solid #dadada;
@@ -104,6 +104,26 @@ body {
   border: 1px solid #dadada;
   box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
   list-style-type: none; 
+}
+
+.temp_chart li {
+  padding: 20px;
+  font-size: 14px;  
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #dadada;
+  box-shadow: 0 0 8px rgba(132, 129, 129, 0.5);
+  list-style-type: none; 
+}
+
+#temp_chart {
+	overflow-x: scroll;
+	width: 665px;
+}
+
+.temp_chart span {
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .info {
@@ -201,7 +221,7 @@ body {
 .forecast td {
 	text-align: -webkit-center;
 	border-right: 1px solid #c3bfbf;
-	width: 100px;
+	width: 85px;
 	padding-right: 5px;
 	padding-left: 5px;
 	cursor: pointer;
@@ -262,7 +282,7 @@ body {
     border: 5px;
     height: 25px;
     padding-left: 20px;
-    width: 288px;
+    width: 295px;
 }
 
 .ui-widget button {
@@ -300,7 +320,7 @@ body {
 
 .bottom_value {
 	text-align: left;
-	width: 130px;
+	width: 150px;
 }
 
 .bottom img {
@@ -443,6 +463,7 @@ path {
   fill: none;
 }
  
+ /* График */
 .axis path,
 .axis line {
 	fill: none;
@@ -451,17 +472,11 @@ path {
 	shape-rendering: crispEdges;
 }
 svg {
-  background: #fefefe;
+
 }
 
 .tick {
     font-size: 12px;
-}
-
-.axis path,
-.axis line{
-    fill: none;
-    stroke: black;
 }
 
 .line{
@@ -481,3 +496,6 @@ svg {
 .line {
     stroke: url(#line-gradient);
 }
+
+
+/* */
