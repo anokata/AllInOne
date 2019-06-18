@@ -191,3 +191,7 @@ https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
         hours.push(k);
     }
     */
+    //d3.select('.axis .tick:first-child').remove();
+    //d3.select('.y.axis .tick').remove();
+
+

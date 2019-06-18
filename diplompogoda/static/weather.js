@@ -151,45 +151,95 @@ function view(weather_data) {
     // Вывести погоду по времени суток на сегодня
 	show_part_weather(0);
     // Настройка графика температуры
+    make_chart(hour);
+}
+
+function make_chart(hour) {
+    // Почасовые данные о температуре и условиях
     let temp_data = [];
+    // Массив подписей для оси времени
     let hours = [];
+    // Количество дней
     let max_day = 3;
+    // Счётчик часов
     let i = hour;
+    // Массив индексов начала суток
     let zero_indexes = [];
+    // Размеры графика
+    let width = 1750; let height = 180;
+    // Отступы
+    let	margin = {top: 30, right: 50, bottom: 30, left: 50};
+     
     // Формирование данных для графика
     for (let d = 0; d < max_day; d++) {
+        // В первый день с последнего часа
         let k = hour;
+        // Если не первый день, то с 0 часа
         if (d) k = 0;
-        let ek = 24;
-        if (d == max_day-1) ek = hour - 2;
-        for (; k < ek; k++) {
+        // Всего часов в день
+        let end_k = 24;
+        // Если это последний день, то до последнего часа
+        if (d == max_day-1) end_k = hour - 2;
+        // Для каждого k-го часа
+        for (; k < end_k; k++) {
+            // Добавить координаты точки (время, температура) и условия в массив
             temp_data.push({
                 'x': k + d*24,
                 'y': weather_data[city].forecasts[d].hours[k].temp,
                 'c': weather_data[city].forecasts[d].hours[k].icon,
             });
+            // Добавить час для подписей
             hours.push(i);
             i++;
+            // Если начало дня - сохранить индекс
             if (k == 0) zero_indexes.push(i-1);
         }
     }
-    let width = 1750; let height = 180;
-    let	margin = {top: 30, right: 50, bottom: 30, left: 50};
-    // Set the ranges
+
+    // Расчёт минимальной и максимальной температуры в собранных данных
+    let temp_max = d3.max(temp_data, function(d) { return d.y; }); 
+    let temp_min = d3.min(temp_data, function(d) { return d.y; });
+    // Вычисление количества подписей для температуры
+    let ticks = temp_max - temp_min;
+    if (ticks < 3) ticks = 3;
+    if (ticks > 12) ticks = 12;
+
+    // Создание отрезков
     var	y = d3.scale.linear().range([height, 0]);
     var	x = d3.scale.linear().range([0, width]);
      
-    // Define the axes
+    // Создание нижней временной оси
     var	xAxis = d3.svg.axis().scale(x)
         .orient("bottom");
 
+    // Создание верхней оси
     var	xAxisTop = d3.svg.axis().scale(x)
         .orient("top");
 
+    // Создание левой оси температуры
+    var	yAxis = d3.svg.axis().scale(y)
+        .orient("left").ticks(ticks)
+        .innerTickSize(-width)
+        .outerTickSize(0)
+        .tickPadding(5)
+        .tickFormat(function(d, i){
+            return human_temp_grad(d);
+        });
+
+    // Создание правой оси температуры
+    var	yAxisRight = d3.svg.axis().scale(y)
+        .orient("right").ticks(ticks)
+        .tickPadding(5)
+        .tickFormat(function(d, i){
+            return human_temp_grad(d);
+        });
+
+    // Настройка верхней оси
     xAxisTop.ticks(0)
         .innerTickSize(0)
         .outerTickSize(0);
 
+    // Настройка нижней оси времени, расстановка отметок
     xAxis.ticks(12)
         .tickFormat(function(d, i){
             let h = d % 24;
@@ -200,64 +250,45 @@ function view(weather_data) {
         .outerTickSize(0)
         .tickValues(hours)
         .tickPadding(10);
-
-    let temp_max = d3.max(temp_data, function(d) { return d.y; }); 
-    let temp_min = d3.min(temp_data, function(d) { return d.y; });
-    let ticks = temp_max - temp_min;
-    if (ticks < 3) ticks = 3;
-    if (ticks > 12) ticks = 12;
      
-    var	yAxis = d3.svg.axis().scale(y)
-        .orient("left").ticks(ticks)
-        .innerTickSize(-width)
-        .outerTickSize(0)
-        .tickPadding(5)
-        .tickFormat(function(d, i){
-            return human_temp_grad(d);
-        });
+    // Установка областей значений отрезков
+	x.domain([d3.min(temp_data, function(d) { return d.x; }), d3.max(temp_data, function(d) { return d.x; })]);
+	y.domain([Math.floor(temp_min) - 2, Math.ceil(temp_max) + 4.5 ]);
 
-    var	yAxisRight = d3.svg.axis().scale(y)
-        .orient("right").ticks(ticks)
-        .tickPadding(5)
-        .tickFormat(function(d, i){
-            return human_temp_grad(d);
-        });
-     
-    // Define the line
+    // Создание температурной линии
     var	valueline = d3.svg.line()
         .interpolate("basis")
         .x(function(d) { return x(d.x); })
         .y(function(d) { return y(d.y); });
 
-	// Scale the range of the data
-	x.domain([d3.min(temp_data, function(d) { return d.x; }), d3.max(temp_data, function(d) { return d.x; })]);
-	y.domain([Math.floor(temp_min) - 2, Math.ceil(temp_max) + 4.5 ]);
-
-    // Adds the svg canvas
+    // Очистка графика
     d3.select("svg").remove();
+    // Создание и настройка SVG элемента
     var	svg = d3.select("#temp_chart").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	// Add the valueline path.
+
+	// Добавление линии температуры на график
 	svg.append("path")	
 		.attr("class", "line")
 		.attr("d", valueline(temp_data));
 
-	// Add the X Axis
+	// Добавление оси времени
 	svg.append("g")		
 		.attr("class", "x axis")
 		.attr("transform", "translate(0," + (height) + ")")
 		.call(xAxis);
 
+	// Добавление верхней оси
 	svg.append("g")		
 		.attr("class", "xt axis")
 		.attr("transform", "translate(0," + 0 + ")")
 		.call(xAxisTop)
         .attr("opacity", "0.2");
  
-	// Add the Y Axis
+	// Добавление осей температуры
 	svg.append("g")		
 		.attr("class", "y axis")
 		.call(yAxis);
@@ -266,10 +297,7 @@ function view(weather_data) {
 		.call(yAxisRight)
         .attr("transform", "translate(" + (width) + "," + 0 + ")");
 
-    //d3.select('.axis .tick:first-child').remove();
-    //d3.select('.y.axis .tick').remove();
-
-
+    // Добавление иконок условий погоды по точками температурной линии
     svg.append('g')
         .classed('labels-group', true)
         .selectAll('text')
@@ -288,12 +316,14 @@ function view(weather_data) {
         .attr('x', function(d,i) { return x(d.x); })
         .attr('y', function(d,i) { return y(d.y); });
 
+    // Выделение линий сетки для начала дня
     d3.selectAll('.x.axis g.tick')
       .filter(function(d){ return zero_indexes.indexOf(d) != -1;} )
       .select('line')
       .style('opacity', "0.3")
       .style('stroke-width', 2);
 
+    // Создание цветового градиента
     svg.append("linearGradient")				
         .attr("id", "line-gradient")			
         .attr("gradientUnits", "userSpaceOnUse")	
@@ -304,9 +334,9 @@ function view(weather_data) {
             {offset: "0%", color: "blue"},		
             {offset: "70%", color: "red"},	
         ])					
-    .enter().append("stop")			
-        .attr("offset", function(d) { return d.offset; })
-        .attr("stop-color", function(d) { return d.color; });
+        .enter().append("stop")			
+            .attr("offset", function(d) { return d.offset; })
+            .attr("stop-color", function(d) { return d.color; });
 }
 
 // Функция формирования даты в человекочитаемом формате
