@@ -151,6 +151,7 @@ function view(weather_data) {
     // Вывести погоду по времени суток на сегодня
 	show_part_weather(0);
     // ---------- TODO chart
+	/*
     let temp_data = [];
     for (let k = hour; k < hour + 13; k++) {
         let h = k % 24;
@@ -201,7 +202,7 @@ function view(weather_data) {
 	svg.append("g")		
 		.attr("class", "y axis")
 		.call(yAxis);
-
+*/
 }
 
 // Функция формирования даты в человекочитаемом формате
