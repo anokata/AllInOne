@@ -457,22 +457,23 @@ svg {
 .tick {
     font-size: 12px;
 }
+
 .axis path,
 .axis line{
-fill: none;
-stroke: black;
+    fill: none;
+    stroke: black;
 }
 
 .line{
-fill: none;
-stroke: #e66;
-stroke-width: 2px;
+    fill: none;
+    stroke: #e66;
+    stroke-width: 2px;
 }
 
 .tick text{
-font-size: 12px;
+    font-size: 12px;
 }
 
 .tick line{
-opacity: 0.2;
+    opacity: 0.2;
 }

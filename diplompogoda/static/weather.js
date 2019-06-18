@@ -155,19 +155,24 @@ function view(weather_data) {
     let hours = [];
     let max_day = 3;
     let i = hour;
+    // Формирование данных для графика
     for (let d = 0; d < max_day; d++) {
         let k = hour;
         if (d) k = 0;
         let ek = 24;
         if (d == max_day-1) ek = hour - 2;
         for (; k < ek; k++) {
-            temp_data.push({'x': k + d*24,'y': weather_data[city].forecasts[d].hours[k].temp});
+            temp_data.push({
+                'x': k + d*24,
+                'y': weather_data[city].forecasts[d].hours[k].temp,
+                'c': weather_data[city].forecasts[d].hours[k].icon,
+            });
             hours.push(i);
             i++;
         }
     }
     let width = 1750; let height = 180;
-    let	margin = {top: 30, right: 20, bottom: 30, left: 50};
+    let	margin = {top: 30, right: 50, bottom: 30, left: 50};
     // Set the ranges
     var	y = d3.scale.linear().range([height, 0]);
     var	x = d3.scale.linear().range([0, width]);
@@ -179,7 +184,6 @@ function view(weather_data) {
     xAxis.ticks(12)
         .tickFormat(function(d, i){
             let h = d % 24;
-            //return d3.format('c')(0x26C5) + h + ":00";
             return h + ":00";
             
         })
@@ -200,6 +204,13 @@ function view(weather_data) {
         .tickFormat(function(d, i){
             return human_temp_grad(d);
         });
+
+    var	yAxisRight = d3.svg.axis().scale(y)
+        .orient("right").ticks(ticks)
+        .tickPadding(5)
+        .tickFormat(function(d, i){
+            return human_temp_grad(d);
+        });
      
     // Define the line
     var	valueline = d3.svg.line()
@@ -209,7 +220,9 @@ function view(weather_data) {
 
 	// Scale the range of the data
 	x.domain([d3.min(temp_data, function(d) { return d.x; }), d3.max(temp_data, function(d) { return d.x; })]);
-	y.domain([d3.min(temp_data, function(d) { return d.y; })-5, d3.max(temp_data, function(d) { return d.y; })]);
+	y.domain([
+        Math.floor(d3.min(temp_data, function(d) { return d.y; })) - 2, 
+        Math.ceil(d3.max(temp_data, function(d) { return d.y; }) + 4.5) ]);
 
     // Adds the svg canvas
     d3.select("svg").remove();
@@ -233,18 +246,32 @@ function view(weather_data) {
 	svg.append("g")		
 		.attr("class", "y axis")
 		.call(yAxis);
-    d3.select('.axis .tick:first-child').remove();
-    d3.select('.y.axis .tick').remove();
+	svg.append("g")		
+		.attr("class", "yr axis")
+		.call(yAxisRight)
+        .attr("transform", "translate(" + (width) + "," + 0 + ")");
+
+    //d3.select('.axis .tick:first-child').remove();
+    //d3.select('.y.axis .tick').remove();
 
 
-    //
-    d3.select("svg").selectAll(".dot")
-        .data(temp_data)
-        .enter().append("circle")
-          .attr("class", "dot")
-          .attr("r", 3)
-          .attr("cx", function(d) { return x(d.x); })
-          .attr("cy", function(d) { return y(d.y); });
+    svg.append('g')
+        .classed('labels-group', true)
+        .selectAll('text')
+        .data(temp_data).enter()
+        .append("image")
+        .attr("xlink:href", function(d, k) {
+            if (k != (i - hour - 1))
+                return make_icon(d.c)
+            return "";
+        })
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("transform", "translate(" + 10 + ","  + -35 + ")")
+        .attr('x', function(d,i) { return x(d.x); })
+        .attr('y', function(d,i) { return y(d.y); });
 }
 
 // Функция формирования даты в человекочитаемом формате
@@ -499,4 +526,29 @@ function human_uv(uv) {
     } else {
         return "";
     }
+}
+
+function condition2d3unicode(c) {
+    let uni = {
+		"clear": "🌧",
+		"partly-cloudy": "0x26C5",
+		"cloudy": "0x2601",
+		"overcast": "0x",
+		"partly-cloudy-and-light-rain": "0x26C8",
+		"partly-cloudy-and-rain": "0x26C8",
+		"overcast-and-rain": "0x26C8",
+		"overcast-thunderstorms-with-rain": "0x26C8",
+		"cloudy-and-light-rain": "0x26C8",
+		"overcast-and-light-rain": "0x26C8",
+		"cloudy-and-rain": "0x26C8",
+		"overcast-and-wet-snow": "0x2603",
+		"partly-cloudy-and-light-snow": "0x2603",
+		"partly-cloudy-and-snow": "0x2603",
+		"overcast-and-snow": "0x2603",
+		"cloudy-and-light-snow": "0x2603",
+		"overcast-and-light-snow": "0x2603",
+		"cloudy-and-snow": "0x2603",
+    }
+    return uni[c];
+    return d3.format('c')(uni[c]);
 }
