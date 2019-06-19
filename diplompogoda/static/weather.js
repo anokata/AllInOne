@@ -308,11 +308,13 @@ function make_chart(hour) {
         .attr('x', function(d,i) { return x(d.x); })
         .attr('y', function(d,i) { return y(d.y); });
 
+    // Добавление правой оси температуры
 	svg.append("g")		
 		.attr("class", "yr axis")
 		.call(yAxisRight)
         .attr("transform", "translate(" + (width) + "," + 0 + ")");
 
+    // Создание и добавление фона оси ординат
     let yAxisBack = svg.append("rect")
         .attr("fill", "white")
         .attr("x", -20)
@@ -320,6 +322,7 @@ function make_chart(hour) {
         .attr("height", 190)
         .attr("transform", "translate(" + (0 - 30) + "," + 0 + ")");
 
+    // Привязка события прокрутки для перемещения оси ординат с фоном
     d3.select("#temp_chart").on("scroll", function () {
         d3.select(".y.axis").attr("transform", "translate(" + this.scrollLeft + "," + 0 + ")");
         yAxisBack.attr("transform", "translate(" + (this.scrollLeft - 30) + "," + 0 + ")");
