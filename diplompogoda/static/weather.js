@@ -219,7 +219,7 @@ function make_chart(hour) {
     // Создание левой оси температуры
     var	yAxis = d3.svg.axis().scale(y)
         .orient("left").ticks(ticks)
-        .innerTickSize(-width)
+        .innerTickSize(0)
         .outerTickSize(0)
         .tickPadding(5)
         .tickFormat(function(d, i){
@@ -230,6 +230,7 @@ function make_chart(hour) {
     var	yAxisRight = d3.svg.axis().scale(y)
         .orient("right").ticks(ticks)
         .tickPadding(5)
+        .innerTickSize(-width)
         .tickFormat(function(d, i){
             return human_temp_grad(d);
         });
@@ -288,15 +289,6 @@ function make_chart(hour) {
 		.call(xAxisTop)
         .attr("opacity", "0.2");
  
-	// Добавление осей температуры
-	svg.append("g")		
-		.attr("class", "y axis")
-		.call(yAxis);
-	svg.append("g")		
-		.attr("class", "yr axis")
-		.call(yAxisRight)
-        .attr("transform", "translate(" + (width) + "," + 0 + ")");
-
     // Добавление иконок условий погоды по точками температурной линии
     svg.append('g')
         .classed('labels-group', true)
@@ -315,6 +307,29 @@ function make_chart(hour) {
         .attr("transform", "translate(" + 10 + ","  + -35 + ")")
         .attr('x', function(d,i) { return x(d.x); })
         .attr('y', function(d,i) { return y(d.y); });
+
+	svg.append("g")		
+		.attr("class", "yr axis")
+		.call(yAxisRight)
+        .attr("transform", "translate(" + (width) + "," + 0 + ")");
+
+    let yAxisBack = svg.append("rect")
+        .attr("fill", "white")
+        .attr("x", -20)
+        .attr("width", 50)
+        .attr("height", 190)
+        .attr("transform", "translate(" + (0 - 30) + "," + 0 + ")");
+
+    d3.select("#temp_chart").on("scroll", function () {
+        d3.select(".y.axis").attr("transform", "translate(" + this.scrollLeft + "," + 0 + ")");
+        yAxisBack.attr("transform", "translate(" + (this.scrollLeft - 30) + "," + 0 + ")");
+    });
+
+	// Добавление осей температуры
+	svg.append("g")		
+		.attr("class", "y axis")
+		.call(yAxis);
+
 
     // Выделение линий сетки для начала дня
     d3.selectAll('.x.axis g.tick')
@@ -337,6 +352,7 @@ function make_chart(hour) {
         .enter().append("stop")			
             .attr("offset", function(d) { return d.offset; })
             .attr("stop-color", function(d) { return d.color; });
+
 }
 
 // Функция формирования даты в человекочитаемом формате
