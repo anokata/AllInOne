@@ -348,6 +348,7 @@ function update() {
 
 // Подпрограмма отображения погоды города по имени
 function render_city(city, is_rotate) {
+    if (!city) return;
     // Очистить поле ввода
     $("#cities").val("");
     // Получение названия страны по городу
@@ -390,6 +391,7 @@ function city_by_name(city_name) {
 
     // Иначе поиск в списке городов с координатами
     city_data = cities_coords[city_name];
+    if (!city_data) return null;
     // Извлечение координат города
     lat = city_data[0];
     lon = city_data[1];
