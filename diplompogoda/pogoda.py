@@ -20,7 +20,7 @@ YANDEX_WHEATHER_URL = "https://api.weather.yandex.ru/v1/forecast"
 CACHE_FILE = "weather.json"
 # Кеш = словарь, ключ=координаты, значение=погодные данные по этим координатам
 # Флаг использования только кеша (для отладки)
-CACHE_ONLY = False
+CACHE_ONLY = True
 #"a57bd39d-59d5-47e1-9bfe-00d40e2676c8"
 #"73f1e491-d7be-40b2-8f72-d69e4cdf09cd"
 
