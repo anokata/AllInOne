@@ -30,6 +30,7 @@ const CITY_COLOR = "#333";
 const COUNTRY_TEXT_COLOR = "#ffffff";
 const RIVER_COLOR = '#0e67a4';
 const EDGE_COLOR = '#111';
+const GRATICULE_COLOR = '#bbb';
 const FONT_STYLE = "px Arial,Helvetica,sans-serif";
 // Словарь аббревиатур стран
 const COUNTRY_ABBREV = {
@@ -44,6 +45,8 @@ const COUNTRY_ABBREV = {
 var width, height;
 // Объект проекции
 var projection;
+// Генератор сетки
+var graticule;
 // Чувствительность перетаскивания
 var sens = 0.25;
 // Минимальная дистанция для попадания в город
@@ -136,6 +139,9 @@ function setMap() {
 
     // Настойка размера точек
     geoGenerator.pointRadius(1.5);
+
+    // Создание генератора сетки
+    graticule = d3.geo.graticule().step([10, 10]);
 
     // Загрузка данных
     loadData();
@@ -332,6 +338,8 @@ function update() {
 
     // Отображение границ стран
     draw_countries();
+    // Отображение сетки меридиан и параллелей
+    draw_graticule();
     // Отображение линий рек
     draw_rivers();
     // Отображение озёр
@@ -344,6 +352,15 @@ function update() {
     draw_city(near_city, NEAR_CITY_COLOR);
     // Отображение выбранного города
     draw_city(selected_city, SELECTED_CITY_COLOR);
+}
+
+function draw_graticule() {
+    // Настройка цвета и толщины линий
+    context.strokeStyle = GRATICULE_COLOR;
+    context.lineWidth = 0.5;
+    context.beginPath();
+    geoGenerator(graticule());
+    context.stroke();
 }
 
 // Подпрограмма отображения погоды города по имени
