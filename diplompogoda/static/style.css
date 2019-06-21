@@ -11,6 +11,10 @@ body {
     padding-top: 10px;
 }
 
+.dragged {
+    cursor: move;
+}
+
 .ui-menu {
 	max-height: 500px;
 	overflow-y: scroll;

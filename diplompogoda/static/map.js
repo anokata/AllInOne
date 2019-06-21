@@ -236,6 +236,9 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
             // Если точка сменилась - значит перетаскивание
             if (!(evt.pageX === startingPos[0] && evt.pageY === startingPos[1])) {
                 isDragging = true;
+                if (evt.buttons == 1) {
+                    $("#map").addClass("dragged");
+                }
             }
         });
 
@@ -265,6 +268,7 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
     // Обработчик отпускания кнопки мыши
     d3.selectAll("canvas")
       .on("mouseup", function () {
+          $("#map").removeClass("dragged");
           // В случае если это был клик, а не перетаскивание
           if (!isDragging) {
               // Взять точку на которую указывает мышь
@@ -294,6 +298,9 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
     $("body").on("mousemove", function() {
           tooltip_hide();
           clearTimeout(tooltip_timer);
+    });
+    $("html").on("mouseup", function() {
+          $("#map").removeClass("dragged");
     });
 
     // Привязка обработчика клика на каждый из дней краткой сводки погоды
