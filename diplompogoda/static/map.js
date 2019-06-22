@@ -106,7 +106,8 @@ function init() {
         else {
             // Уменьшить масштаб
             scale_projection(-SCALE_VAL/2);
-        }
+        };
+		event.preventDefault();
     });
 }
 
