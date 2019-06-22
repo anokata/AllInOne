@@ -1,0 +1,12 @@
+This is TeX, Version 3.14159265 (TeX Live 2018/Arch Linux) (preloaded format=tex 2019.6.20)  22 JUN 2019 20:33
+**hw.tex
+(./hw.tex
+Missing character: There is no ^^d0 in font cmr10!
+Missing character: There is no ^^af in font cmr10!
+
+! Undefined control sequence.
+l.14 abcde \tenpoint
+                    
+? 
+[1] )
+Output written on hw.dvi (1 page, 584 bytes).
