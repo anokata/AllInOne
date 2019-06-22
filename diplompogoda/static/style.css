@@ -1,18 +1,38 @@
 body {
-  padding: 20px;
+/*  padding: 20px;  */
   font-family: Helvetica;
   background: #545859;
  /* background: linear-gradient(360deg, #EECFBA, #C5DDE8);*/
   cursor: default;
+  overflow-x: hidden;
 }
 
 #map > div {
 	padding-bottom: 30px;
-    padding-top: 10px;
+ /*   padding-top: 10px;  */
 }
 
 .dragged {
     cursor: move;
+}
+
+#footer {
+    background: #b1d5e526;
+    color: #ffffff69; 
+    width: 100%;	
+	clear: left;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 150px;
+   }
+
+.weatherglob { 
+	font-size: 40px;
+	padding-bottom: 15px;
+	color: white;
+	margin-left: 30px;
+	width: 300px;
+	padding-top: 20px;
 }
 
 .ui-menu {
@@ -23,6 +43,7 @@ body {
 
 .ui-widget {
 	padding-left: 40px;
+	padding-top: 20px;
 }
 
 .one_section {
