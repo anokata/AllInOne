@@ -9,7 +9,8 @@ from datetime import timedelta
 app = Flask(__name__)
 # API-ключ к сервису Яндекс.Погоды
 #YANDEX_WHEATHER_APIKEY = "43a9fa46-f747-4526-87ed-518f094abe2b"
-YANDEX_WHEATHER_APIKEY = "2d001a12-9851-4254-ae73-b95e65a4170c"
+#YANDEX_WHEATHER_APIKEY = "2d001a12-9851-4254-ae73-b95e65a4170c"
+YANDEX_WHEATHER_APIKEY = "f5179842-5f92-4942-ad9e-169ec224452c"
 # keys:
 #1553bb9f-a1a2-40d3-8662-1c7d53c994f1
 #fc2d8810-310e-44c7-86ce-1beb9ff466e7
