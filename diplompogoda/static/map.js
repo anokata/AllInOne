@@ -330,6 +330,14 @@ function processData(error, worldMap, lakesMap, riversMap, townsMap) {
 		$("#five_toggle").addClass("fiveten_selected");
 		$("#ten_toggle").removeClass("fiveten_selected");
 	});
+
+    $("#temp_chart").bind('mousewheel DOMMouseScroll', function(event){
+        let ds = event.originalEvent.wheelDelta || event.originalEvent.detail;
+        if (Math.abs(ds) < 10) ds *= 100;
+        let chart = $("#temp_chart")[0];
+        chart.scrollLeft += ds;
+		event.preventDefault();
+    });
 }
 
 // Подпрограмма отрисовки глобуса со всем содержимым
