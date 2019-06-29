@@ -4,17 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
-import android.widget.Toast;
 import android.view.View;
-import android.content.ClipboardManager;
-import android.content.ClipData;
+import android.graphics.Color;
 
 public class MainActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	setContentView(R.layout.activity_main);
+	//setContentView(R.layout.activity_main);
 
 	TextView text = (TextView)findViewById(R.id.my_text);
 	text.setText("Hi");
@@ -23,5 +21,9 @@ public class MainActivity extends Activity {
 	  public void onClick(View v) {
 	  }
 	});
+
+      View bouncingBallView = new BouncingBallView(this);
+      setContentView(bouncingBallView);
+      bouncingBallView.setBackgroundColor(Color.BLACK);
   }
 }
