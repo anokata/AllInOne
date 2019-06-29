@@ -1,18 +1,23 @@
-local background = display.newImageRect( "background.png", 350, 570 )
+local background = display.newImageRect( "map.png", 1000, 1000 )
 background.x = display.contentCenterX
 background.y = display.contentCenterY
+background.fill.effect = "filter.blur"
 
-local platform = display.newImageRect( "platform.png", 300, 50 )
-platform.x = display.contentCenterX
-platform.y = display.contentHeight-25
+local entity = display.newImageRect("entity1.png", 30, 30)
+entity.x = entity.width
+entity.y = display.contentHeight - entity.height
 
-local balloon = display.newImageRect( "balloon.png", 112, 112 )
-balloon.x = display.contentCenterX
-balloon.y = display.contentCenterY
-balloon.alpha = 0.8
+local function logt(t)
+    for k,v in pairs(t) do print(k,v) end
+end
 
-local physics = require( "physics" )
-physics.start()
+local function goToMap(event)
+    logt(event)
+    entity.x = event.x
+    entity.y = event.y
+end
 
-physics.addBody( platform, "static" )
-physics.addBody( balloon, "dynamic", { radius=50, bounce=0.3 } )
+background:addEventListener("tap", goToMap)
+
+local text = display.newText("123", display.contentCenterX, 20, native.systemFont, 40 )
+text:setFillColor(20, 100, 0)
