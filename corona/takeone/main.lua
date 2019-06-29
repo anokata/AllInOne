@@ -1,3 +1,15 @@
+local function logt(t)
+    print('')
+    for k,v in pairs(t) do print(k,v) end
+end
+
+tiled = require "com.ponywolf.ponytiled"
+local mapData = require "map1" 
+local map = tiled.new(mapData)
+map:translate(0,0)
+--map:centerObject
+logt(map)
+
 local background = display.newImageRect( "map.png", 1000, 1000 )
 background.x = display.contentCenterX
 background.y = display.contentCenterY
@@ -7,9 +19,6 @@ local entity = display.newImageRect("entity1.png", 30, 30)
 entity.x = entity.width
 entity.y = display.contentHeight - entity.height
 
-local function logt(t)
-    for k,v in pairs(t) do print(k,v) end
-end
 
 local function goToMap(event)
     logt(event)
