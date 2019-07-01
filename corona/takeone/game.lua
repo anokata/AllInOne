@@ -1,5 +1,6 @@
 local composer = require( "composer" )
 local physics = require( "physics" )
+local json = require( "json" )
 local scene = composer.newScene()
 local entity
 local background
@@ -9,6 +10,22 @@ local uiGroup
 local tick = 0
 local text 
 local map
+local saveGame = {}
+local filePath = system.pathForFile( "saveGame.json", system.DocumentsDirectory )
+
+local function loadProgress()
+    local file = io.open( filePath, "r" )
+    if file then
+        local contents = file:read( "*a" )
+        io.close( file )
+        saveGame = json.decode( contents )
+    end
+ 
+    if ( saveGame == nil or #saveGame == 0 ) then
+        saveGame = { }
+    end
+end
+ 
 
 local function logt(t)
     print('')
@@ -42,8 +59,9 @@ end
 
 local function gameLoop()
     tick = tick + 1 
+    composer.setVariable( "tick", tick )
     display.remove(text)
-    text = display.newText("t=" .. tick, display.contentCenterX, 20, native.systemFont, 40 )
+    text = display.newText(uiGroup, "t=" .. tick, display.contentCenterX, 20, native.systemFont, 40 )
     text:setFillColor(20, 100, 0)
 end
 
@@ -74,6 +92,10 @@ function scene:create( event )
     entity.myName = "entity"
     background:addEventListener("tap", goToMap)
     entity:addEventListener("touch", drag)
+
+    local menuButton = display.newText( sceneGroup, "Menu", 30, 0, native.systemFont, 20 )
+    menuButton:setFillColor( 0.82, 0.86, 0 )
+    menuButton:addEventListener( "tap", function() composer.gotoScene( "menu") end )
 
 end
 
@@ -107,9 +129,12 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
+        timer.cancel( gameLoopTimer )
 
 	elseif ( phase == "did" ) then
-		-- Code here runs immediately after the scene goes entirely off screen
+        --Runtime:removeEventListener( "collision", onCollision )
+        -- physics.pause()
+        composer.removeScene( "game" )
 
 	end
 end
