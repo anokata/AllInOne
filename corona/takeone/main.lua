@@ -10,15 +10,24 @@ map:translate(0,0)
 --map:centerObject
 logt(map)
 
-local background = display.newImageRect( "map.png", 1000, 1000 )
+local backGroup = display.newGroup()
+local mainGroup = display.newGroup()
+local uiGroup = display.newGroup()
+
+local background = display.newImageRect(backGroup, "map.png", 1000, 1000)
 background.x = display.contentCenterX
 background.y = display.contentCenterY
 background.fill.effect = "filter.blur"
 
-local entity = display.newImageRect("entity1.png", 30, 30)
+local entity = display.newImageRect(mainGroup, "entity1.png", 30, 30)
 entity.x = entity.width
 entity.y = display.contentHeight - entity.height
+entity.myName = "entity"
+-- local physics = require( "physics" )
+-- physics.start()
+-- physics.addBody(entity, { radius=30, isSensor=true } )
 
+display.setStatusBar( display.HiddenStatusBar )
 
 local function goToMap(event)
     logt(event)
