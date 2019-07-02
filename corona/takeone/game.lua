@@ -17,11 +17,19 @@ function loadMap()
     local mapData = require "map32" 
     map = tiled.new(mapData)
     map:translate(0,0)
-    --map:centerObject
 end
 
 local function goToMap(event)
-    transition.to(entity, { y=event.y, x=event.x, time=500, } )
+    -- transition.to(entity, { y=event.y, x=event.x, time=500, } )
+    local dx = entity.x - event.x
+    local dy = entity.y - event.y
+    -- dx = dx / math.abs(dx)
+    -- dy = dy / math.abs(dy)
+
+    -- entity:setLinearVelocity(-100 * dx , -100 * dy)
+    entity:setLinearVelocity(-10* dx , -10* dy)
+
+    -- map:centerObject(entity)
     audio.play( piuSound )
 end
 
@@ -68,8 +76,8 @@ function scene:create( event )
     background.fill.effect = "filter.blur"
 
     entity = display.newImage(mainGroup, "g2.png")
-    entity.x = entity.width
-    entity.y = display.contentHeight - entity.height
+    entity.x = 200
+    entity.y = 200
     entity.myName = "entity"
     background:addEventListener("tap", goToMap)
     entity:addEventListener("touch", drag)
@@ -105,15 +113,18 @@ function scene:show( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
         gameLoopTimer = timer.performWithDelay( 500, gameLoop, 0 )
-        -- Runtime:addEventListener( "collision", onCollision )
-        -- physics.start()
-        -- physics.addBody(entity, { radius=30, isSensor=true } )
+        Runtime:addEventListener( "collision", onCollision )
+        physics.setGravity( 0, 0 )
+        physics.addBody(entity, "dynamic", { radius=30, isSensor=false } )
         --audio.play( introSound,  { channel=1, loops=-1 } )
 
 
 	end
 end
 
+function onCollision() 
+print("collide")
+end
 
 -- hide()
 function scene:hide( event )
