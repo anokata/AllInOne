@@ -34,7 +34,7 @@ end
 
 function loadMap() 
     tiled = require "com.ponywolf.ponytiled"
-    local mapData = require "map1" 
+    local mapData = require "map32" 
     map = tiled.new(mapData)
     map:translate(0,0)
     --map:centerObject
@@ -86,7 +86,7 @@ function scene:create( event )
     background.y = display.contentCenterY
     background.fill.effect = "filter.blur"
 
-    entity = display.newImageRect(mainGroup, "entity1.png", 30, 30)
+    entity = display.newImage(mainGroup, "g2.png")
     entity.x = entity.width
     entity.y = display.contentHeight - entity.height
     entity.myName = "entity"

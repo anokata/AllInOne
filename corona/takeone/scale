@@ -1,0 +1,2 @@
+# get size * 4
+convert $1 -scale 128x128 $2
