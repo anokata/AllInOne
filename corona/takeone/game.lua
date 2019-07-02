@@ -1,36 +1,16 @@
 local composer = require( "composer" )
 local physics = require( "physics" )
-local json = require( "json" )
 local scene = composer.newScene()
 local entity
 local background
 local backGroup
 local mainGroup
 local uiGroup
-local tick = 0
 local text 
 local map
-local saveGame = {}
-local filePath = system.pathForFile( "saveGame.json", system.DocumentsDirectory )
-
-local function loadProgress()
-    local file = io.open( filePath, "r" )
-    if file then
-        local contents = file:read( "*a" )
-        io.close( file )
-        saveGame = json.decode( contents )
-    end
- 
-    if ( saveGame == nil or #saveGame == 0 ) then
-        saveGame = { }
-    end
-end
- 
-
-local function logt(t)
-    print('')
-    for k,v in pairs(t) do print(k,v) end
-end
+local piuSound
+local introSound
+local tick = 0
 
 function loadMap() 
     tiled = require "com.ponywolf.ponytiled"
@@ -38,11 +18,11 @@ function loadMap()
     map = tiled.new(mapData)
     map:translate(0,0)
     --map:centerObject
-    -- logt(map)
 end
 
 local function goToMap(event)
     transition.to(entity, { y=event.y, x=event.x, time=500, } )
+    audio.play( piuSound )
 end
 
 local function drag(event)
@@ -60,6 +40,7 @@ end
 local function gameLoop()
     tick = tick + 1 
     composer.setVariable( "tick", tick )
+    saveGame.tick = tick
     display.remove(text)
     text = display.newText(uiGroup, "t=" .. tick, display.contentCenterX, 20, native.systemFont, 40 )
     text:setFillColor(20, 100, 0)
@@ -93,10 +74,22 @@ function scene:create( event )
     background:addEventListener("tap", goToMap)
     entity:addEventListener("touch", drag)
 
-    local menuButton = display.newText( sceneGroup, "Menu", 30, 0, native.systemFont, 20 )
-    menuButton:setFillColor( 0.82, 0.86, 0 )
-    menuButton:addEventListener( "tap", function() composer.gotoScene( "menu") end )
+    --composer.setVariable( "tick", saveGame.tick )
+    print("LOOADDDDDD", saveGame.tick, tick)
+    if (saveGame.tick ~= nil) then
+        tick = saveGame.tick
+    end
 
+    piuSound= audio.loadSound( "sound/piu.wav" )
+    introSound= audio.loadSound( "sound/meowtekA.wav" )
+
+end
+
+local function handleButtonEvent( event )
+ 
+    if ( "ended" == event.phase ) then
+        print( "Button was pressed and released" )
+    end
 end
 
 
@@ -115,6 +108,7 @@ function scene:show( event )
         -- Runtime:addEventListener( "collision", onCollision )
         -- physics.start()
         -- physics.addBody(entity, { radius=30, isSensor=true } )
+        --audio.play( introSound,  { channel=1, loops=-1 } )
 
 
 	end
@@ -129,11 +123,14 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-        timer.cancel( gameLoopTimer )
+        if ( gameLoopTimer ~= nil ) then
+            timer.cancel( gameLoopTimer )
+        end
 
 	elseif ( phase == "did" ) then
         --Runtime:removeEventListener( "collision", onCollision )
         -- physics.pause()
+        audio.stop( 1 )
         composer.removeScene( "game" )
 
 	end
@@ -145,7 +142,8 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-
+    audio.dispose( piuSound)
+    audio.dispose( introSound )
 end
 
 
