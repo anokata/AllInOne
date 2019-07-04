@@ -13,6 +13,18 @@ local piuSound
 local introSound
 local tick = 0
 
+function mapXY2IJ(x, y)
+    local i = math.floor(x / mapData.tilewidth)
+    local j = math.floor(y / mapData.tileheight)
+    return {["i"]= i, ["j"]= j}
+end
+
+function mapIJ2XY(i, j)
+    local x = i * mapData.tilewidth
+    local y = j * mapData.tileheight
+    return {["x"]= x, ["y"]= y}
+end
+
 function loadMap() 
     tiled = require "com.ponywolf.ponytiled"
     mapData = require "map32" 
@@ -22,11 +34,16 @@ end
 
 local function goToMap(event)
     --transition.to(entity, { y=event.y, x=event.x, time=500} )
-    transition.to(map, { y=-event.y, x=-event.x, time=500} )
+    --transition.to(map, { y=-event.y, x=-event.x, time=500} )
     -- local dx = entity.x - event.x
     -- local dy = entity.y - event.y
     -- entity:setLinearVelocity(-10* dx , -10* dy)
-    audio.play( piuSound )
+    --audio.play( piuSound )
+    i, j = mapXY2IJ(event.x, event.y).i,mapXY2IJ(event.x, event.y).j
+    print(i, j)
+    print(mapIJ2XY(i, j).x,mapIJ2XY(i, j).y)
+    x, y = mapIJ2XY(i, j).x,mapIJ2XY(i, j).y
+    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=5} )
 end
 
 local function drag(event)
