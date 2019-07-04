@@ -41,6 +41,16 @@ local function goToMap(event)
     --audio.play( piuSound )
     i, j = mapXY2IJ(event.x, event.y).i,mapXY2IJ(event.x, event.y).j
     print(i, j)
+    if (i > 6) then
+        i = 6
+    end
+    if (j > 10) then
+        -- TODO move map
+        local mapDy = mapData.tileheight * (j - 10)
+        -- карта уже сдвинута на mapData.y
+        --
+        j = 10
+    end
     print(mapIJ2XY(i, j).x,mapIJ2XY(i, j).y)
     x, y = mapIJ2XY(i, j).x,mapIJ2XY(i, j).y
     transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=5} )
