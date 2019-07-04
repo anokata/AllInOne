@@ -10,7 +10,9 @@ return {
   tileheight = 32,
   nextlayerid = 7,
   nextobjectid = 10,
-  properties = {},
+  properties = {
+    ["walktiles"] = "1,2,3"
+  },
   tilesets = {
     {
       name = "tileset128",

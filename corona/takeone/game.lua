@@ -8,28 +8,24 @@ local mainGroup
 local uiGroup
 local text 
 local map
+local mapData
 local piuSound
 local introSound
 local tick = 0
 
 function loadMap() 
     tiled = require "com.ponywolf.ponytiled"
-    local mapData = require "map32" 
+    mapData = require "map32" 
     map = tiled.new(mapData)
     map:translate(0,0)
 end
 
 local function goToMap(event)
-    -- transition.to(entity, { y=event.y, x=event.x, time=500, } )
-    local dx = entity.x - event.x
-    local dy = entity.y - event.y
-    -- dx = dx / math.abs(dx)
-    -- dy = dy / math.abs(dy)
-
-    -- entity:setLinearVelocity(-100 * dx , -100 * dy)
-    entity:setLinearVelocity(-10* dx , -10* dy)
-
-    -- map:centerObject(entity)
+    --transition.to(entity, { y=event.y, x=event.x, time=500} )
+    transition.to(map, { y=-event.y, x=-event.x, time=500} )
+    -- local dx = entity.x - event.x
+    -- local dy = entity.y - event.y
+    -- entity:setLinearVelocity(-10* dx , -10* dy)
     audio.play( piuSound )
 end
 
@@ -114,8 +110,8 @@ function scene:show( event )
 		-- Code here runs when the scene is entirely on screen
         gameLoopTimer = timer.performWithDelay( 500, gameLoop, 0 )
         Runtime:addEventListener( "collision", onCollision )
-        physics.setGravity( 0, 0 )
-        physics.addBody(entity, "dynamic", { radius=30, isSensor=false } )
+        -- physics.setGravity( 0, 0 )
+        -- physics.addBody(entity, "dynamic", { radius=30, isSensor=false } )
         --audio.play( introSound,  { channel=1, loops=-1 } )
 
 

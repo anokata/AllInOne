@@ -1,11 +1,6 @@
 local composer = require( "composer" )
 local widget = require( "widget" )
 local scene = composer.newScene()
-saveGame = {}
-
--- liba.logt({1})
-widget.setTheme( "widget_theme_android_holo_light" )
-
 local playButton 
 local menuButton
 
