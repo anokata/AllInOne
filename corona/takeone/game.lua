@@ -16,13 +16,13 @@ local tick = 0
 function mapXY2IJ(x, y)
     local i = math.floor(x / mapData.tilewidth)
     local j = math.floor(y / mapData.tileheight)
-    return {["i"]= i, ["j"]= j}
+    return i, j
 end
 
 function mapIJ2XY(i, j)
     local x = i * mapData.tilewidth
     local y = j * mapData.tileheight
-    return {["x"]= x, ["y"]= y}
+    return x, y
 end
 
 function loadMap() 
@@ -39,7 +39,7 @@ local function goToMap(event)
     -- local dy = entity.y - event.y
     -- entity:setLinearVelocity(-10* dx , -10* dy)
     --audio.play( piuSound )
-    i, j = mapXY2IJ(event.x, event.y).i,mapXY2IJ(event.x, event.y).j
+    i, j = mapXY2IJ(event.x, event.y)
     print(i, j)
     if (i > 6) then
         i = 6
@@ -51,8 +51,8 @@ local function goToMap(event)
         --
         j = 10
     end
-    print(mapIJ2XY(i, j).x,mapIJ2XY(i, j).y)
-    x, y = mapIJ2XY(i, j).x,mapIJ2XY(i, j).y
+    print(mapIJ2XY(i, j))
+    x, y = mapIJ2XY(i, j)
     transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=5} )
 end
 
