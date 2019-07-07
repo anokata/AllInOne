@@ -28,7 +28,7 @@
    </properties>
   </object>
  </objectgroup>
- <layer id="6" name="Tile Layer 1" width="20" height="20">
+ <layer id="6" name="Ground" width="20" height="20">
   <data encoding="csv">
 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,

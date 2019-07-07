@@ -9,6 +9,8 @@ local uiGroup
 local text 
 local map
 local mapData
+local tiles 
+local walkable
 local piuSound
 local introSound
 local tick = 0
@@ -23,10 +25,32 @@ function mapXY2IJ(x, y)
     return i, j
 end
 
+function mapTileIJ(i, j)
+    -- сдвиг карты на тайлы
+    local mi = -math.floor(map.x / mapData.tilewidth)
+    local mj = -math.floor(map.y / mapData.tileheight)
+    -- print(i, j, mi, mj)
+    return i + mi + 1, j + mj
+end
+
 function mapIJ2XY(i, j)
     local x = i * mapData.tilewidth
     local y = j * mapData.tileheight
     return x, y
+end
+
+function mapLinearIndex(i, j)
+    return j * mapData.width + i
+end
+
+function mapTileId(i, j)
+    return tiles[mapLinearIndex(i, j)]
+end
+
+function mapIsWalkable(i, j)
+    local tileId = mapTileId(i, j)
+    -- print(tileId, walkable[tileId])
+    return liba.setContains(walkable, tileId)
 end
 
 function loadMap() 
@@ -34,6 +58,18 @@ function loadMap()
     mapData = require "map32" 
     map = tiled.new(mapData)
     map:translate(0,0)
+    -- извлечём данные тайлов из слоя земли
+    for i, layer in pairs(mapData.layers) do
+        if (layer.type == "tilelayer" and layer.name == "Ground") then
+            tiles = layer.data
+            break
+        end
+    end
+    walkable = {}
+    local walkableT = liba.split(mapData.properties.walktiles, ",")
+    for i, t in pairs(walkableT) do
+        liba.addToSet(walkable, tonumber(t))
+    end
 end
 
 local function goToMap(event)
@@ -44,6 +80,11 @@ local function goToMap(event)
     -- entity:setLinearVelocity(-10* dx , -10* dy)
     --audio.play( piuSound )
     i, j = mapXY2IJ(event.x, event.y)
+    ti, tj = mapTileIJ(i, j)
+    local iswalk = mapIsWalkable(ti, tj)
+    -- print(iswalk)
+    if (not iswalk) then return end
+
     -- print(i, j)
     -- карта уже сдвинута на mapData.y
     local mapDx = 0

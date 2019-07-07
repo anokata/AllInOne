@@ -118,7 +118,7 @@ return {
     {
       type = "tilelayer",
       id = 6,
-      name = "Tile Layer 1",
+      name = "Ground",
       x = 0,
       y = 0,
       width = 20,
