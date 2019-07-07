@@ -18,6 +18,7 @@ local mapBoxMinI = 2
 local mapBoxMinJ = 2
 local mapBoxMaxI = 6
 local mapBoxMaxJ = 10
+local PATH_LENGTH = 6
 
 function Reverse (arr)
 	local i, j = 1, #arr
@@ -34,14 +35,14 @@ function entityGoTo(x, y)
     transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
 end
 
-function followWay(w)
+function followWay(w, dx, dy)
     -- TODO надо двигать с учётом сдвига карты. или просто указывать сдвиг на + - 1клетку подпрограммой перемещения (которая и карту двинет)
     for z, v in pairs(w) do
-        print("goto:", v[1], v[2])
         -- entityGoTo(mapIJ2XY(v[1], v[2]))
         x, y = mapIJ2XY(v[1], v[2])
-        x = x - map.x
-        y = y - map.y
+        x = x + map.x + dx
+        y = y + map.y + dy
+        print("goto:", v[1], v[2], x, y)
         transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
     end
 end
@@ -50,9 +51,9 @@ function findWay(si, sj, ei, ej)
     w = {}
     -- print(si, sj, ei, ej)
     local done
-    done, w = findWayStep(w, si, sj, ei, ej, 4)
-    if (not done) then return false end
-    -- print(done, w)
+    done, w = findWayStep(w, si, sj, ei, ej, PATH_LENGTH)
+    print(done, w)
+    if (not done) then return done end
     Reverse(w)
     return w
 end
@@ -168,9 +169,8 @@ local function goToMap(event)
     if (not iswalk) then print("BLOCK"); return end
     -- Поиск пути
     local way = findWay(ei, ej, ti, tj)
-    -- TODO Следование пути
-    if (way) then followWay(way) end
-
+    -- Следование пути
+    if (not way) then return end
     -- print(i, j)
     -- карта уже сдвинута на mapData.y
     local mapDx = 0
@@ -193,8 +193,9 @@ local function goToMap(event)
     end
     transition.to(map, { y=map.y+mapDy, x=map.x+mapDx, time=150} )
     -- print(mapIJ2XY(i, j))
-    x, y = mapIJ2XY(i, j)
-    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
+    -- x, y = mapIJ2XY(i, j)
+    followWay(way, mapDx, mapDy)
+    -- transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
 end
 
 local function drag(event)
