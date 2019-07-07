@@ -36,15 +36,30 @@ function entityGoTo(x, y)
 end
 
 function followWay(w, dx, dy)
-    -- TODO надо двигать с учётом сдвига карты. или просто указывать сдвиг на + - 1клетку подпрограммой перемещения (которая и карту двинет)
-    for z, v in pairs(w) do
-        -- entityGoTo(mapIJ2XY(v[1], v[2]))
-        x, y = mapIJ2XY(v[1], v[2])
-        x = x + map.x + dx
-        y = y + map.y + dy
-        print("goto:", v[1], v[2], x, y)
-        transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
-    end
+    -- надо двигать с учётом сдвига карты
+    entity.i = 0
+    entity.way = w
+    print("I", entity.i)
+    followStep()
+    -- for z, v in pairs(w) do
+    --     -- entityGoTo(mapIJ2XY(v[1], v[2]))
+    --     x, y = mapIJ2XY(v[1], v[2])
+    --     x = x + map.x + dx
+    --     y = y + map.y + dy
+    --     print("goto:", v[1], v[2], x, y)
+    --     transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
+    -- end
+end
+
+function followStep(w, dx, dy)
+    if (entity.i > #w) then return end
+    local v = w[entity.i]
+    print("I", entity.i, v)
+    x, y = mapIJ2XY(v[1], v[2])
+    x = x + map.x + dx
+    y = y + map.y + dy
+    print("goto:", v[1], v[2], x, y)
+    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150, onComplete=followStep} )
 end
 
 function findWay(si, sj, ei, ej)
@@ -193,9 +208,9 @@ local function goToMap(event)
     end
     transition.to(map, { y=map.y+mapDy, x=map.x+mapDx, time=150} )
     -- print(mapIJ2XY(i, j))
-    -- x, y = mapIJ2XY(i, j)
-    followWay(way, mapDx, mapDy)
-    -- transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
+    x, y = mapIJ2XY(i, j)
+    ---TODO followWay(way, mapDx, mapDy)
+    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
 end
 
 local function drag(event)
