@@ -12,6 +12,10 @@ local mapData
 local piuSound
 local introSound
 local tick = 0
+local mapBoxMinI = 2
+local mapBoxMinJ = 2
+local mapBoxMaxI = 6
+local mapBoxMaxJ = 10
 
 function mapXY2IJ(x, y)
     local i = math.floor(x / mapData.tilewidth)
@@ -40,20 +44,30 @@ local function goToMap(event)
     -- entity:setLinearVelocity(-10* dx , -10* dy)
     --audio.play( piuSound )
     i, j = mapXY2IJ(event.x, event.y)
-    print(i, j)
-    if (i > 6) then
-        i = 6
+    -- print(i, j)
+    -- карта уже сдвинута на mapData.y
+    local mapDx = 0
+    local mapDy = 0
+    if (i > mapBoxMaxI) then
+        mapDx = -mapData.tilewidth* (i - mapBoxMaxI)
+        i = mapBoxMaxI
     end
-    if (j > 10) then
-        -- TODO move map
-        local mapDy = mapData.tileheight * (j - 10)
-        -- карта уже сдвинута на mapData.y
-        --
-        j = 10
+    if (j > mapBoxMaxJ) then
+        mapDy = -mapData.tileheight * (j - mapBoxMaxJ)
+        j = mapBoxMaxJ
     end
-    print(mapIJ2XY(i, j))
+    if (i < mapBoxMinI) then
+        mapDx = mapData.tilewidth* (mapBoxMinI - i)
+        i = mapBoxMinI
+    end
+    if (j < mapBoxMinJ) then
+        mapDy = mapData.tileheight * (mapBoxMinJ - j)
+        j = mapBoxMinJ
+    end
+    transition.to(map, { y=map.y+mapDy, x=map.x+mapDx, time=150} )
+    -- print(mapIJ2XY(i, j))
     x, y = mapIJ2XY(i, j)
-    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=5} )
+    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
 end
 
 local function drag(event)
@@ -106,7 +120,7 @@ function scene:create( event )
     entity:addEventListener("touch", drag)
 
     --composer.setVariable( "tick", saveGame.tick )
-    print("LOOADDDDDD", saveGame.tick, tick)
+    -- print("LOOADDDDDD", saveGame.tick, tick)
     if (saveGame.tick ~= nil) then
         tick = saveGame.tick
     end
