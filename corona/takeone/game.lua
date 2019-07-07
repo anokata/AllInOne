@@ -19,6 +19,85 @@ local mapBoxMinJ = 2
 local mapBoxMaxI = 6
 local mapBoxMaxJ = 10
 
+function Reverse (arr)
+	local i, j = 1, #arr
+
+	while i < j do
+		arr[i], arr[j] = arr[j], arr[i]
+
+		i = i + 1
+		j = j - 1
+	end
+end
+
+function entityGoTo(x, y)
+    transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
+end
+
+function followWay(w)
+    -- TODO надо двигать с учётом сдвига карты. или просто указывать сдвиг на + - 1клетку подпрограммой перемещения (которая и карту двинет)
+    for z, v in pairs(w) do
+        print("goto:", v[1], v[2])
+        -- entityGoTo(mapIJ2XY(v[1], v[2]))
+        x, y = mapIJ2XY(v[1], v[2])
+        x = x - map.x
+        y = y - map.y
+        transition.to(entity, { y=y+entity.height/2, x=x+entity.width/2, time=150} )
+    end
+end
+
+function findWay(si, sj, ei, ej)
+    w = {}
+    -- print(si, sj, ei, ej)
+    local done
+    done, w = findWayStep(w, si, sj, ei, ej, 4)
+    if (not done) then return false end
+    -- print(done, w)
+    Reverse(w)
+    return w
+end
+
+function findWayStep(w, si, sj, ei, ej, maxsteps)
+    local way, done
+    if (maxsteps == 0) then return false, w end
+    -- print(si, sj)
+    done = false
+    if ((si == ei) and (sj == ej)) then 
+        -- table.insert(w, {si, sj})
+        print("\nFIND")
+        return true, w
+    end
+    if (mapIsWalkable(si+1, sj)) then
+        done, way = findWayStep(w, si+1, sj, ei, ej, maxsteps-1)
+        if (done) then 
+            table.insert(way, {si+1, sj})
+            return true, way
+        end
+    end
+    if (mapIsWalkable(si-1, sj)) then
+        done, way = findWayStep(w, si-1, sj, ei, ej, maxsteps-1)
+        if (done) then 
+            table.insert(way, {si-1, sj})
+            return true, way
+        end
+    end
+    if (mapIsWalkable(si, sj+1)) then
+        done, way = findWayStep(w, si, sj+1, ei, ej, maxsteps-1)
+        if (done) then 
+            table.insert(way, {si, sj+1})
+            return true, way
+        end
+    end
+    if (mapIsWalkable(si, sj-1)) then
+        done, way = findWayStep(w, si, sj-1, ei, ej, maxsteps-1)
+        if (done) then 
+            table.insert(way, {si, sj-1})
+            return true, way
+        end
+    end
+    return done, w
+end
+
 function mapXY2IJ(x, y)
     local i = math.floor(x / mapData.tilewidth)
     local j = math.floor(y / mapData.tileheight)
@@ -30,7 +109,7 @@ function mapTileIJ(i, j)
     local mi = -math.floor(map.x / mapData.tilewidth)
     local mj = -math.floor(map.y / mapData.tileheight)
     -- print(i, j, mi, mj)
-    return i + mi + 1, j + mj
+    return i + mi, j + mj
 end
 
 function mapIJ2XY(i, j)
@@ -48,9 +127,11 @@ function mapTileId(i, j)
 end
 
 function mapIsWalkable(i, j)
-    local tileId = mapTileId(i, j)
+    local tileId = mapTileId(i + 1, j)
     -- print(tileId, walkable[tileId])
-    return liba.setContains(walkable, tileId)
+    local r = liba.setContains(walkable, tileId)
+    -- if (not r) then print('block') end
+    return r
 end
 
 function loadMap() 
@@ -73,17 +154,22 @@ function loadMap()
 end
 
 local function goToMap(event)
-    --transition.to(entity, { y=event.y, x=event.x, time=500} )
-    --transition.to(map, { y=-event.y, x=-event.x, time=500} )
-    -- local dx = entity.x - event.x
-    -- local dy = entity.y - event.y
-    -- entity:setLinearVelocity(-10* dx , -10* dy)
     --audio.play( piuSound )
+    -- координаты тапа
     i, j = mapXY2IJ(event.x, event.y)
+    -- координаты места назначения с учётом сдвига карты
     ti, tj = mapTileIJ(i, j)
+    -- координаты сущности
+    ei, ej = mapTileIJ(mapXY2IJ(entity.x, entity.y))
+    print("E", ei, ej)
+    print("T", ti, tj)
     local iswalk = mapIsWalkable(ti, tj)
     -- print(iswalk)
-    if (not iswalk) then return end
+    if (not iswalk) then print("BLOCK"); return end
+    -- Поиск пути
+    local way = findWay(ei, ej, ti, tj)
+    -- TODO Следование пути
+    if (way) then followWay(way) end
 
     -- print(i, j)
     -- карта уже сдвинута на mapData.y
