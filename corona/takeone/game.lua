@@ -143,8 +143,8 @@ function mapTileId(i, j)
 end
 
 function mapIsWalkable(i, j)
-    local tileId = mapTileId(i + 1, j)
-    -- print(tileId, walkable[tileId])
+    local tileId = mapTileId(i + 1, j) - 1
+    print(tileId, walkable[tileId])
     local r = liba.setContains(walkable, tileId)
     -- if (not r) then print('block') end
     return r
