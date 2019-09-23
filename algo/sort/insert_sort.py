@@ -9,7 +9,17 @@ def insert_sort(a):
         current = a[j]
         i = j-1
         while i >= 0 and a[i] > current: # >=
-            print(a)
+            #print(a)
+            a[i+1] = a[i]
+            i -= 1
+        a[i+1] = current
+    return a
+
+def insert_sort_back(a):
+    for j in range(2, len(a)):
+        current = a[j]
+        i = j-1
+        while i >= 0 and a[i] < current:
             a[i+1] = a[i]
             i -= 1
         a[i+1] = current
@@ -17,4 +27,6 @@ def insert_sort(a):
 
 print(test1)
 insert_sort(test1)
+print(test1)
+insert_sort_back(test1)
 print(test1)
