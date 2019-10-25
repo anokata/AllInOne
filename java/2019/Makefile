@@ -1,0 +1,3 @@
+Hello:
+	javac $@.java
+	java $@
