@@ -12,3 +12,7 @@ PhraseBuilder:
 puzzle:
 	javac $@.java
 	java $@
+
+App:
+	javac $@.java
+	java $@
