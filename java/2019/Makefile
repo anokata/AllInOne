@@ -9,3 +9,6 @@ Beer:
 PhraseBuilder:
 	javac $@.java
 	java $@
+puzzle:
+	javac $@.java
+	java $@
