@@ -1,5 +1,6 @@
-public class {
+public class Main {
     public static void main(String[] args) {
-        Game.start();
+        Game g = new Game();
+        g.start();
     }
 }
