@@ -16,3 +16,9 @@ puzzle:
 App:
 	javac $@.java
 	java $@
+TestArrays:
+	javac $@.java
+	java $@
+Triangle:
+	javac $@.java
+	java $@
