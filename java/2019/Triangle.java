@@ -1,7 +1,7 @@
 class Triangle {
-    double area;
-    int height;
-    int length;
+    private double area;
+    private int height;
+    private int length;
     public static void main(String[] args) {
         Triangle[] ta = new Triangle[4];
         int x = 0;
@@ -23,7 +23,7 @@ class Triangle {
 
     }
 
-    void setArea() {
+    private void setArea() {
         area = (height * length) / 2;
     }
 }
