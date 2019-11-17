@@ -20,8 +20,26 @@ public class App {
         System.out.println("object hash:" + o.hashCode());
         System.out.println("object string:" + o.toString());
         System.out.println("object class:" + o.getClass());
-        dog = (Dog) o; // unsafe ?
+        dog = (Dog) o; // unsafe
+        if (o instanceof Dog) {
+            Dog newdog = (Dog) o; // safe now
+            newdog.bark();
+        }
         //dog = (Dog) new Object(); // error: cannot cast
 
     }
 }
+
+interface Pet {
+    abstract void beFriendly();
+}
+
+/* WTF?
+class PetDog extends Dog implements Pet {
+    public void beFriendly() {
+        System.out.println("I like you");
+    }
+    public PetDog(String n) { }
+    public PetDog() { }
+}
+*/
