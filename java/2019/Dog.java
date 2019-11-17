@@ -7,6 +7,11 @@ class Dog {
         this.name = name;
     }
 
+    // overlap Object.toString
+    public String toString() {
+        return super.toString() + "  I'm " + name + " dog";
+    }
+
     public void bark() {
         System.out.println("Gaw! I'm " + name);
     }
