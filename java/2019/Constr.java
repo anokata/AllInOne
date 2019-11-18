@@ -5,6 +5,7 @@ public class Constr {
         C c = new C();
         a = new A(1);
         D d = new D(2);
+        E e = new E();
     }
 }
 
@@ -32,4 +33,17 @@ class C extends A {
 class D {
     D(int x) {
     }
+}
+
+abstract class F {
+    int a;
+    F() {
+        a = 8;
+    }
+}
+
+class E extends F {
+   E() {
+       System.out.println("E:" + a);
+   } 
 }
