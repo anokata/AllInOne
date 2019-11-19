@@ -1,7 +1,13 @@
 public class Global {
     private Global() {} // недоступный конструктор
 
-    public static final int One = 1;
+    public static final int ONE;
+    public static int count = 1;
+
+    static { // Initializator
+        ONE = (int) (Math.random() * 100);
+        count = ONE;
+    }
 
 
     public static void print(String s) {
@@ -15,5 +21,15 @@ public class Global {
         System.out.println("Test Global:");
         Global.print("hi");
         Global.print(123);
+
+        System.out.println(Global.count);
+        Tester.test();
+        System.out.println(Global.count);
+    }
+}
+
+class Tester {
+    public static void test() {
+        Global.count++;
     }
 }
