@@ -6,6 +6,8 @@ public class Constr {
         a = new A(1);
         D d = new D(2);
         E e = new E();
+        e = new E(1, 2.0f);
+        e = new E(2.0f, 4);
     }
 }
 
@@ -45,5 +47,14 @@ abstract class F {
 class E extends F {
    E() {
        System.out.println("E:" + a);
+       // super(); can not be not first
    } 
+
+   E(int a, float b) {
+       System.out.println("E:" + a + b);
+   }
+   
+   E(float b, int a) {
+       this(a, b); // call other constructor
+   }
 }
