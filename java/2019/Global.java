@@ -35,7 +35,29 @@ public class Global {
         System.out.println(i.intValue());
         boolean b = false;
         Boolean wb = new Boolean(b);
-        ArrayList<Integer> a new ArrayList<Integer>();
+        ArrayList<Integer> a = new ArrayList<Integer>();
+        Integer x = unboxi() * new Integer(123);
+        x++;
+        float f = x^2;
+        Float ff = f;
+        Double d = (double) ff;
+        System.out.println(d);
+
+        int j;
+        Integer ii = new Integer(0);
+        j = ii;
+        System.out.println(j);
+        System.out.println(ii);
+        Double dd = new Double("0.0");
+        Integer ing = new Integer("111");
+ 
+        System.out.println((new Boolean("true")).toString());
+        //printf
+        System.out.println(String.format("%,d %d hi", Math.round(Math.pow(2,30)), 10));
+    }
+
+    static Integer unboxi() {
+        return 1;
     }
 }
 
