@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Global {
     private Global() {} // недоступный конструктор
 
@@ -25,11 +27,27 @@ public class Global {
         System.out.println(Global.count);
         Tester.test();
         System.out.println(Global.count);
+        wrappers();
+    }
+
+    static void wrappers() {
+        Integer i = new Integer(2);
+        System.out.println(i.intValue());
+        boolean b = false;
+        Boolean wb = new Boolean(b);
+        ArrayList<Integer> a new ArrayList<Integer>();
     }
 }
 
 class Tester {
     public static void test() {
         Global.count++;
+    }
+}
+
+final class Const {
+    final int x = 4*18;
+    final void dosome(final int z) {
+        final int y = z;
     }
 }
