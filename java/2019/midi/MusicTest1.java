@@ -10,6 +10,21 @@ class MusicTest1 {
         out.println("end");
     }
 
+    static int noteidx = 0;
+    public void note(Track t, int n) throws InvalidMidiDataException {
+            ShortMessage a = new ShortMessage();
+            a.setMessage(144, 1, n, 100);
+            MidiEvent noteOn = new MidiEvent(a, noteidx);
+            t.add(noteOn);
+            noteidx+=3;
+
+            ShortMessage b = new ShortMessage();
+            a.setMessage(128, 1, n, 100);
+            MidiEvent noteOff = new MidiEvent(b, noteidx);
+            t.add(noteOff);
+            noteidx+=3;
+    }
+
     public void play() {
         Sequencer player;
         try {
@@ -22,6 +37,11 @@ class MusicTest1 {
             Track t = seq.createTrack();
             out.println("created track");
 
+            ShortMessage f = new ShortMessage();
+            f.setMessage(192, 1, 102, 0);
+            MidiEvent fi = new MidiEvent(f, 1);
+            t.add(fi);
+
             ShortMessage a = new ShortMessage();
             a.setMessage(144, 1, 44, 100);
             MidiEvent noteOn = new MidiEvent(a, 1);
@@ -31,6 +51,11 @@ class MusicTest1 {
             a.setMessage(128, 1, 44, 100);
             MidiEvent noteOff = new MidiEvent(b, 2);
             t.add(noteOff);
+
+            note(t, 47);
+            note(t, 50);
+            note(t, 10);
+            note(t, 100);
 
             player.setSequence(seq);
             out.println("created midi");
