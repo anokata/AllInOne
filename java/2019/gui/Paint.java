@@ -21,11 +21,11 @@ public class Paint implements ActionListener {
         frame.getContentPane().add(BorderLayout.CENTER, c);
         frame.getContentPane().add(BorderLayout.SOUTH, button);
         frame.getContentPane().add(BorderLayout.NORTH, labelButton);
+        frame.getContentPane().add(BorderLayout.WEST, new JLabel("Left"));
         frame.setSize(300,300);
         frame.setVisible(true);
         button.addActionListener(this);
-        LabelButtonAction labelButtonAction = new LabelButtonAction();
-        labelButton.addActionListener(labelButtonAction);
+        labelButton.addActionListener(new LabelButtonAction());
     }
    
     public void actionPerformed(ActionEvent e) {
