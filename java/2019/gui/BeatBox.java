@@ -56,6 +56,7 @@ class BeatBox {
         JButton tempDown= new JButton("Tempo Down");
         JButton exitButton = new JButton("exit");
         JButton clearButton = new JButton("clear");
+        JButton randomButton = new JButton("randomize");
 
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         gridLabel.setVgap(1);
@@ -65,6 +66,7 @@ class BeatBox {
         buttonPanel.add(stopButton);
         buttonPanel.add(tempUp);
         buttonPanel.add(tempDown);
+        buttonPanel.add(randomButton);
         buttonPanel.add(clearButton);
         buttonPanel.add(exitButton);
         startButton.addActionListener(new StartButtonAction());
@@ -73,6 +75,7 @@ class BeatBox {
         tempUp.addActionListener(new TempUpButtonAction());
         tempDown.addActionListener(new TempDownButtonAction());
         clearButton.addActionListener(new ClearButtonAction());
+        randomButton.addActionListener(new RandomButtonAction());
 
         for (String labelName : instrumentNames) {
             JLabel label = new JLabel(labelName);
@@ -159,6 +162,15 @@ class BeatBox {
     class StopButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             sequencer.stop();
+        }
+    }
+
+    class RandomButtonAction implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+        for (JCheckBox c : checkBoxList) {
+            c.setSelected(((int) (Math.random() * 2) == 1));
+        }
+
         }
     }
 
