@@ -17,13 +17,18 @@ class BeatBox {
         "Acoustic Snare",
         "Crash Cymbal",
         "Hand Clap",
-        "",
-        "",
-        "",
-        "",
-        "",
+        "High Tom",
+        "Hi Bongo",
+        "Maracas",
+        "Whistle",
+        "Low Conga",
+        "Cowbell",
+        "Vibraslap",
+        "Low-mid Tom",
+        "High Agogo",
+        "Open Hi Conga",
     };
-    final int[] instruments = {35,42};
+    final int[] instruments = {35,42,46,38,49,39,50,60,70,72,64,56,58,47,67,63};
 
     Sequencer sequencer;
     Sequence sequence;
@@ -50,6 +55,7 @@ class BeatBox {
         JButton tempUp = new JButton("Tempo Up");
         JButton tempDown= new JButton("Tempo Down");
         JButton exitButton = new JButton("exit");
+        JButton clearButton = new JButton("clear");
 
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         gridLabel.setVgap(1);
@@ -59,12 +65,14 @@ class BeatBox {
         buttonPanel.add(stopButton);
         buttonPanel.add(tempUp);
         buttonPanel.add(tempDown);
+        buttonPanel.add(clearButton);
         buttonPanel.add(exitButton);
         startButton.addActionListener(new StartButtonAction());
         stopButton.addActionListener(new StopButtonAction());
         exitButton.addActionListener(new ExitButtonAction());
         tempUp.addActionListener(new TempUpButtonAction());
         tempDown.addActionListener(new TempDownButtonAction());
+        clearButton.addActionListener(new ClearButtonAction());
 
         for (String labelName : instrumentNames) {
             JLabel label = new JLabel(labelName);
@@ -102,14 +110,47 @@ class BeatBox {
         }
     }
 
+    public void buildTrackAndStart() {
+        int[] trackList = null;
+
+        sequence.deleteTrack(track);
+        track = sequence.createTrack();
+
+        for (int i=0; i < 16; i++) {
+            trackList = new int[16];
+            int key = instruments[i];
+            for (int j=0; j < 16; j++) {
+                JCheckBox jc = (JCheckBox) checkBoxList.get(j + i*16);
+                if (jc.isSelected()) {
+                    trackList[j] = key;
+                } else {
+                    trackList[j] = 0;
+                }
+            }
+
+            makeTracks(trackList);
+            track.add(makeEvent(176, 1, 127, 0, 16));
+        }
+
+        track.add(makeEvent(192, 9, 1, 0, 15));
+        try {
+            sequencer.setSequence(sequence);
+            sequencer.setLoopCount(sequencer.LOOP_CONTINUOUSLY);
+            sequencer.start();
+            System.out.println("started");
+            sequencer.setTempoInBPM(120);
+        } catch (Exception e) {e.printStackTrace();}
+    }
+
     class StartButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            System.out.println("tst");
+            buildTrackAndStart();
         }
     }
 
     class ExitButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            sequencer.stop();
             sequencer.close();
             frame.dispose();
         }
@@ -117,23 +158,52 @@ class BeatBox {
 
     class StopButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            sequencer.stop();
+        }
+    }
+
+    class ClearButtonAction implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            sequencer.stop();
+            for (JCheckBox c : checkBoxList) {
+                c.setSelected(false);
+            }
         }
     }
 
     class TempUpButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            float tempoFactor = sequencer.getTempoFactor();
+            sequencer.setTempoFactor((float)(tempoFactor * 1.03));
         }
     }
 
     class TempDownButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
+            float tempoFactor = sequencer.getTempoFactor();
+            sequencer.setTempoFactor((float)(tempoFactor * 0.97));
         }
     }
 
     public MidiEvent makeEvent(int comd, int chan, int one, int two, int tick) {
         MidiEvent event = null;
         try {
-        } catch (Exception e) {e.printStackTrace()};
+            ShortMessage a = new ShortMessage();
+            a.setMessage(comd, chan, one, two);
+            event = new MidiEvent(a, tick);
+        } catch (Exception e) {e.printStackTrace();}
         return event;
     }
+
+    public void makeTracks(int[] list) {
+        for (int i=0; i < list.length; i++) {
+            int key = list[i];
+            if (key != 0) {
+                track.add(makeEvent(144,9,key, 100,i));
+                track.add(makeEvent(128,9,key, 100,i+1));
+            }
+        }
+    }
+
+
 }
