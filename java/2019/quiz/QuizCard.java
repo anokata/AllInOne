@@ -1,6 +1,11 @@
 public class QuizCard {
-    public Strign question;
-    public Strign answer;
+    public String question;
+    public String answer;
+
+    QuizCard(String q, String a) {
+        question = q;
+        answer = a;
+    }
 
     public String getQuestion() {
         return question;
