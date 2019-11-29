@@ -7,6 +7,10 @@ public class QuizCard {
         answer = a;
     }
 
+    public String toString() {
+        return "(" + question + "/" + answer + ")";
+    }
+
     public String getQuestion() {
         return question;
     }
