@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.sound.midi.*;
 import java.util.*;
+import java.io.*;
 
 class BeatBox {
     public static void main(String[] args) {
@@ -11,6 +12,7 @@ class BeatBox {
     }
 
     JFrame frame;
+    File file = new File("beatbox.save");
     ArrayList<JCheckBox> checkBoxList;
     final String[] instrumentNames = {
         "Bass Drum", "Closed Hi-Hat", "Open Hi-Hat",
@@ -57,6 +59,8 @@ class BeatBox {
         JButton exitButton = new JButton("exit");
         JButton clearButton = new JButton("clear");
         JButton randomButton = new JButton("randomize");
+        JButton saveButton = new JButton("Save");
+        JButton loadButton = new JButton("Load");
 
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         gridLabel.setVgap(1);
@@ -68,6 +72,8 @@ class BeatBox {
         buttonPanel.add(tempDown);
         buttonPanel.add(randomButton);
         buttonPanel.add(clearButton);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(loadButton);
         buttonPanel.add(exitButton);
         startButton.addActionListener(new StartButtonAction());
         stopButton.addActionListener(new StopButtonAction());
@@ -76,6 +82,8 @@ class BeatBox {
         tempDown.addActionListener(new TempDownButtonAction());
         clearButton.addActionListener(new ClearButtonAction());
         randomButton.addActionListener(new RandomButtonAction());
+        saveButton.addActionListener(new SaveButtonAction());
+        loadButton.addActionListener(new LoadButtonAction());
 
         for (String labelName : instrumentNames) {
             JLabel label = new JLabel(labelName);
@@ -165,12 +173,65 @@ class BeatBox {
         }
     }
 
+    private boolean[] makeBoxes() {
+        boolean[] boxs = new boolean[256];
+        int i = 0;
+        for (JCheckBox c : checkBoxList) {
+            if (c.isSelected()) {
+                boxs[i] = true;
+            } else {
+                boxs[i] = false;
+            }
+            i++;
+        }
+        return boxs;
+    }
+
+    class SaveButtonAction implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            boolean[] boxs = makeBoxes();
+            try {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.showSaveDialog(frame);
+                file = fileChooser.getSelectedFile();
+                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+                out.writeObject(boxs);
+                out.close();
+            } catch (IOException ex) {ex.printStackTrace();}
+        }
+    }
+
+    private void loadBoxes(boolean[] boxs) {
+        int i = 0;
+        for (JCheckBox c : checkBoxList) {
+            c.setSelected(boxs[i]);
+            i++;
+        }
+    }
+
+    class LoadButtonAction implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            boolean[] boxs;
+            try {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.showOpenDialog(frame);
+                file = fileChooser.getSelectedFile();
+                ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+                boxs = (boolean[]) in.readObject();
+                in.close();
+                loadBoxes(boxs);
+            } catch (IOException ex) {ex.printStackTrace();}
+            catch (Exception ex) {ex.printStackTrace();}
+            sequencer.stop();
+            //buildTrackAndStart();
+        }
+    }
+
     class RandomButtonAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-        for (JCheckBox c : checkBoxList) {
-            c.setSelected(((int) (Math.random() * 2) == 1));
-        }
-
+            for (JCheckBox c : checkBoxList) {
+                c.setSelected(((int) (Math.random() * 2) == 1));
+            }
         }
     }
 
