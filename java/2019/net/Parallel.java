@@ -38,9 +38,12 @@ class Parallel {
     class Account {
         private int acc = 100;
         public int get() { return acc;}
-        public synchronized int take() { 
-            if (a.get() > 0) {
-                acc -= 10; 
+        //public synchronized int take() { 
+        public int take() { 
+            synchronized(this) {
+                if (a.get() > 0) {
+                    acc -= 10; 
+                }
             }
             return acc; 
         }
