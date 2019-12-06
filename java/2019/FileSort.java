@@ -22,6 +22,16 @@ class FileSort {
         System.out.println(list);
         Collections.sort(list, new SongCompareRating());
         System.out.println(list);
+
+        HashSet<Song> songSet = new HashSet<Song>();
+        songSet.addAll(list);
+        System.out.println(songSet);
+
+        TreeSet<Song> songTree = new TreeSet<Song>();
+        songTree.addAll(list);
+        songTree.add(new Song("A", "b", "0", "1"));
+        System.out.println(songTree);
+
     }
 
     Song makeSong(String s) {
@@ -63,4 +73,19 @@ class Song implements Comparable<Song> {
     public String toString() {
         return title + " -- " + artist + "(" + rating + ")";
     }
+    
+    public int hashCode() {
+        //return toString().hashCode();
+        return title.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        if (o instanceof Song) {
+            Song s = (Song) o;
+            return s.title.equals(title);
+        }
+        return false;
+    }
+
+    // TODO Что если в хеш сет добавить несколько объектов с одним hash но разные и потом извлчечь по хешу?
 }
