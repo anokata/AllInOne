@@ -1,3 +1,4 @@
+package com.ksihe;
 import java.io.*;
 
 class DungeonGame implements Serializable {
