@@ -1,0 +1,4 @@
+javac -d ~/classes X.java
+
+run:
+java -cp ~/classes com.ksihe.X
