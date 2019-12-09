@@ -12,7 +12,6 @@ class Main {
 
     Main () {
         System.out.println("Created Main");
-        MyRemote m = new MyRemoteImpl();
     }
 }
 
