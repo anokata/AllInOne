@@ -14,6 +14,28 @@ class ServiceBrowser {
     public void buildGUI() {
         JFrame frame = new JFrame("RMI Viewer");
         mainPanel = new JPanel();
+        frame.getContentPane().add(BorderLayout.CENTER, mainPanel);
+        Object[] services = getServicesList();
+
+        serviceList = new JComboBox(services);
+        frame.getContentPane().add(BorderLayout.NORTH, serviceList);
+        serviceList.addActionListener(new MyListListener());
+        frame.setSize(500,500);
+        frame.setVisible(true);
+    }
+
+    void loadService(Object serviceSelection) {
+        try {
+            Service svc = server.getService(serviceSelection);
+            mainPanel.removeAll();
+            mainPanel.add(svc.getGuiPanel());
+            mainPanel.validate();
+            mainPanel.repaint();
+        } catch (Exception ex) { ex.printStackTrace(); }
+    }
+
+    Object[] getServicesList() {
+        Object obj = null;
     }
 
     public static void main(String[] args) {
