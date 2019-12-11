@@ -36,14 +36,30 @@ class ServiceBrowser {
 
     Object[] getServicesList() {
         Object obj = null;
+        Object[] services = null;
+
+        try {
+            obj = Naming.lookup("rmi://127.0.0.1/ServiceServer");
+        } catch (Exception ex) { ex.printStackTrace(); }
+
+        server = (ServiceServer) obj;
+
+        try {
+            services = server.getServiceList();
+        } catch (Exception ex) { ex.printStackTrace(); }
+        return services;
+    }
+
+    class MyListListener implements ActionListener {
+        public void actionPerformed(ActionEvent ev) {
+            Object selection = serviceList.getSelectedItem();
+            loadService(selection);
+        }
     }
 
     public static void main(String[] args) {
         ServiceBrowser app = new ServiceBrowser();
-    }
-
-    ServiceBrowser () {
-        System.out.println("Created ServiceBrowser");
+        app.buildGUI();
     }
 }
 
