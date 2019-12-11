@@ -21,6 +21,10 @@ class Hello {
         socks[0] = new Sock("z");
         p(socks[0].name);
         if (socks[1] == null) { p("null");}
+        // assert (1<0);
+        assert (1>0);
+        assert (true) : "Assert It!";
+        // assert (false) : "Assert It!";
     }
     static void p(String s) {
         System.out.println(s);
