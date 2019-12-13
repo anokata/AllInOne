@@ -18,9 +18,12 @@ class Main {
 
     JFrame frame = new JFrame();
     GameField gameField = new GameField(3);
-    FieldPanel field = new FieldPanel();
+    FieldPanel field;
+    Painter painter;
 
     void gui() {
+        painter = new Painter(gameField);
+        field = new FieldPanel(painter);
         frame.add(field);
         gameField.logprint();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
