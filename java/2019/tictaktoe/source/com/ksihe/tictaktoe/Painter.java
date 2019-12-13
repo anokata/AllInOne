@@ -3,7 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.awt.*;
 
-class Painter {
+class Painter implements FieldDrawer {
     public static void main(String[] args) {}
 
     GameField field;

@@ -6,7 +6,7 @@ import java.awt.*;
 class FieldPanel extends JPanel {
 
     // отделить метод отображения поля от панели
-    Painter painter;
+    FieldDrawer painter;
 
     public void paintComponent(Graphics g) {
             super.paintComponent(g);
