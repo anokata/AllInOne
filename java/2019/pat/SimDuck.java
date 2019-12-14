@@ -8,6 +8,7 @@ class SimDuck extends Duck {
     SimDuck () {
         System.out.println("Created SimDuck");
         flyer.fly();
+        performQuack();
     }
 }
 

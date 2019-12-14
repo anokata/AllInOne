@@ -6,8 +6,13 @@ class RealDuck extends Duck {
 
     RealDuck () {
         setFly(new FlyWithWings());
+        quacker = new Quack();
+        // or
+        //flyer = new FlyWithWings();
         System.out.println("Created RealDuck");
         performFly();
+        performQuack();
+
     }
 }
 
