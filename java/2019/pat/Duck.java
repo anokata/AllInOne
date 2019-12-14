@@ -10,5 +10,13 @@ class Duck {
     Duck () {
         System.out.println("Created Duck");
     }
+    
+    void setFly(FlyBehaviour f) {
+        flyer = f;
+    }
+
+    void performFly() {
+        flyer.fly();
+    }
 }
 
