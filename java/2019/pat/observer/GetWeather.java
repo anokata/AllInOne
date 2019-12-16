@@ -4,9 +4,9 @@ import java.net.*;
 
 // https://www.weatherbit.io/api
 class GetWeather {
-    final String APIKEY = "68ef485b8e294c84837d02b96b8f6763";
-    //final String URL = "https://api.weatherbit.io/v2.0/current?lat=58&lon=38&key=68ef485b8e294c84837d02b96b8f6763";
-    final String URL = "api.weatherbit.io/v2.0/current";
+    final static String APIKEY = "68ef485b8e294c84837d02b96b8f6763";
+    final String URL = "https://api.weatherbit.io/v2.0/current?lat=58&lon=38&key=68ef485b8e294c84837d02b96b8f6763";
+    //final static String URL = "https://api.weatherbit.io/v2.0/current";
 
 	private static void sendGET(String url) throws IOException {
 		URL obj = new URL(url);
