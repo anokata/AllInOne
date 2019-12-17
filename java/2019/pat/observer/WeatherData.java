@@ -4,7 +4,7 @@ import java.net.*;
 
 class WeatherData implements WeatherDataSubject {
 
-    ArrayList<WeatherDataObserver> displays;
+    ArrayList<WeatherDataObserver> displays = new ArrayList<WeatherDataObserver>();
 
     public static void main(String[] args) {
         WeatherData app = new WeatherData();
@@ -15,7 +15,9 @@ class WeatherData implements WeatherDataSubject {
     }
 
     public void remove(WeatherDataObserver w) {
-        displays.remove(w);
+        if (displays.indexOf(w) >=0 ) {
+            displays.remove(w);
+        }
     }
 
     public void notifyDisplays() {
