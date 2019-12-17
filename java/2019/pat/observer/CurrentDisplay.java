@@ -5,7 +5,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-class CurrentDisplay implements Display {
+class CurrentDisplay implements WeatherDataObserver {
     JFrame frame = new JFrame();
 
 

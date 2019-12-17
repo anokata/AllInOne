@@ -2,12 +2,26 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-class WeatherData {
+class WeatherData implements WeatherDataSubject {
 
-    ArrayList<Display> displays;
+    ArrayList<WeatherDataObserver> displays;
 
     public static void main(String[] args) {
         WeatherData app = new WeatherData();
+    }
+
+    public void register(WeatherDataObserver w) {
+        displays.add(w);
+    }
+
+    public void remove(WeatherDataObserver w) {
+        displays.remove(w);
+    }
+
+    public void notifyDisplays() {
+        for (WeatherDataObserver d : displays) {
+            d.update(getTemerature(), getHumidity(), getPressure());
+        }
     }
 
     public int getTemerature() {
@@ -23,15 +37,10 @@ class WeatherData {
     }
 
     WeatherData () {
-        GetWeather getter = new GetWeather();
+        //GetWeather getter = new GetWeather();
         System.out.println("Created WeatherData");
         // every second change
     }
 
-    public void changed() {
-        for (Display d : displays) {
-            d.update(getTemerature(), getHumidity(), getPressure());
-        }
-    }
 }
 
