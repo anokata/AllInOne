@@ -1,6 +1,10 @@
 class DarkRoast extends Beverage {
-    public int cost() {
-        return 12;
+    public String getDescription() {
+        return "DarkRoast";
+    }
+
+    public double cost() {
+        return 0.99;
     }
 
     public static void main(String[] args) {

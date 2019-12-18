@@ -1,6 +1,8 @@
 abstract class Beverage {
+    String description = "Unknow beverage";
+    public String getDescription() { return description; }
 
-    abstract public int cost();
+    abstract public double cost();
 
     public static void main(String[] args) {
     }

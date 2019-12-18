@@ -1,15 +1,16 @@
-class Mocha extends CondimentDecorator {
+class Soy extends CondimentDecorator {
     public String getDescription() { 
-        return base.getDescription() + ", Mocha"; 
+        return base.getDescription() + ", Soy"; 
     }
 
     public double cost() {
-        return 0.20 + base.cost();
+        return 0.15 + base.cost();
     }
     public static void main(String[] args) {
     }
 
-    Mocha(Beverage b) {
+    Soy(Beverage b) {
         super(b);
     }
 }
+
