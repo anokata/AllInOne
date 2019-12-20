@@ -6,7 +6,7 @@ class NYStyleCheesePizza extends Pizza {
     NYStyleCheesePizza () {
         name = "NY Style cheese Pizza";
         dough = "Thin";
-        sauce = "Marinara"
+        sauce = "Marinara";
 
         toppings.add("Reggiano");
     }
