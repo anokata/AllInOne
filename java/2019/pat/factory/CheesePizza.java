@@ -1,18 +1,25 @@
 class CheesePizza extends Pizza {
+
+    PizzaIngredientFactory ingredientFactory;
+
     public static void main(String[] args) {
-        CheesePizza p = new CheesePizza();
+        CheesePizza p = new CheesePizza(new NYPizzaIngredientFactory());
         p.prepare();
         p.bake();
         p.cut();
         p.box();
     }
 
-    CheesePizza () {
+    CheesePizza (PizzaIngredientFactory ingredientFactory) {
+        this.ingredientFactory = ingredientFactory;
         System.out.println("Created CheesePizza");
     }
 
     public void prepare() {
         System.out.println(this.getClass() + " is preparing...");
+        dough = ingredientFactory.createDough();
+        sauce = ingredientFactory.createSauce();
+        cheese = ingredientFactory.createCheese();
     }
     public void bake() {
         System.out.println("pizza is baking...");
