@@ -9,5 +9,9 @@ class LightOffCommand implements Command {
         System.out.println("cmd:Light is off");
         light.off();
     }
+
+    public void undo() {
+        light.on();
+    }
 }
 

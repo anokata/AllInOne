@@ -1,6 +1,7 @@
 class RemoteControl {
     Command[] onCmd;
     Command[] offCmd;
+    Command undoCmd;
 
     public static void main(String[] args) {
         RemoteControl r = new RemoteControl();
@@ -35,6 +36,9 @@ class RemoteControl {
 
         r.onButtonPushed(2);
         r.offButtonPushed(2);
+
+        r.undoButton();
+        r.undoButton();
     }
 
     RemoteControl () {
@@ -46,6 +50,7 @@ class RemoteControl {
             onCmd[i] = noCmd;
             offCmd[i] = noCmd;
         }
+        undoCmd = noCmd;
         System.out.println("Created RemoteControl");
     }
 
@@ -56,10 +61,16 @@ class RemoteControl {
 
     public void onButtonPushed(int slot) {
         onCmd[slot].execute();
+        undoCmd = onCmd[slot];
     }
 
     public void offButtonPushed(int slot) {
         offCmd[slot].execute();
+        undoCmd = offCmd[slot];
+    }
+
+    public void undoButton() {
+        undoCmd.undo();
     }
 
     public String toString() {
@@ -74,4 +85,5 @@ class RemoteControl {
 
 class NoCommand implements Command {
     public void execute() {}
+    public void undo() {}
 }
