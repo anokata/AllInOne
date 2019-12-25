@@ -39,6 +39,21 @@ class RemoteControl {
 
         r.undoButton();
         r.undoButton();
+
+        Command[] partyOn = {lon, kon, son, gon};
+        Command[] partyOff = {lof, kof, sof};
+        MacroCommand partyOnMacro = new MacroCommand(partyOn);
+        MacroCommand partyOffMacro = new MacroCommand(partyOff);
+        r.setCommand(3, partyOnMacro, partyOffMacro);
+
+        r.onButtonPushed(3);
+        r.offButtonPushed(3);
+
+        // on fly garage off
+        // need Command with one method(functional interface)
+        //r.setCommand(4, () -> { g.close(); }, () -> { g.open();} );
+        // or direct link to method
+        //r.setCommand(4, g::open, g::close);
     }
 
     RemoteControl () {
