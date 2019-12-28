@@ -21,7 +21,13 @@ abstract class Beverage {
         boilWater();
         brew();
         pourInCup();
-        addCondiments();
+        if (needCondiments()) {
+            addCondiments();
+        }
+    }
+
+    public boolean needCondiments() {
+        return true;
     }
 }
 
