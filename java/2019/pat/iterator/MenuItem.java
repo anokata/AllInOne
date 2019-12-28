@@ -18,5 +18,10 @@ class MenuItem {
     MenuItem (String name, double price) {
         this(name, "", false, price);
     }
+
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public double getPrice() { return price; }
+    public boolean isVegetarian() { return vegetarian; }
 }
 
