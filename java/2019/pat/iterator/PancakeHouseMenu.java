@@ -4,7 +4,12 @@ class PancakeHouseMenu {
     ArrayList<MenuItem> menuItems;
 
     public static void main(String[] args) {
-        PancakeHouseMenu app = new PancakeHouseMenu();
+        PancakeHouseMenu m = new PancakeHouseMenu();
+        Iterator i = m.createIterator();
+        while(i.hasNext()) {
+            MenuItem t = (MenuItem) i.next();
+            System.out.println(t);
+        }
     }
 
     PancakeHouseMenu () {
@@ -24,6 +29,9 @@ class PancakeHouseMenu {
         menuItems.add(item);
     }
     
-    public ArrayList<MenuItem> getMenuItems() { return menuItems; }
+    // public ArrayList<MenuItem> getMenuItems() { return menuItems; }
+    public Iterator createIterator() {
+        return new PancakeHouseIterator(this.menuItems);
+    }
 }
 

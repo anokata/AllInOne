@@ -4,7 +4,12 @@ class DinerMenu {
     MenuItem[] menuItems;
 
     public static void main(String[] args) {
-        DinerMenu app = new DinerMenu();
+        DinerMenu m = new DinerMenu();
+        Iterator i = m.createIterator();
+        while(i.hasNext()) {
+            MenuItem t = (MenuItem) i.next();
+            System.out.println(t);
+        }
     }
 
     DinerMenu () {
@@ -28,6 +33,9 @@ class DinerMenu {
         numberOfItems++;
     }
 
-    public MenuItem[] getMenuItems() { return menuItems; }
+    // public MenuItem[] getMenuItems() { return menuItems; }
+    public Iterator createIterator() {
+        return new DinerMenuIterator(this.menuItems);
+    }
 }
 
