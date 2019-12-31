@@ -1,6 +1,7 @@
 import java.util.*;
+import java.util.Iterator;
 
-class PancakeHouseMenu {
+class PancakeHouseMenu implements Menu {
     ArrayList<MenuItem> menuItems;
 
     public static void main(String[] args) {
@@ -30,8 +31,9 @@ class PancakeHouseMenu {
     }
     
     // public ArrayList<MenuItem> getMenuItems() { return menuItems; }
-    public Iterator createIterator() {
-        return new PancakeHouseIterator(this.menuItems);
+    public Iterator<MenuItem> createIterator() {
+        //return new PancakeHouseIterator(this.menuItems);
+        return this.menuItems.iterator();
     }
 }
 

@@ -1,3 +1,4 @@
+import java.util.Iterator;
 import java.util.*;
 
 class DinerMenuIterator implements Iterator {
@@ -30,6 +31,10 @@ class DinerMenuIterator implements Iterator {
         } else {
             return false;
         }
+    }
+
+    public void remove() {
+        throw new IllegalStateException();
     }
 }
 

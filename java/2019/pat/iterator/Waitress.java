@@ -1,6 +1,8 @@
+import java.util.Iterator;
+
 class Waitress {
-    PancakeHouseMenu pancake;
-    DinerMenu diner;
+    Menu pancake;
+    Menu diner;
 
     public static void main(String[] args) {
         Waitress app = new Waitress();
@@ -14,8 +16,8 @@ class Waitress {
     }
 
     public void printMenu() {
-        Iterator pancakeIterator = pancake.createIterator();
-        Iterator dinerIterator = diner.createIterator();
+        Iterator<MenuItem> pancakeIterator = pancake.createIterator();
+        Iterator<MenuItem> dinerIterator = diner.createIterator();
         System.out.println("MENU\n----\nBREAKFAST");
         printMenu(pancakeIterator);
         System.out.println("\nLUNCH");
