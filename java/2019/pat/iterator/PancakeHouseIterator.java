@@ -19,7 +19,7 @@ class PancakeHouseIterator implements Iterator {
         System.out.println("Created PancakeHouseIterator");
     }
 
-    public Object next() {
+    public MenuItem next() {
         MenuItem item = items.get(position);
         position++;
         return item;

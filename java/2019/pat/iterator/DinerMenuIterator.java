@@ -18,7 +18,7 @@ class DinerMenuIterator implements Iterator {
         this.items = menu;
     }
 
-    public Object next() {
+    public MenuItem next() {
         MenuItem item = items[position];
         position++;
         return item;
