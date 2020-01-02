@@ -1,4 +1,4 @@
-class MenuItem {
+class MenuItem extends MenuComponent {
     String name;
     String description;
     boolean vegetarian;
@@ -6,6 +6,7 @@ class MenuItem {
 
     public static void main(String[] args) {
         MenuItem app = new MenuItem("bliny", 10.0);
+        app.print();
     }
 
     MenuItem (String name,
@@ -30,6 +31,15 @@ class MenuItem {
 
     public String toString() {
         return "MenuItem: " + name + " $" + price;
+    }
+
+    public void print() {
+        System.out.print(" " + getName());
+        if (isVegetarian()) {
+        System.out.print("(v)");
+        }
+        System.out.print(", " + getPrice());
+        System.out.println("  -- " + getDescription());
     }
 }
 

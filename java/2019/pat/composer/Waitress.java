@@ -2,36 +2,33 @@ import java.util.Iterator;
 import java.util.*;
 
 class Waitress {
-    ArrayList<Menu> menus;
+    MenuComponent menus;
 
     public static void main(String[] args) {
-        ArrayList<Menu> menus = new ArrayList<Menu>();
-        menus.add(new PancakeHouseMenu());
-        menus.add(new DinerMenu());
-        menus.add(new CafeMenu());
-        Waitress app = new Waitress(menus);
+        MenuComponent diner = new Menu("Dinner", "");
+        MenuComponent pancake = new Menu("Pancake", "");
+        MenuComponent cafe = new Menu("Cafe", "");
+        MenuComponent dessert = new Menu("Dessert", "");
+        MenuComponent all = new Menu("All", "");
+        
+        all.add(diner);
+        all.add(cafe);
+        all.add(pancake);
+        
+        diner.add(new MenuItem("Pasta", 3.89));
+        diner.add(dessert);
+        dessert.add(new MenuItem("Pie", 1.59));
+
+        Waitress app = new Waitress(all);
+        app.printMenu();
     }
 
-    Waitress (ArrayList<Menu> menus) {
-        this.menus = menus;
-        printMenu();
+    Waitress (MenuComponent m) {
+        this.menus = m;
     }
-
+    
     public void printMenu() {
-        Iterator<Menu> i = menus.iterator();
-        while (i.hasNext()) {
-            Menu menu = i.next();
-            printMenu(menu.createIterator());
-        }
-    }
-
-    public void printMenu(Iterator i) {
-        while (i.hasNext()) {
-            MenuItem menuItem = (MenuItem) i.next();
-            System.out.print(menuItem.getName() + ": ");
-            System.out.print(menuItem.getPrice() + " -- ");
-            System.out.println(menuItem.getDescription());
-        }
+        menus.print();
     }
 }
 
