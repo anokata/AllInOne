@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 abstract class MenuComponent {
     public String getName() {
         throw new UnsupportedOperationException();
@@ -25,6 +27,8 @@ abstract class MenuComponent {
     public MenuComponent getChild(int i) {
         throw new UnsupportedOperationException();
     }
+
+    public abstract Iterator<MenuComponent> createIterator();
 
 
     public static void main(String[] args) { }

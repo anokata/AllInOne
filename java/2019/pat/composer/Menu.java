@@ -5,10 +5,18 @@ public class Menu extends MenuComponent {
     ArrayList<MenuComponent> menuComponents = new ArrayList<MenuComponent>();
     String name;
     String desc;
+    Iterator<MenuComponent> iterator = null;
 
     public Menu(String name, String desc) {
         this.name = name;
         this.desc = desc;
+    }
+
+    public Iterator<MenuComponent> createIterator() {
+        if (iterator == null) {
+            iterator = new CompositeIterator(menuComponents.iterator());
+        }
+        return iterator;
     }
 
     public void add(MenuComponent menuComponent) {

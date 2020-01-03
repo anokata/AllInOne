@@ -20,6 +20,8 @@ class MenuItem extends MenuComponent {
         this.vegetarian = vegetarian;
     }
 
+    public Iterator<MenuComponent> createIterator() { return new NullIterator(); }
+
     MenuItem (String name, double price) {
         this(name, "", false, price);
     }
