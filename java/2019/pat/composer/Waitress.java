@@ -18,9 +18,12 @@ class Waitress {
         diner.add(new MenuItem("Pasta", 3.89));
         diner.add(dessert);
         dessert.add(new MenuItem("Pie", 1.59));
+        dessert.add(new MenuItem("VPie", "", true, 1.59));
 
         Waitress app = new Waitress(all);
         app.printMenu();
+
+        app.printVeg();
     }
 
     Waitress (MenuComponent m) {
@@ -29,6 +32,19 @@ class Waitress {
     
     public void printMenu() {
         menus.print();
+    }
+
+    public void printVeg() {
+        Iterator<MenuComponent> iterator = menus.createIterator();
+        System.out.println("Veg menu:");
+        while (iterator.hasNext()) {
+            MenuComponent item = iterator.next();
+            try {
+                if (item.isVegetarian()) {
+                    item.print();
+                }
+            } catch (UnsupportedOperationException ex) {}
+        }
     }
 }
 

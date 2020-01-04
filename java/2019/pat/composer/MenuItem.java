@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 class MenuItem extends MenuComponent {
     String name;
     String description;
