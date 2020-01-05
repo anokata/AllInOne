@@ -3,6 +3,7 @@ class GumballMachine {
     State noQuarterState;
     State hasQuarterState;
     State soldState;
+    State winnerState;
     State state;
     int count = 5;
 
@@ -13,6 +14,20 @@ class GumballMachine {
         m.insertQuarter();
         m.turnCrank();
         System.out.println("balls: " + m.count + " in " + m.state.getClass().getName());
+        m.insertQuarter();
+        m.turnCrank();
+        m.insertQuarter();
+        m.turnCrank();
+        m.insertQuarter();
+        m.turnCrank();
+        m.insertQuarter();
+        m.turnCrank();
+        m.insertQuarter();
+        m.turnCrank();
+        m.insertQuarter();
+        m.turnCrank();
+        m.insertQuarter();
+        m.turnCrank();
     }
 
     GumballMachine () {
@@ -25,6 +40,7 @@ class GumballMachine {
         noQuarterState = new NoQuarterState(this);
         hasQuarterState = new HasQuarterState(this);
         soldState = new SoldState(this);
+        winnerState = new WinnerState(this);
         if (c > 0) {
             state = noQuarterState;
         } else {
@@ -62,5 +78,6 @@ class GumballMachine {
     public State getHasQuarterState() { return hasQuarterState; }
     public State getSoldOutState() {return soldOutState; }
     public State getSoldState() {return soldState; }
+    public State getWinnerState() {return winnerState; }
 }
 

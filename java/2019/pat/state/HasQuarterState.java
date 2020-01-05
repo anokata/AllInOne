@@ -23,7 +23,12 @@ class HasQuarterState implements State {
     // Переход в SoldState
     public void turnCrank() {
         System.out.println("You turned...");
-        gumballMachine.setState(gumballMachine.getSoldState());
+        int winner = (int)(Math.random() * 10);
+        if ((winner == 0) && (gumballMachine.getCount() > 1)) {
+            gumballMachine.setState(gumballMachine.getWinnerState());
+        } else {
+            gumballMachine.setState(gumballMachine.getSoldState());
+        }
     }
 
     // "сперва надо повернуть"
