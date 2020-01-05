@@ -7,7 +7,12 @@ class GumballMachine {
     int count = 5;
 
     public static void main(String[] args) {
-        GumballMachine app = new GumballMachine();
+        GumballMachine m = new GumballMachine();
+        m.insertQuarter();
+        m.ejectQuarter();
+        m.insertQuarter();
+        m.turnCrank();
+        System.out.println("balls: " + m.count + " in " + m.state.getClass().getName());
     }
 
     GumballMachine () {
@@ -27,9 +32,6 @@ class GumballMachine {
         }
     }
 
-    public State getHasQuarterState() {
-        return new HasQuarterState(this);
-    }
 
     public void setState(State s) {
         this.state = s;
@@ -49,6 +51,16 @@ class GumballMachine {
     }
 
     public void releaseBall() {
+        System.out.println("A gumball comes rolling...");
+        if (count != 0) {
+            count--;
+        }
     }
+
+    public int getCount() { return count; }
+    public State getNoQuarterState() { return noQuarterState; }
+    public State getHasQuarterState() { return hasQuarterState; }
+    public State getSoldOutState() {return soldOutState; }
+    public State getSoldState() {return soldState; }
 }
 

@@ -11,18 +11,24 @@ class HasQuarterState implements State {
 
     // "нельзя всунуть ещё одну"
     public void insertQuarter() {
+        System.out.println("нельзя всунуть ещё одну");
     }
 
     // Возврат и переход в NoQuarterState
     public void ejectQuarter() {
+        System.out.println("returned");
+        gumballMachine.setState(gumballMachine.getNoQuarterState());
     }
 
     // Переход в SoldState
     public void turnCrank() {
+        System.out.println("You turned...");
+        gumballMachine.setState(gumballMachine.getSoldState());
     }
 
     // "сперва надо повернуть"
     public void dispense() {
+        System.out.println("сперва надо повернуть");
     }
 }
 
