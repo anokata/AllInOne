@@ -7,15 +7,19 @@ class SoldState implements State {
         System.out.println("Created SoldState");
     }
 
+    // "подождите выдачи"
     public void insertQuarter() {
     }
 
+    // "нельзя вернуть, потрачено"
     public void ejectQuarter() {
     }
 
+    // "уже выдаётся"
     public void turnCrank() {
     }
 
+    // выдать, >0? перейти NoQuarterState или SoldOutState
     public void dispense() {
     }
 }

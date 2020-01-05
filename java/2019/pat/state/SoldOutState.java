@@ -7,15 +7,19 @@ class SoldOutState implements State {
         System.out.println("Created SoldOutState");
     }
 
+    // "не стоит - нет шариков"
     public void insertQuarter() {
     }
 
+    // "нечего"
     public void ejectQuarter() {
     }
 
+    // "нет шариков"
     public void turnCrank() {
     }
 
+    // "кончились"
     public void dispense() {
     }
 }
