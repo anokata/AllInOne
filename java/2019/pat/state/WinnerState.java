@@ -39,5 +39,6 @@ class WinnerState implements State {
             }
         }
     }
+    public void refill() { }
 }
 

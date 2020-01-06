@@ -27,5 +27,9 @@ class SoldOutState implements State {
     public void dispense() {
         System.out.println("кончились");
     }
+
+    public void refill() {
+        gumballMachine.setState(gumballMachine.getNoQuarterState());
+    }
 }
 

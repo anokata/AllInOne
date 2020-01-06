@@ -26,6 +26,7 @@ class GumballMachine {
         m.turnCrank();
         m.insertQuarter();
         m.turnCrank();
+        m.refill(3);
         m.insertQuarter();
         m.turnCrank();
     }
@@ -71,6 +72,12 @@ class GumballMachine {
         if (count != 0) {
             count--;
         }
+    }
+
+    public void refill(int c) {
+        System.out.println("Заполняем");
+        this.count += c;
+        state.refill();
     }
 
     public int getCount() { return count; }

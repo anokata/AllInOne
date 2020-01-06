@@ -35,5 +35,6 @@ class HasQuarterState implements State {
     public void dispense() {
         System.out.println("сперва надо повернуть");
     }
+    public void refill() { }
 }
 

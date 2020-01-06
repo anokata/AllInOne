@@ -34,5 +34,6 @@ class SoldState implements State {
             gumballMachine.setState(gumballMachine.getSoldOutState());
         }
     }
+    public void refill() { }
 }
 

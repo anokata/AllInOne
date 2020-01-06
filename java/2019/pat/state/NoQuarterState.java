@@ -29,5 +29,6 @@ class NoQuarterState implements State {
     public void dispense() {
         System.out.println("без монеты ничего не выдаём");
     }
+    public void refill() { }
 }
 
