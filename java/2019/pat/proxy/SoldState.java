@@ -1,5 +1,6 @@
 class SoldState implements State {
-    GumballMachine gumballMachine;
+    private static final long serialVersionUID = 5L;
+    transient GumballMachine gumballMachine;
 
     public static void main(String[] args) {
     }

@@ -1,9 +1,8 @@
 class NoQuarterState implements State {
-    GumballMachine gumballMachine;
+    private static final long serialVersionUID = 3L;
+    transient GumballMachine gumballMachine;
     
-    public static void main(String[] args) {
-        NoQuarterState app = new NoQuarterState(new GumballMachine());
-    }
+    public static void main(String[] args) { }
 
     NoQuarterState (GumballMachine m) {
         this.gumballMachine = m;

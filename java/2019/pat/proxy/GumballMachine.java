@@ -1,4 +1,8 @@
-class GumballMachine {
+import java.rmi.*;
+import java.rmi.server.*;
+
+class GumballMachine extends UnicastRemoteObject implements GumballMachineRemote {
+    private static final long serialVersionUID = 8L;
     State soldOutState;
     State noQuarterState;
     State hasQuarterState;
@@ -9,7 +13,8 @@ class GumballMachine {
 
     String location;
 
-    public static void main(String[] args) {
+    public static void testone() {
+        try {
         GumballMachine m = new GumballMachine();
         m.insertQuarter();
         m.ejectQuarter();
@@ -31,13 +36,27 @@ class GumballMachine {
         m.refill(3);
         m.insertQuarter();
         m.turnCrank();
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    GumballMachine () {
+    public static void testrmi() {
+        GumballMachine m = null;
+        try {
+            m = new GumballMachine("Nowhere", 4);
+            Naming.rebind("//127.0.0.1/gumballmachine", m);
+            //Naming.rebind("gumballmachine", m);
+        } catch (Exception ex) { ex.printStackTrace(); }
+    }
+
+    public static void main(String[] args) {
+        testrmi();
+    }
+
+    GumballMachine () throws RemoteException {
         this("nowhere", 5);
     }
 
-    GumballMachine (String loc, int c) {
+    GumballMachine (String loc, int c) throws RemoteException {
         this.location = loc;
         this.count = c;
         soldOutState = new SoldOutState(this);
@@ -90,7 +109,8 @@ class GumballMachine {
     public State getSoldState() {return soldState; }
     public State getWinnerState() {return winnerState; }
 
-    public String getState() { return state.getClass().getName(); }
+    public String getStateName() { return state.getClass().getName(); }
+    public State getState() { return state; }
     public String getLocation() { return location; }
 }
 

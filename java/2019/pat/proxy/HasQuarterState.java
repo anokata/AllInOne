@@ -1,9 +1,8 @@
 class HasQuarterState implements State {
-    GumballMachine gumballMachine;
+    private static final long serialVersionUID = 2L;
+    transient GumballMachine gumballMachine;
 
-    public static void main(String[] args) {
-        HasQuarterState app = new HasQuarterState(new GumballMachine());
-    }
+    public static void main(String[] args) { }
 
     HasQuarterState (GumballMachine m) {
         this.gumballMachine = m;

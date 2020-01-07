@@ -1,5 +1,6 @@
 class WinnerState implements State {
-    GumballMachine gumballMachine;
+    private static final long serialVersionUID = 6L;
+    transient GumballMachine gumballMachine;
 
     public static void main(String[] args) {
     }

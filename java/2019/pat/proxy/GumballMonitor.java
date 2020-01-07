@@ -14,7 +14,7 @@ class GumballMonitor {
     public void report() {
         System.out.println("Gumball machine:\t " + machine.getLocation());
         System.out.println("Current inventory:\t " + machine.getCount() + " gumballs");
-        System.out.println("Current state:\t\t " + machine.getState());
+        System.out.println("Current state:\t\t " + machine.getStateName());
     }
 }
 
