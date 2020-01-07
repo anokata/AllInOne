@@ -1,20 +1,29 @@
+import java.rmi.*;
+
 class GumballMonitor {
 
-    GumballMachine machine;
+    GumballMachineRemote machine;
 
     public static void main(String[] args) {
-        GumballMonitor mn = new GumballMonitor(new GumballMachine());
-        mn.report();
+        String location = "rmi://127.0.0.1/gumballmachine";
+        try {
+            GumballMachineRemote m = (GumballMachineRemote) Naming.lookup(location);
+            GumballMonitor mn = new GumballMonitor(m);
+            System.out.println(mn);
+            mn.report();
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    GumballMonitor (GumballMachine m) {
+    GumballMonitor (GumballMachineRemote m) {
         machine = m;
     }
 
     public void report() {
-        System.out.println("Gumball machine:\t " + machine.getLocation());
-        System.out.println("Current inventory:\t " + machine.getCount() + " gumballs");
-        System.out.println("Current state:\t\t " + machine.getStateName());
+        try {
+            System.out.println("Gumball machine:\t " + machine.getLocation());
+            System.out.println("Current inventory:\t " + machine.getCount() + " gumballs");
+            System.out.println("Current state:\t\t " + machine.getState().getClass().getName());
+        } catch (RemoteException ex) { ex.printStackTrace(); }
     }
 }
 
