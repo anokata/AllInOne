@@ -5,12 +5,72 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-// TODO To State
+interface ImageProxyState {
+    public int getIconWidth();
+    public int getIconHeight();
+    public void paintIcon(final Component c, Graphics g, int x, int y);
+}
+
+class LoadingState implements ImageProxyState {
+    ImageProxy imageProxy;
+
+    LoadingState(ImageProxy p) {
+        imageProxy = p;
+    }
+
+    public int getIconWidth() {
+        return 800;
+    }
+
+    public int getIconHeight() {
+        return 600;
+    }
+
+    public void paintIcon(final Component c, Graphics g, int x, int y) {
+        g.drawString("Loading CD cover, please wait...", x+300, y+190);
+        if (!imageProxy.retrieving) {
+            imageProxy.retrieving = true;
+            imageProxy.retrievalThread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        imageProxy.setIconImage(new ImageIcon(imageProxy.imageURL, "CD Cover"));
+                        c.repaint();
+                    } catch (Exception ex) { ex.printStackTrace(); }
+                }
+            });
+            imageProxy.retrievalThread.start();
+        }
+    }
+}
+
+class IconState implements ImageProxyState {
+    ImageProxy imageProxy;
+
+    IconState(ImageProxy p) {
+        imageProxy = p;
+    }
+
+    public int getIconWidth() {
+        return imageProxy.imageIcon.getIconWidth();
+    }
+
+    public int getIconHeight() {
+        return imageProxy.imageIcon.getIconHeight();
+    }
+
+    public void paintIcon(final Component c, Graphics g, int x, int y) {
+        imageProxy.imageIcon.paintIcon(c, g, x, y);
+    }
+}
+
 class ImageProxy implements Icon {
     volatile ImageIcon imageIcon;
     final URL imageURL;
     Thread retrievalThread;
     boolean retrieving = false;
+    ImageProxyState state;
+    ImageProxyState loadingState;
+    ImageProxyState iconState;
 
     static Hashtable<String, String> cds = new Hashtable<String, String>();
     public static void main(String[] args) throws Exception {
@@ -63,49 +123,26 @@ class ImageProxy implements Icon {
     ImageProxy (URL url) {
         this.imageURL = url;
         System.out.println("Created ImageProxy");
+        this.loadingState = new LoadingState(this);
+        this.iconState = new IconState(this);
+        this.state = loadingState;
     }
 
     public int getIconWidth() {
-        if (imageIcon != null) {
-            return imageIcon.getIconWidth();
-        } else {
-            return 800;
-        }
+        return state.getIconHeight();
     }
 
     public int getIconHeight() {
-        if (imageIcon != null) {
-            return imageIcon.getIconHeight();
-        } else {
-            return 600;
-        }
+        return state.getIconWidth();
     }
     
     synchronized void setIconImage(ImageIcon icon) {
         this.imageIcon = icon;
+        this.state = this.iconState;
     }
 
     public void paintIcon(final Component c, Graphics g, int x, int y) {
-        if (imageIcon != null) {
-            imageIcon.paintIcon(c, g, x, y);
-        } else {
-            g.drawString("Loading CD cover, please wait...", x+300, y+190);
-            if (!retrieving) {
-                retrieving = true;
-                retrievalThread = new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            setIconImage(new ImageIcon(imageURL, "CD Cover"));
-                            c.repaint();
-                        } catch (Exception ex) { ex.printStackTrace(); }
-                    }
-                });
-                retrievalThread.start();
-            }
-        }
+        state.paintIcon(c,g,x,y);
     }
-
-
-
 }
 
