@@ -9,7 +9,27 @@ class MatchMakingTestDrive {
     HashMap<String, PersonBean> datingDB = new HashMap<String, PersonBean>();
 
     void go() {
-        PersonBean joe = getPersonFromDatabase("");
+        PersonBean joe = getPersonFromDatabase("Joe Javabean");
+        PersonBean ownerProxy = getOwnerProxy(joe);
+        System.out.println("name is " + ownerProxy.getName());
+        ownerProxy.setInterests("bowling, Go");
+        System.out.println("Interests set form owner proxy");
+        try {
+            ownerProxy.setHotOrNotRating(10);
+        } catch (Exception e) {
+            System.out.println("Can't set rating for himself");
+        }
+        System.out.println("Rating is " +ownerProxy.getHotOrNotRating());
+
+        PersonBean nonOwnerProxy = getNotOwnerProxy(joe);
+        System.out.println("Name is " + nonOwnerProxy.getName());
+        try {
+            nonOwnerProxy.setInterests("Some");
+        } catch (Exception e) {
+            System.out.println("Can't set interests for others");
+        }
+        nonOwnerProxy.setHotOrNotRating(3);
+        System.out.println("Rating is " +ownerProxy.getHotOrNotRating());
     }
 
 	PersonBean getPersonFromDatabase(String name) {

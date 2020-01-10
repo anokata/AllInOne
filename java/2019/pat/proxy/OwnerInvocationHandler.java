@@ -13,6 +13,7 @@ class OwnerInvocationHandler implements InvocationHandler {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws IllegalAccessException {
+        System.out.println("Method: " + method.getName());
         try {
             if (method.getName().startsWith("get")) {
                 return method.invoke(person, args);

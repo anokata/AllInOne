@@ -13,9 +13,10 @@ class NotOwnerInvocationHandler implements InvocationHandler {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws IllegalAccessException {
+        System.out.println("Method: " + method.getName());
         try {
             if (method.getName().startsWith("get")) {
-                throw new IllegalAccessException();
+                return method.invoke(person, args);
             } else if (method.getName().equals("setHotOrNotRating")) {
                 return method.invoke(person, args);
             } else if (method.getName().startsWith("set")) {
