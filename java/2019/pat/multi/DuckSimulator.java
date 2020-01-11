@@ -26,6 +26,11 @@ class DuckSimulator {
         flockOfMallard.add(duckFactory.createMallardDuck());
         flockOfDucks.add(flockOfMallard);
 
+        Quackologist quackologist = new Quackologist();
+        flockOfDucks.registerObserver(quackologist);
+        //flockOfMallard.registerObserver(quackologist);
+        //mallardDuck.registerObserver(quackologist);
+
         System.out.println("(Duck Simulator)");
         simulate(flockOfDucks);
 
