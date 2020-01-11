@@ -1,4 +1,4 @@
 interface QuackObservable {
-    public void registerOberser(Observer observer);
+    public void registerObserver(Observer observer);
     public void notifyObservers();
 }
