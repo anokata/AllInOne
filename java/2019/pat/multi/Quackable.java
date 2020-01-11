@@ -1,3 +1,3 @@
-interface Quackable {
+interface Quackable extends QuackObservable {
     public void quack();
 }
