@@ -1,7 +1,7 @@
 import javax.sound.midi.*;
 import java.util.*;
 
-class BeatModel implements BeatModelInterface {
+class BeatModel implements BeatModelInterface, MetaEventListener {
     public static void main(String[] args) {
         BeatModel app = new BeatModel();
     }
@@ -14,9 +14,6 @@ class BeatModel implements BeatModelInterface {
     int bpm = 90;
 
     BeatModel () {
-    }
-
-    void setUpMidi() {
     }
 
     void buildTrackAndStart() {
@@ -62,7 +59,9 @@ class BeatModel implements BeatModelInterface {
     }
 
     public void removeObserver(BeatObserver o) {
-        beatObservers.remove(o);
+        if (beatObservers.indexOf(o) >= 0) {
+            beatObservers.remove(o);
+        }
     }
 
     public void registerObserver(BPMObserver o) {
@@ -76,7 +75,27 @@ class BeatModel implements BeatModelInterface {
     }
 
     public void removeObserver(BPMObserver o) {
-        bpmObservers.remove(o);
+        if (bpmObservers.indexOf(o) >= 0) {
+            bpmObservers.remove(o);
+        }
+    }
+
+
+    public void meta(MetaMessage msg) {
+        if (msg.getType() == 47) {
+            beatEvent();
+            sequencer.start();
+            setBPM(getBPM());
+        }
+    }
+
+    public void setUpMidi() {
+        try {
+            sequencer = MidiSystem.getSequencer();
+            sequencer.open();
+            sequencer.addMetaEventListener(this);
+
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
 }
