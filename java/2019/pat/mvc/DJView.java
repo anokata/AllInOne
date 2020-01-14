@@ -49,12 +49,12 @@ class DJView implements ActionListener, BeatObserver, BPMObserver {
         bpmPanel.add(bpmOutputLabel);
         viewPanel.add(bpmPanel);
         viewFrame.getContentPane().add(viewPanel, BorderLayout.CENTER);
-        viewPanel.pack();
+        viewFrame.pack();
         viewFrame.setVisible(true);
     }
 
     public void createControls() {
-        JFrame.setDefautLookAndFeelDecorated(true);
+        //JFrame.setDefautLookAndFeelDecorated(true);
         controlFrame = new JFrame("Control");
         controlFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         controlFrame.setSize(new Dimension(100, 80));

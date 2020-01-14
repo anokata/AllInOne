@@ -4,6 +4,8 @@ import java.util.*;
 class BeatModel implements BeatModelInterface, MetaEventListener {
     public static void main(String[] args) {
         BeatModel app = new BeatModel();
+        app.initialize();
+        app.on();
     }
 
     Sequencer sequencer;
@@ -17,8 +19,11 @@ class BeatModel implements BeatModelInterface, MetaEventListener {
     }
 
     public void initialize() {
+        System.out.println("set up midi");
         setUpMidi();
+        System.out.println("build track");
         buildTrackAndStart();
+        System.out.println("Done.");
     }
 
     public void on() {
@@ -102,9 +107,11 @@ class BeatModel implements BeatModelInterface, MetaEventListener {
         int[] trackList = {35, 0, 46, 0};
         sequence.deleteTrack(null);
         track = sequence.createTrack();
+        System.out.println("make track");
         makeTracks(trackList);
         track.add(makeEvent(192,9,1,0,4));
         try {
+            System.out.println("set sequence");
             sequencer.setSequence(sequence);
         } catch (Exception ex) { ex.printStackTrace(); }
     }
