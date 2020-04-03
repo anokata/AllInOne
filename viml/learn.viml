@@ -1,3 +1,23 @@
 echo "hello world!"
 echom "tse" " like debug msg view in :messages
+set number! # toggle
+set number? # check
+set numberwidth=0
+map <space> viw
+map - x
+map <c-d> dd
+map <c-c> yy:@"<CR>
+Сделать выполнение питон команд, функций, по команде
+map - ddp
+map + ddkP
+map <cr> o<Esc>
+unmap -
+
+
+
+
+
+
+
+
 
