@@ -12,10 +12,11 @@ map - ddp
 map + ddkP
 map <cr> o<Esc>
 unmap -
-
-
-
-
+nmap \ dd
+vmap \ U
+imap <c-d> <esc>ddi
+imap <c-u> <esc>viwUi
+nmap <c-u> viwU
 
 
 
