@@ -18,7 +18,13 @@ imap <c-d> <esc>ddi
 imap <c-u> <esc>viwUi
 nmap <c-u> viwU
 
+nmap - dd
+nmap \ -
+nmap dd O<esc>jddk
+ non recurcive mapping
+nnoremap \ -
 
-
-
-
+nnoremap -d dd
+nnoremap -c ddO
+let mapleader = "-"
+nnoremap <leader>d aX<esc>
