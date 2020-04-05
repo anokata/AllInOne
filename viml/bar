@@ -1,0 +1,10 @@
+Now we're going to take a few minutes to revisit three things we've already talked about: mappings, abbreviations, and options, but with a twist. We're going to set each of them in a single buffer at a time.
+nnoremap <leader>d dd
+nnoremap <buffer> <leader>x dd
+nnoremap <buffer> <localleader>x dd
+setlocal wrap
+setlocal nonumber
+set number
+set nonumber
+nnoremap <buffer> Q x
+nnoremap          Q dd

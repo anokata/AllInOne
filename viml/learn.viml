@@ -28,3 +28,24 @@ nnoremap -d dd
 nnoremap -c ddO
 let mapleader = "-"
 nnoremap <leader>d aX<esc>
+
+iabbrev adn and
+iabbrev waht what
+iabbrev tehn then
+iabbrev fi if
+iabbrev @@ quartenium@gmail.com
+inoremap ssig -- <cr>Steve Losh<cr>steve@stevelosh.com
+
+nnoremap jk dd
+nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
+nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
+vnoremap <leader>" <esc>`<i"<esc>`>a"<esc>lel
+nnoremap H 0
+nnoremap L $
+
+inoremap jk <esc>
+inoremap kj <esc>
+Учимся - отключаем старое и оставляем только новое.
+inoremap <esc> <nop>
+inoremap <left> <nop>
+

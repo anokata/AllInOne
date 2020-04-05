@@ -1,0 +1,5 @@
+Now we're going to take a few minutes to revisit three things we've already talked about: mappings, abbreviations, and options, but with a twist. We're going to set each of them in a single buffer at a time.
+setlocal nowrap
+set nowrap
+set wrap
+
