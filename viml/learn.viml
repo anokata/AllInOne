@@ -49,3 +49,17 @@ inoremap kj <esc>
 inoremap <esc> <nop>
 inoremap <left> <nop>
 
+autocmd BufNewFile * :write
+autocmd BufNewFile,BufRead *.html setlocal nowrap
+autocmd FileType javascript nnoremap <buffer> <localleader>c I//<esc>
+autocmd FileType python     nnoremap <buffer> <localleader>c I#<esc>
+autocmd FileType python colorscheme sonokai
+
+autocmd FileType python :iabbrev <buffer> iff if:<left>
+
+augroup testgroup
+    autocmd!
+    autocmd BufWrite * :echom "Writing buffer!"
+    autocmd BufWrite * :echom "twice!"
+augroup END
+
