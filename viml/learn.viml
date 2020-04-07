@@ -63,3 +63,23 @@ augroup testgroup
     autocmd BufWrite * :echom "twice!"
 augroup END
 
+nnoremap GG GGzz
+
+return person.get_pets(type="cat", fluffy_only=True)
+onoremap p i(
+onoremap b /return<cr>
+
+def count(i):
+    i += 1
+    print i
+
+    return foo
+
+print foo(bar)   ()  (asdf)  a a a a
+onoremap in( :<c-u>normal! f(vi(<cr>
+onoremap il( :<c-u>normal! F)vi(<cr>
+
+onoremap an( :<c-u>normal! f(vf)<cr>
+onoremap al( :<c-u>normal! F(vf)<cr>
+
+
