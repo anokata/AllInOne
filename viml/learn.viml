@@ -82,4 +82,28 @@ onoremap il( :<c-u>normal! F)vi(<cr>
 onoremap an( :<c-u>normal! f(vf)<cr>
 onoremap al( :<c-u>normal! F(vf)<cr>
 
+Topic One
+=========
+
+This is some text about topic one.
+
+It has multiple paragraphs.
+
+Topic Two
+=========
+
+This is some text about topic two.  It has only one paragraph.
+
+onoremap ih :<c-u>execute "normal! ?^==\\+$\r:nohlsearch\rkvg_"<cr>
+execute "string" - run string as command
+normal some - run some as keys in normal mode
+
+onoremap ah :<c-u>execute "normal! ?^==\\+$\r:nohlsearch\rg_vk0"<cr>
+
+Topic 3
+-------
+
+onoremap ih :<c-u>execute "normal! ?^--\\+$\r:nohlsearch\rkvg_"<cr>
+
+!Setlocal and autocmd for different statuslines on diff files
 
