@@ -3,3 +3,5 @@ setlocal nowrap
 set nowrap
 set wrap
 iabbrev <buffer> --- &mdash;
+let b:hello="hello"
+echo b:hello
