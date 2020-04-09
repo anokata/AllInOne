@@ -165,5 +165,14 @@ else
     echom "finally!"
 endif
 
+if 10 > 1 | echo "true" | endif
+if 10 == 11 | echo "no" | elseif 10 == 10 | echo "ye" | endif
+if 0 | echo 1 | else | echo 2 | endif
+if "ff" == "bb" | echo "eq" | else | echo "noeq" | endif
+set ignorecase
+if "ff" == "FF" | echo "eq" | else | echo "noeq" | endif
 
+set noignorecase
+if "foo" ==? "FOO" | echo "first" | else | echo "second" | endif
+if "foo" ==# "FOO" | echo "first" | else | echo "second" | endif
 
