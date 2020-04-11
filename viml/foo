@@ -5,3 +5,5 @@ set wrap
 iabbrev <buffer> --- &mdash;
 let b:hello="hello"
 echo b:hello
+
+execute "rightbelow vsplit " . bufname("#")

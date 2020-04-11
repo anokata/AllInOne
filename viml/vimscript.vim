@@ -3,7 +3,7 @@ function DisplayName(name)
     echom a:name
 endfunction
 
-call DisplayName("Danny")
+call DisplayName("Danny foo")
 
 
 function UDisplayName(name)
@@ -88,5 +88,15 @@ echo split('a,b', ',')
 echo split('1 2')
 echo split('1,,,2', ',')
 echo split("abdasf123", '\zs')
+
+execute "echom 'Hi there!'"
+execute "rightbelow vsplit " . bufname("#")
+normal ggdd
+" exe normal mode key withou any mappings
+normal! G
+"execute "normal! /foo\<cr\>"
+nnoremap <leader>d dddd
+nnoremap <leader>d :exe "normal! dd" <cr>:exe "normal! dd" <cr>
+nnoremap <leader>d :normal! dd <cr> :normal! dd <cr>
 
 
