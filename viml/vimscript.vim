@@ -96,7 +96,51 @@ normal ggdd
 normal! G
 "execute "normal! /foo\<cr\>"
 nnoremap <leader>d dddd
-nnoremap <leader>d :exe "normal! dd" <cr>:exe "normal! dd" <cr>
+nnoremap <leader>d :execute "normal! dd" <cr>:exe "normal! dd" <cr>
 nnoremap <leader>d :normal! dd <cr> :normal! dd <cr>
+
+execute "normal! gg/foo\<cr>dd"
+execute "normal! mqA;\<esc>`q"
+
+let a=':execute "normal! mqA;\<esc>`q"'
+echo a
+execute a
+
+let b=":echo 'hi'"
+echo b
+execute b
+" ?
+nnoremap aa :execute ':execute "normal! mqA;\<esc>`q"'
+nnoremap aa :let a=':execute "normal! mqA;\<esc>`q"';
+nnoremap aa :normal! mqA;<esc>a`q
+
+function! _Add_semi()
+    let cmd=':execute "normal! mqA;\<esc>`q"'
+    echo cmd
+    execute cmd
+endfunction
+nnoremap aa :call _Add_semi()<cr>
+
+
+max = 10
+
+print "Starting"
+
+for i in range(max):
+    print "Counter:", i
+
+print "Done"
+
+set hlsearch incsearch
+execute "normal! gg/print\<cr>"
+execute "normal! G?print\<cr>"
+" Regexp
+execute "normal! gg/for .+ in .+:\<cr>"
+execute "normal! gg/for .\\+ in .\\+:\<cr>"
+execute 'normal! gg/for .\+ in .\+:\<cr>'
+execute "normal! gg" . '/for .\+ in .\+:' . "\<cr>"
+execute "normal! gg" . '/\vfor .+ in .+:' . "\<cr>"
+
+
 
 
