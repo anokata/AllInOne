@@ -1,54 +1,54 @@
 function DisplayName(name)
-    echom "hi my name is:"
-    echom a:name
+echom "hi my name is:"
+echom a:name
 endfunction
 
 call DisplayName("Danny foo")
 
 
 function UDisplayName(name)
-    echom "hi my name is:"
-    echom name
+echom "hi my name is:"
+echom name
 endfunction
 
 call UDisplayName("Danny")
 
 function! Varg(...)
-    "len
-    echom a:0 
-    " first arg
-    echom a:1 
-    " all
-    echo a:000 
+"len
+echom a:0 
+" first arg
+echom a:1 
+" all
+echo a:000 
 endfunction
 
 call Varg("a", "b")
 
 function! Varg2(x, ...)
-    echom a:x 
-    "len
-    echom a:0 
-    " first arg
-    echom a:1 
-    " all
-    echo a:000 
+echom a:x 
+"len
+echom a:0 
+" first arg
+echom a:1 
+" all
+echo a:000 
 endfunction
 
 call Varg2("a", "b", "C")
 
 function! Assign(x)
-    let a:x = "some"
-    echom a:x
+let a:x = "some"
+echom a:x
 endfunction
 
 call Assign("none")
 
 
 function! Assign2(x)
-    let y = a:x
-    let y = "some"
-    echom a:x
-    echom y
+let y = a:x
+let y = "some"
+echom a:x
+echom y
 endfunction
 
 call Assign2("none")
@@ -115,9 +115,9 @@ nnoremap aa :let a=':execute "normal! mqA;\<esc>`q"';
 nnoremap aa :normal! mqA;<esc>a`q
 
 function! _Add_semi()
-    let cmd=':execute "normal! mqA;\<esc>`q"'
-    echo cmd
-    execute cmd
+let cmd=':execute "normal! mqA;\<esc>`q"'
+echo cmd
+execute cmd
 endfunction
 nnoremap aa :call _Add_semi()<cr>
 
@@ -127,7 +127,7 @@ max = 10
 print "Starting"
 
 for i in range(max):
-    print "Counter:", i
+print "Counter:", i
 
 print "Done"
 
@@ -139,8 +139,29 @@ execute "normal! gg/for .+ in .+:\<cr>"
 execute "normal! gg/for .\\+ in .\\+:\<cr>"
 execute 'normal! gg/for .\+ in .\+:\<cr>'
 execute "normal! gg" . '/for .\+ in .\+:' . "\<cr>"
-execute "normal! gg" . '/\vfor .+ in .+:' . "\<cr>"
+execute "normal! gg" . '/\vfor .+ in .+:' . "\<cr>"  
 
+" highlight trailing spaces     
+match Error /\v +$/
+match none
+nnoremap / /\\v
+grep some %
+cope
 
+nnoremap <leader>g :grep -R something .<cr>
+nnoremap <leader>g :grep -R <cword> %<cr>
+nnoremap <leader>g :grep -R '<cword>' %<cr><cr>:cope<cr>
+foo;ls that's
+
+nnoremap <leader>g :execute "grep -R " . shellescape("<cWORD>") . " %"<cr><cr>:cope<cr>
+echom shellescape("<cword>")
+echom shellescape(expand("<cword>"))
+nnoremap <leader>g :execute "grep! -R " . shellescape(expand("<cWORD>")) . " %"<cr><cr>:cope<cr>
+
+nnoremap <leader>g :silent execute "grep! -R " . shellescape(expand("<cWORD>")) . " %"<cr>:cope<cr>
+nnoremap <leader>g :execute "grep! -R " . shellescape(expand("<cWORD>")) . " %"<cr><cr>:cope<cr><c-w><c-w>
+nnoremap <leader>n :cnext<cr>
+nnoremap <leader>l :cclose<cr>
+"plugin
 
 
