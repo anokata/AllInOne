@@ -164,4 +164,32 @@ nnoremap <leader>n :cnext<cr>
 nnoremap <leader>l :cclose<cr>
 "plugin
 
+let b = ['foo', 3, 'bar', ['some']]
+echo b
+echo ['foo', 3, 'bar', ['some']][0]
+echo ['foo', 3, 'bar', ['some']][3]
+echo ['foo', 3, 'bar', ['some']][-1][0]
+echo a[2]
+let a = split("abcdef", '\zs')
+echo a[0:2]
+echo a[-2:-1]
+echo a[-1:-1]
+echo "abcd"[1]
+echo a[:3]
+echo a[3:]
+echo "abcd"[1:2]
+echo "abcd"[-1:]
+echo a + b
+echo [1,2] + ['c', 'd']
+call add(a, 'e') | echo a
+echo len(a)
+echo get(a, 1, 'default')
+echo get(a, 100, 'default')
+echo index(a, 'f')
+echo index(a, 'no')
+echo join(a)
+echo join(a, '-')
+echo join([1,2,3], '')
+call reverse(a) | echo a
+
 
