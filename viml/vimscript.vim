@@ -208,4 +208,24 @@ while c <= 4
 endwhile
 echom total
 
+echo {'a': 34, 100: 'abc'}
+echo {'a': 34, 100: 'abc',}
+let d = {'a': 34, 100: 'abc', 18:'add', 'a2':'dd'}
+echo d
+echo d['18']
+echo d[123]
+echo d.a
+echo d.18
+echo d.a2
+let d.a = 8 | echo d
+let d.b = 9 | echo d
+unlet d.a | echo d
+let x = remove(d, 'b') | echo x
+
+echom get(d, 'a', 'def')
+echom has_key(d, 'a')
+echo items(d)
+echo keys(d)
+echo values(d)
+
 
