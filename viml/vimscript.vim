@@ -254,5 +254,15 @@ function! s:QuickfixToggle()
     endif
 endfunction
 
+" Paths
+echom expand('%')
+echom expand('%:p')
+echom fnamemodify('foo.txt', ':p')
+
+echo globpath('.', '*')
+echo split(globpath('.', '*'), '\n')
+echo split(globpath('~', '*.png'), '\n')
+" recursive
+echo split(globpath('/boot', '**'), '\n')
 
 
