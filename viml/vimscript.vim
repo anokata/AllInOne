@@ -265,4 +265,20 @@ echo split(globpath('~', '*.png'), '\n')
 " recursive
 echo split(globpath('/boot', '**'), '\n')
 
+source test.vim
+let filename="test.vim"
+execute "source ". filename
+
+echom &runtimepath
+let &runtimepath=&runtimepath . "," . "/home/ksi/dev/allInOne/viml"
+color mycolor
+
+function! Insertpwd()
+    let p = expand("%:p:h")
+    execute "normal! i" . p
+endfunction
+
+nnoremap <leader>d :execute "normal! a" . expand("%:p:h")<cr>
+
+
 
