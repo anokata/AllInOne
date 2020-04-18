@@ -10,4 +10,8 @@ factorial = (n):
     factorial (i) string print
     "\n" print.
 
-    //#if else
+#if else
+0x123f2 print
+0123.123 print
+12e23 print
+12e-23 print
