@@ -29,7 +29,10 @@ syntax match potionNumber "\v\d+e[+-]?\d+"
 syntax match potionNumber "\v\d+.\d+"
 syntax match potionNumber "\v\dx[0-9abcdef]*"
 
+syntax region potionString start=/\v"/ skip=/\v\\./ end=/\v"/
+
 highlight link potionOperator Operator
 highlight link  potionNumber Number
+highlight link potionString String
 
 let b:current_syntax = "potion"
