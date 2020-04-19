@@ -280,5 +280,12 @@ endfunction
 
 nnoremap <leader>d :execute "normal! a" . expand("%:p:h")<cr>
 
+" to read
+help ins-completion
+help omnifunc 
+help compl-omni
+help Python
+" autoload example: see .vim/autoload/example.vim
+call example#Hello()
 
 
