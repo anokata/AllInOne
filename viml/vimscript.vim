@@ -288,4 +288,5 @@ help Python
 " autoload example: see .vim/autoload/example.vim
 call example#Hello()
 
-
+let out=system("pwd")
+echom out
